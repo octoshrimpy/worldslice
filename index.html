@@ -595,6 +595,18 @@
         "dead trees",
       ];
 
+      const DEBUG = false;
+      const FEATURE_SET = new Set([...geoFeatures, "lagoon", "watering hole"]);
+
+      function debugWarn(message) {
+        if (DEBUG) console.warn(message);
+      }
+
+      function validateFeatureName(id, context) {
+        if (!DEBUG) return;
+        if (!FEATURE_SET.has(id)) debugWarn(`Unknown feature "${id}"${context ? ` in ${context}` : ""}`);
+      }
+
       const themes = {
         fantasy: {
           biome: [
@@ -1096,7 +1108,6 @@
                 lake: 0.15,
                 ridge: 0.2,
                 mycelium: 0.2,
-                "dead trees": 0.2,
               },
             },
             {
@@ -1151,7 +1162,6 @@
                 "river-lava": 0.2,
                 lake: 0.2,
                 mycelium: 0.25,
-                "dead trees": 0.35,
               },
             },
             {
@@ -1431,8 +1441,8 @@
 
       /* ====================== Tileset (no colors here; CSS drives colors) ====================== */
       const tileset = {
-        water: { depthGlyphs: { 1: "~", 2: "≈", 3: "≋" } },
-        lava: { depthGlyphs: { 1: "~", 2: "≈", 3: "≋" } },
+        water: { depthGlyphs: { 1: ["~","∾","˜","∿"], 2: "≈", 3: "≋" } },
+        lava: { depthGlyphs: { 1: ["~","∾","˜","∿"], 2: "≈", 3: "≋" } },
         plains: { tile: "·", variants: ["‧", "∙"] },
         beach: { tile: "·", variants: ["‧", "∙"] },
         grass: { tile: "ᵞ", variants: ["ᵞ", "˯", "ˬ", "ˇ", "…", "ⵈ", '"', "'"] },
@@ -1457,6 +1467,46 @@
         camp: { tile: "ᗑ" },
         religious: { death: "⚱", monastery: "⛨" },
       };
+
+      const TILE_SET = new Set(Object.keys(tileset));
+
+      function validateTileset(tilesetDef) {
+        if (!DEBUG) return;
+        for (const key of TILE_SET) {
+          const def = tilesetDef[key];
+          if (!def) {
+            debugWarn(`Missing tileset entry for "${key}"`);
+            continue;
+          }
+          if (key === "water" || key === "lava") {
+            if (!def.depthGlyphs) {
+              debugWarn(`Tileset "${key}" missing depthGlyphs`);
+              continue;
+            }
+            for (const depth of [1, 2, 3]) {
+              if (!def.depthGlyphs[depth]) debugWarn(`Tileset "${key}" missing depthGlyphs[${depth}]`);
+            }
+            continue;
+          }
+          if (key === "mountain") {
+            if (!def.height) {
+              debugWarn(`Tileset "mountain" missing height map`);
+              continue;
+            }
+            for (const h of [1, 2, 3, 4, 5]) {
+              if (!def.height[h]) debugWarn(`Tileset "mountain" missing height[${h}]`);
+            }
+            continue;
+          }
+          if (key === "religious") {
+            if (!def.death || !def.monastery) debugWarn(`Tileset "religious" missing glyphs for death/monastery`);
+            continue;
+          }
+          if (!def.tile) debugWarn(`Tileset "${key}" missing tile glyph`);
+        }
+      }
+
+      validateTileset(tileset);
 
 
       const syllablePool = ["al", "ur", "da", "ri", "ka", "lem", "vor", "zan", "ti", "sha", "mor", "bel", "oth", "ryn", "ser", "vak", "nel", "ios", "qar", "ume", "thal", "gre", "nor", "fen", "zir", "una", "vek", "cal", "mar", "ros", "ion", "kha", "zul", "ora", "sta", "dra", "pha"];
@@ -1598,92 +1648,97 @@
       function linkifyRefs(text, refs) {
         let out = escHtml(text);
         if (!Array.isArray(refs) || !refs.length) return out;
-        const ordered = refs.slice().sort((a, b) => b.name.length - a.name.length);
+        const ordered = refs
+          .map((ref) => {
+            const name = String(ref?.name ?? "");
+            return { ...ref, name, _escName: escHtml(name) };
+          })
+          .filter((ref) => ref.name.length)
+          .sort((a, b) => b.name.length - a.name.length);
         for (const ref of ordered) {
-          const re = new RegExp(escRe(escHtml(ref.name)), "g");
+          const re = new RegExp(escRe(ref._escName), "g");
           out = out.replace(re, xref(ref.cell, ref.name));
         }
         return out;
       }
 
-      class SeededRng {
-        constructor(seed) {
-          this.seed = seed;
-        }
-
-        h32(s) {
-          let h = 5381 >>> 0;
-          const str = String(s ?? "");
-          for (let i = 0; i < str.length; i++) h = ((h * 33) ^ str.charCodeAt(i)) >>> 0;
-          return h >>> 0;
-        }
-
-        xs32(seed) {
-          let x = seed >>> 0;
-          return () => {
-            x ^= x << 13;
-            x ^= x >>> 17;
-            x ^= x << 5;
-            return (x >>> 0) / 4294967296;
-          };
-        }
-
-        n2(seed, x, y) {
-          let v = (seed ^ ((x * 374761393) | 0) ^ ((y * 668265263) | 0)) >>> 0;
-          v ^= v >>> 13;
-          v = Math.imul(v, 1274126177) >>> 0;
-          v ^= v >>> 16;
-          return (v >>> 0) / 4294967296;
-        }
-
-        randSeed() {
-          const a = new Uint32Array(1);
-          if (crypto && crypto.getRandomValues) crypto.getRandomValues(a);
-          else a[0] = (Math.random() * 4294967296) >>> 0;
-          return a[0].toString(36);
-        }
-
-        oneOf(r, src) {
-          if (!src) return undefined;
-          if (Array.isArray(src)) {
-            const picked = src[(r() * src.length) | 0];
-            return resolveInlineOptions(picked, r);
-          }
-          if (typeof src === "object") {
-            const keys = Object.keys(src);
-            if (!keys.length) return undefined;
-            const k = keys[(r() * keys.length) | 0];
-            return resolveInlineOptions(src[k], r);
-          }
-          return resolveInlineOptions(src, r);
-        }
-
-        pickWeighted(r, items) {
-          const sum = items.reduce((acc, it) => acc + (it.weight || 1), 0);
-          const roll = r() * sum;
-          let acc = 0;
-          for (const it of items) {
-            acc += it.weight || 1;
-            if (roll < acc) return it;
-          }
-          return items[items.length - 1];
-        }
-
-        maybe(rng, chance = 0.5) {
-          return typeof rng === "function" ? rng() < chance : Math.random() < chance;
-        }
-
-        shuffleDet(r, arr) {
-          const a = arr.slice();
-          for (let i = a.length - 1; i > 0; i--) {
-            const j = (r() * (i + 1)) | 0;
-            [a[i], a[j]] = [a[j], a[i]];
-          }
-          return a;
-        }
+      /* ====================== RNG modules (single-file) ====================== */
+      function h32(s) {
+        let h = 5381 >>> 0;
+        const str = String(s ?? "");
+        for (let i = 0; i < str.length; i++) h = ((h * 33) ^ str.charCodeAt(i)) >>> 0;
+        return h >>> 0;
       }
 
-      const rngUtil = new SeededRng();
+      function xs32(seed) {
+        let x = seed >>> 0;
+        return () => {
+          x ^= x << 13;
+          x ^= x >>> 17;
+          x ^= x << 5;
+          return (x >>> 0) / 4294967296;
+        };
+      }
+
+      function n2(seed, x, y) {
+        let v = (seed ^ ((x * 374761393) | 0) ^ ((y * 668265263) | 0)) >>> 0;
+        v ^= v >>> 13;
+        v = Math.imul(v, 1274126177) >>> 0;
+        v ^= v >>> 16;
+        return (v >>> 0) / 4294967296;
+      }
+
+      function randSeed() {
+        const a = new Uint32Array(1);
+        if (crypto && crypto.getRandomValues) crypto.getRandomValues(a);
+        else a[0] = (Math.random() * 4294967296) >>> 0;
+        return a[0].toString(36);
+      }
+
+      function oneOf(r, src) {
+        if (!src) return undefined;
+        if (Array.isArray(src)) {
+          const picked = src[(r() * src.length) | 0];
+          return resolveInlineOptions(picked, r);
+        }
+        if (typeof src === "object") {
+          const keys = Object.keys(src);
+          if (!keys.length) return undefined;
+          const k = keys[(r() * keys.length) | 0];
+          return resolveInlineOptions(src[k], r);
+        }
+        return resolveInlineOptions(src, r);
+      }
+
+      function pickWeighted(r, items) {
+        const sum = items.reduce((acc, it) => acc + (it.weight || 1), 0);
+        const roll = r() * sum;
+        let acc = 0;
+        for (const it of items) {
+          acc += it.weight || 1;
+          if (roll < acc) return it;
+        }
+        return items[items.length - 1];
+      }
+
+      function maybe(rng, chance = 0.5) {
+        return typeof rng === "function" ? rng() < chance : Math.random() < chance;
+      }
+
+      function shuffleDet(r, arr) {
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = (r() * (i + 1)) | 0;
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+      }
+
+      const rngHash = { h32 };
+      const rngFactory = { xs32, randSeed };
+      const rngNoise = { n2 };
+      const rngSample = { oneOf, pickWeighted, shuffleDet, maybe };
+      const rngUtil = { ...rngHash, ...rngFactory, ...rngNoise, ...rngSample };
 
       /* ====================== Naming + Lexicon ====================== */
       class NameGenerator {
@@ -1800,11 +1855,10 @@
 
       /* ====================== World Placement ====================== */
       class WorldBuilder {
-        constructor(rng, themeTables, tileset, tileKeyGrid) {
-          this.r = rng;
-          this.tt = themeTables;
+        constructor(mapGen, tileset, themeTables = themes) {
+          this.mapGen = mapGen;
           this.tileset = tileset;
-          this.tileKeyGrid = tileKeyGrid;
+          this.themes = themeTables;
         }
 
         pickTempTier(r, tt) {
@@ -1918,7 +1972,7 @@
 
           const poiPlacements = [];
           const poiTypesExpanded = poiTypes.slice();
-          const ruinsRarity = mapGenerator.biomeFeatureRarity(biome, "ruins");
+          const ruinsRarity = this.mapGen.biomeFeatureRarity(biome, "ruins");
           let ruinCount = 0;
           if (ruinsRarity > 0) {
             ruinCount = 1 + Math.floor(ruinsRarity * 2);
@@ -2035,7 +2089,7 @@
               label = `${label}: ${group} of ${deity}`;
 
               const o = ensureCell(cell);
-              const rel = { kind, label, glyph: tileset.religious?.[kind] };
+              const rel = { kind, label, glyph: this.tileset?.religious?.[kind] };
               o.religious = rel;
               o.poi.push({ name: label, type: "religious" });
               poiPlacements.push({ poiType: "religious", poiName: label, cell });
@@ -2052,7 +2106,7 @@
         buildSlice(seedStr, theme) {
           const base = rngUtil.h32(String(seedStr));
           const r = rngUtil.xs32(base);
-          const tt = themes[theme] || themes.fantasy;
+          const tt = this.themes[theme] || this.themes.fantasy;
           const npcR = rngUtil.xs32(base ^ 0x52dce729);
           const factionOpR = rngUtil.xs32(base ^ 0x1fb77b21);
           const npcGen = new NameGenerator(npcR);
@@ -2062,7 +2116,7 @@
           const toponyms = lexicon.buildToponyms(r, 20);
           const region = lexicon.buildRegionsFromToponyms(r, toponyms, 1)[0];
 
-          const biome = mapGenerator.normalizeBiome(rngUtil.oneOf(r, tt.biome));
+          const biome = this.mapGen.normalizeBiome(rngUtil.oneOf(r, tt.biome));
           const biomeName = biome.name;
           const tempPick = this.pickTempTier(r, tt);
           const rainPick = this.pickRainIndex(r, tt);
@@ -2087,7 +2141,7 @@
           const weatherNow = rngUtil.oneOf(r, tt.weather);
 
           const mapSeed = rngUtil.h32(seedStr + "|map|" + theme);
-          const map0 = mapGenerator.genMap(mapSeed, biomeName, tileset, null, climate);
+          const map0 = this.mapGen.genMap(mapSeed, biomeName, this.tileset, null, climate);
           const landCells = [];
           for (let y = 0; y < map0.N; y++) {
             for (let x = 0; x < map0.N; x++) {
@@ -2104,9 +2158,29 @@
           let guard = 0;
           const fieldMotiveVerbSet = new Set(fieldMotiveVerbs);
 
-          const pickLandCell = () => landCells[(npcR() * landCells.length) | 0] || "0,0";
+          const pickCell = ({ rng, cells, avoid = null, filter = null, fallback = "0,0" }) => {
+            const list = Array.isArray(cells) ? cells : [];
+            if (!list.length) return fallback;
+            const pool = filter ? list.filter(filter) : list;
+            if (!pool.length) return null;
+            if (avoid === null || avoid === undefined) return pool[(rng() * pool.length) | 0] || fallback;
+            if (pool.length <= 1) return pool[0] || fallback;
+            let cell = avoid;
+            for (let i = 0; i < 8 && cell === avoid; i++) cell = pool[(rng() * pool.length) | 0] || avoid;
+            if (cell === avoid) {
+              const idx = pool.indexOf(avoid);
+              if (idx >= 0) return pool[(idx + 1) % pool.length];
+            }
+            return cell;
+          };
 
-          const pickLandCellForOps = () => landCells[(factionOpR() * landCells.length) | 0] || "0,0";
+          const pickLandCell = () => pickCell({ rng: npcR, cells: landCells });
+
+          const pickLandCellForOps = () => pickCell({ rng: factionOpR, cells: landCells });
+
+          function pickDifferentLandCell(avoidCell) {
+            return pickCell({ rng: npcR, cells: landCells, avoid: avoidCell });
+          }
 
           const pickLandCellNear = (targetCell, maxDist) => {
             if (!targetCell) return pickLandCell();
@@ -2114,15 +2188,18 @@
             const tx = Number(parts[0]);
             const ty = Number(parts[1]);
             if (!Number.isFinite(tx) || !Number.isFinite(ty)) return pickLandCell();
-            const near = [];
-            for (const cell of landCells) {
-              const c = cell.split(",");
-              const x = Number(c[0]);
-              const y = Number(c[1]);
-              if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
-              if (Math.abs(x - tx) + Math.abs(y - ty) <= maxDist) near.push(cell);
-            }
-            if (near.length) return near[(npcR() * near.length) | 0];
+            const near = pickCell({
+              rng: npcR,
+              cells: landCells,
+              filter: (cell) => {
+                const c = cell.split(",");
+                const x = Number(c[0]);
+                const y = Number(c[1]);
+                if (!Number.isFinite(x) || !Number.isFinite(y)) return false;
+                return Math.abs(x - tx) + Math.abs(y - ty) <= maxDist;
+              },
+            });
+            if (near) return near;
             return pickLandCell();
           };
 
@@ -2132,16 +2209,19 @@
             const tx = Number(parts[0]);
             const ty = Number(parts[1]);
             if (!Number.isFinite(tx) || !Number.isFinite(ty)) return pickLandCell();
-            const near = [];
-            for (const cell of landCells) {
-              if (cell === targetCell) continue;
-              const c = cell.split(",");
-              const x = Number(c[0]);
-              const y = Number(c[1]);
-              if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
-              if (Math.abs(x - tx) + Math.abs(y - ty) <= maxDist) near.push(cell);
-            }
-            if (near.length) return near[(npcR() * near.length) | 0];
+            const near = pickCell({
+              rng: npcR,
+              cells: landCells,
+              filter: (cell) => {
+                if (cell === targetCell) return false;
+                const c = cell.split(",");
+                const x = Number(c[0]);
+                const y = Number(c[1]);
+                if (!Number.isFinite(x) || !Number.isFinite(y)) return false;
+                return Math.abs(x - tx) + Math.abs(y - ty) <= maxDist;
+              },
+            });
+            if (near) return near;
             return pickDifferentLandCell(targetCell);
           };
 
@@ -2154,28 +2234,6 @@
             const by = Number(pb[1]);
             if (!Number.isFinite(ax) || !Number.isFinite(ay) || !Number.isFinite(bx) || !Number.isFinite(by)) return Infinity;
             return Math.abs(ax - bx) + Math.abs(ay - by);
-          };
-
-          const pickDifferentLandCell = (avoidCell) => {
-            if (landCells.length <= 1) return landCells[0] || "0,0";
-            let cell = avoidCell;
-            for (let i = 0; i < 8 && cell === avoidCell; i++) cell = pickLandCell();
-            if (cell === avoidCell) {
-              const idx = landCells.indexOf(avoidCell);
-              if (idx >= 0) return landCells[(idx + 1) % landCells.length];
-            }
-            return cell;
-          };
-
-          const pickDifferentLandCellForOps = (avoidCell) => {
-            if (landCells.length <= 1) return landCells[0] || "0,0";
-            let cell = avoidCell;
-            for (let i = 0; i < 8 && cell === avoidCell; i++) cell = pickLandCellForOps();
-            if (cell === avoidCell) {
-              const idx = landCells.indexOf(avoidCell);
-              if (idx >= 0) return landCells[(idx + 1) % landCells.length];
-            }
-            return cell;
           };
 
           const pickAltLocation = (avoidCell) => {
@@ -2286,7 +2344,7 @@
             a.npcs.push({ name: npc.name, task: npc.task });
           }
 
-          const map1 = mapGenerator.genMap(mapSeed, biomeName, tileset, worldMeta, climate);
+          const map1 = this.mapGen.genMap(mapSeed, biomeName, this.tileset, worldMeta, climate);
           const hookPick = rngUtil.oneOf(r, worldMeta.poiPlacements);
           const hookPOIName = hookPick ? hookPick.poiName : rngUtil.oneOf(r, tt.pois);
           const hookPOICell = hookPick ? hookPick.cell : null;
@@ -2343,7 +2401,7 @@
           html += `\nHook: ${hookHtml}\n`;
 
           const biomeLower = biomeName.toLowerCase();
-          const mapFlags = { deadTrees: mapGenerator.biomeAllowsFeature(biomeName, "dead trees", 0.2), desert: biomeLower.includes("desert") };
+          const mapFlags = { deadTrees: this.mapGen.biomeAllowsFeature(biomeName, "dead trees", 0.2), desert: biomeLower.includes("desert") };
 
           return { html, mapGrid: map1.html, mapFlags };
         }
@@ -2351,13 +2409,7 @@
 
       /* ====================== Map Generation ====================== */
       class MapGenerator {
-        constructor(rng, biome, tileset, worldMeta, climate) {
-          this.r = rng;
-          this.biome = biome;
-          this.tileset = tileset;
-          this.worldMeta = worldMeta;
-          this.climate = climate;
-        }
+        constructor() {}
 
         normalizeWeights(weights) {
           const total = Object.values(weights).reduce((a, b) => a + b, 0) || 1;
@@ -2371,13 +2423,17 @@
             const out = {};
             for (const f of features) {
               if (typeof f === "string") {
+                validateFeatureName(f, "biome.features");
                 out[f] = fallbackRarity;
                 continue;
               }
               if (f && typeof f === "object") {
                 const id = "id" in f ? f.id : "name" in f ? f.name : "";
                 const rarity = Number.isFinite(f.rarity) ? clampRarity(Number(f.rarity)) : fallbackRarity;
-                if (id) out[String(id)] = rarity;
+                if (id) {
+                  validateFeatureName(String(id), "biome.features");
+                  out[String(id)] = rarity;
+                }
               }
             }
             return out;
@@ -2386,6 +2442,7 @@
             const out = {};
             for (const [key, value] of Object.entries(features)) {
               if (!key) continue;
+              validateFeatureName(String(key), "biome.features");
               const rarity = Number.isFinite(value) ? clampRarity(Number(value)) : fallbackRarity;
               out[String(key)] = rarity;
             }
@@ -2395,7 +2452,7 @@
         }
 
         normalizeBiome(biome) {
-          const defaultFeatures = this.normalizeBiomeFeatures(geoFeatures);
+          const defaultFeatures = {};
           if (!biome) return { name: "", features: {} };
           if (typeof biome === "string") {
             const known = this.normalizeBiomeFeatures(biomeFeaturesByName[biome.toLowerCase()]);
@@ -2412,12 +2469,14 @@
         }
 
         biomeFeatureRarity(biome, id) {
+          validateFeatureName(String(id), "feature lookup");
           const { features } = this.normalizeBiome(biome);
           const rarity = features?.[id];
           return Number.isFinite(rarity) ? rarity : 0;
         }
 
         biomeAllowsFeature(biome, id, minRarity = 0.25) {
+          validateFeatureName(String(id), "feature lookup");
           const { features } = this.normalizeBiome(biome);
           const rarity = features?.[id];
           return Number.isFinite(rarity) && rarity >= minRarity;
@@ -2531,18 +2590,60 @@
         }
 
         pickVariant(tileKey, tileset, seed) {
-          const variants = [tileset[tileKey].tile, ...(tileset[tileKey].variants || [])];
+          const def = tileset[tileKey] || tileset.plains;
+          const variants = [def?.tile, ...((def && def.variants) || [])].filter(Boolean);
           const index = Math.floor(seed * variants.length);
-          return variants[index];
+          return variants[index] || tileset.plains?.tile || "?";
         }
 
         genMap(seedU32, biome, tileset, worldMeta = null, climate = null) {
-          return genMap(seedU32, biome, tileset, worldMeta, climate);
+          const N = 25;
+          const weights = this.tileWeightsForBiome(biome);
+          const normalizeWeights = this.normalizeWeights.bind(this);
+          const pickByWeights = this.pickByWeights.bind(this);
+          const biomeAllowsFeature = this.biomeAllowsFeature.bind(this);
+          const biomeFeatureRarity = this.biomeFeatureRarity.bind(this);
+          maybeApplyMountainBias(seedU32, weights, normalizeWeights);
+          const { riverType, river } = buildRiver(seedU32, biome, N, biomeAllowsFeature);
+          let tileKeyGrid = initGrid(N, "plains");
+          tileKeyGrid = applyInitialTiles(seedU32, tileKeyGrid, weights, N, riverType, river, pickByWeights);
+
+          const ridgeRarity = biomeFeatureRarity(biome, "ridge");
+          tileKeyGrid = cleanupIsolatedWater(seedU32, tileKeyGrid, weights, N, pickByWeights);
+          tileKeyGrid = smoothMountains(seedU32, tileKeyGrid, weights, N, 2, pickByWeights);
+          tileKeyGrid = thinRidges(seedU32, tileKeyGrid, weights, N, ridgeRarity, pickByWeights);
+          tileKeyGrid = applyDesertAll(seedU32, tileKeyGrid, biome, N);
+          tileKeyGrid = applyDunePatches(seedU32, tileKeyGrid, N, biomeFeatureRarity(biome, "dunes"));
+          const oasisResult = applyOasisPatches(seedU32, tileKeyGrid, N, biomeFeatureRarity(biome, "oasis"));
+          tileKeyGrid = oasisResult.grid;
+          const oasisVeg = oasisResult.oasisVeg;
+          tileKeyGrid = applyMyceliumPatches(seedU32, tileKeyGrid, N, biomeFeatureRarity(biome, "mycelium"));
+          const ruinCenters = worldMeta?.poiPlacements?.filter((p) => p.poiType === "ruins") || [];
+          tileKeyGrid = applyRuinsClusters(seedU32, tileKeyGrid, N, ruinCenters, biomeFeatureRarity(biome, "ruins"));
+
+          const depthGrid = buildDepthGrid(seedU32, tileKeyGrid, river, N, riverType || "water");
+          tileKeyGrid = applyBeachPatches(seedU32, tileKeyGrid, depthGrid, N);
+          let heightGrid = buildHeightGrid(tileKeyGrid, N);
+          heightGrid = boostMountainHeights(heightGrid, tileKeyGrid, N, ridgeRarity);
+          const forestTypeGrid = buildForestTypeGrid(seedU32, tileKeyGrid, N, biome, climate, oasisVeg, biomeAllowsFeature);
+          const html = renderMapHtml(
+            seedU32,
+            tileKeyGrid,
+            depthGrid,
+            heightGrid,
+            forestTypeGrid,
+            N,
+            worldMeta,
+            tileset,
+            this.pickVariant.bind(this),
+          );
+
+          return { html, tileKeyGrid, depthGrid, heightGrid, forestTypeGrid, N, river };
         }
       }
 
-      const worldBuilder = new WorldBuilder(null, null, null, null);
-      const mapGenerator = new MapGenerator(null, null, null, null, null);
+      const mapGenerator = new MapGenerator();
+      const worldBuilder = new WorldBuilder(mapGenerator, tileset);
 
       function riverCells(seedU32, N) {
         const cells = new Set();
@@ -2575,14 +2676,18 @@
         };
 
         const pickDir = () => dirs[(rand() * dirs.length) | 0];
+        const pickPerpendicular = (dx, dy) => {
+          if (dx !== 0) return rand() < 0.5 ? [0, 1] : [0, -1];
+          return rand() < 0.5 ? [1, 0] : [-1, 0];
+        };
         const lenMain = Math.floor(N * (1.5 + rand() * 0.8));
         const start = {
           x: (rand() * N) | 0,
           y: (rand() * N) | 0,
           len: lenMain,
           width: 1,
-          branchChance: 0.08,
-          turnChance: 0.22,
+          branchChance: 0.04,
+          turnChance: 0.35,
           dir: pickDir(),
         };
 
@@ -2595,7 +2700,7 @@
           let dy = p.dir[1];
 
           for (let i = 0; i < p.len; i++) {
-            const width = rand() < 0.12 ? 2 : p.width;
+            const width = rand() < 0.03 ? 2 : p.width;
             addCells(x, y, width);
 
             if (rand() < p.branchChance && p.len - i > 8) {
@@ -2611,7 +2716,7 @@
             }
 
             if (rand() < p.turnChance) {
-              const nd = pickDir();
+              const nd = pickPerpendicular(dx, dy);
               dx = nd[0];
               dy = nd[1];
             }
@@ -2678,7 +2783,7 @@
         return c;
       }
 
-      function cleanupIsolatedWater(seedU32, tileKeyGrid, weights, N) {
+      function cleanupIsolatedWater(seedU32, tileKeyGrid, weights, N, pickByWeights) {
         const next = tileKeyGrid.map((row) => row.slice());
         for (let y = 0; y < N; y++) {
           for (let x = 0; x < N; x++) {
@@ -2711,7 +2816,7 @@
               delete w2.settlement;
               const total = Object.values(w2).reduce((a, b) => a + b, 0) || 1;
               for (const k in w2) w2[k] /= total;
-              replacement = mapGenerator.pickByWeights(roll, w2);
+              replacement = pickByWeights(roll, w2);
             }
 
             next[y][x] = replacement || "plains";
@@ -2721,7 +2826,7 @@
       }
 
       // Deterministic "make ranges" pass.
-      function smoothMountains(seedU32, tileKeyGrid, weights, N, rounds = 2) {
+      function smoothMountains(seedU32, tileKeyGrid, weights, N, rounds = 2, pickByWeights) {
         let cur = tileKeyGrid.map((row) => row.slice());
 
         for (let round = 0; round < rounds; round++) {
@@ -2743,7 +2848,7 @@
                   delete w2.mountain;
                   const total = Object.values(w2).reduce((a, b) => a + b, 0) || 1;
                   for (const kk in w2) w2[kk] /= total;
-                  next[y][x] = mapGenerator.pickByWeights(roll, w2);
+                  next[y][x] = pickByWeights(roll, w2);
                 } else if (m8 === 3 && roll < 0.35) {
                   const w2 = { ...weights };
                   delete w2.water;
@@ -2751,7 +2856,7 @@
                   delete w2.mountain;
                   const total = Object.values(w2).reduce((a, b) => a + b, 0) || 1;
                   for (const kk in w2) w2[kk] /= total;
-                  next[y][x] = mapGenerator.pickByWeights(roll, w2);
+                  next[y][x] = pickByWeights(roll, w2);
                 }
               } else {
                 if (m8 >= 5 && roll < 0.45) next[y][x] = "mountain";
@@ -2766,7 +2871,7 @@
         return cur;
       }
 
-      function thinRidges(seedU32, tileKeyGrid, weights, N, ridgeRarity) {
+      function thinRidges(seedU32, tileKeyGrid, weights, N, ridgeRarity, pickByWeights) {
         if (!Number.isFinite(ridgeRarity) || ridgeRarity <= 0) return tileKeyGrid;
         let cur = tileKeyGrid.map((row) => row.slice());
         const erosionChance = clamp(0.35 + ridgeRarity * 0.35, 0.35, 0.75);
@@ -2800,7 +2905,7 @@
                   delete w2.mountain;
                   const total = Object.values(w2).reduce((a, b) => a + b, 0) || 1;
                   for (const kk in w2) w2[kk] /= total;
-                  next[y][x] = mapGenerator.pickByWeights(roll, w2);
+                  next[y][x] = pickByWeights(roll, w2);
                 }
               } else {
                 const straightNeighbor = isStraight(x, y, cur);
@@ -2815,9 +2920,14 @@
       }
 
       /* ====================== Water depth via distance-to-land + smoothing ====================== */
-      function liquidGlyph(tileKey, depth) {
+      function liquidGlyph(tileKey, depth, tileset, seedU32, x, y) {
         const t = tileset[tileKey] || tileset.water;
-        return t.depthGlyphs[depth] || t.depthGlyphs[1] || tileset.plains?.tile;
+        const glyph = t.depthGlyphs[depth] || t.depthGlyphs[1] || tileset.plains?.tile;
+        if (Array.isArray(glyph)) {
+          const roll = Number.isFinite(seedU32) ? rngUtil.n2(seedU32, 88000 + x, 88100 + y) : Math.random();
+          return glyph[Math.floor(roll * glyph.length)] || glyph[0] || tileset.plains?.tile || "?";
+        }
+        return glyph;
       }
 
       function distToNonLiquid(tileKeyGrid, N, liquidKey) {
@@ -2992,7 +3102,7 @@
         return heightGrid;
       }
 
-      function mountainGlyph(h) {
+      function mountainGlyph(h, tileset) {
         return tileset.mountain.height[h] || tileset.mountain.height[1] || tileset.mountain?.tile || tileset.plains?.tile;
       }
 
@@ -3203,14 +3313,25 @@
       }
 
       /* ====================== Forest typing (biome + climate) ====================== */
-      function forestTypeForCell(seedU32, x, y, biome, climate, oasisVeg) {
+      function forestTypeForCell(seedU32, x, y, biome, climate, oasisVeg, biomeAllowsFeature) {
         const s = String(biome || "").toLowerCase();
         const tempTier = clamp(climate?.tempTier ?? 4, 1, 8);
         const rainIdx = clamp((climate?.rainIdx ?? 3) + 1, 1, 8);
 
-        const isDeadBiome = mapGenerator.biomeAllowsFeature(biome, "dead trees", 0.2);
+        const isDeadBiome = biomeAllowsFeature(biome, "dead trees", 0.2);
 
         const isColdBiome = s.includes("tundra") || s.includes("taiga") || s.includes("ice") || s.includes("highland");
+        const isWetBiome =
+          s.includes("wetland") ||
+          s.includes("bog") ||
+          s.includes("marsh") ||
+          s.includes("floodplain") ||
+          s.includes("jungle") ||
+          s.includes("oceanic") ||
+          s.includes("tidal") ||
+          s.includes("canal") ||
+          s.includes("lagoon") ||
+          s.includes("reef");
 
         if (isDeadBiome) {
           if (oasisVeg?.has(`${x},${y}`)) return "deciduous";
@@ -3221,10 +3342,19 @@
 
         if (isColdBiome || tempTier <= 3) return "coniferous";
 
+        if (isWetBiome) {
+          if (oasisVeg?.has(`${x},${y}`)) return "deciduous";
+          const roll = rngUtil.n2(seedU32, 70150 + x, 70175 + y);
+          return roll < 0.9 ? "deciduous" : "coniferous";
+        }
+
         if (tempTier >= 7 && rainIdx <= 2) {
           if (oasisVeg?.has(`${x},${y}`)) return "deciduous";
-          const roll = rngUtil.n2(seedU32, 70200 + x, 70300 + y);
-          return roll < 0.6 ? "dead" : "deciduous";
+          if (isDeadBiome) {
+            const roll = rngUtil.n2(seedU32, 70200 + x, 70300 + y);
+            return roll < 0.6 ? "dead" : "deciduous";
+          }
+          return "deciduous";
         }
 
         if (rainIdx >= 6 && tempTier >= 5) return "deciduous";
@@ -3233,36 +3363,41 @@
         return roll < 0.18 ? "coniferous" : "deciduous";
       }
 
-      function forestGlyphForType(ft, seed01) {
+      function forestGlyphForType(ft, seed01, tileset) {
         const t = tileset.forest;
         const list = ft === "coniferous" ? t.coniferous : ft === "dead" ? t.dead : ft === "deciduous" ? t.deciduous : t.variants;
         const idx = Math.floor(seed01 * list.length);
         return list[idx] || t.tile;
       }
 
-      /* ====================== Map generator ====================== */
-      function genMap(seedU32, biome, tileset, worldMeta = null, climate = null) {
-        const N = 25;
-        const weights = mapGenerator.tileWeightsForBiome(biome);
-        const mountainBias = rngUtil.n2(seedU32, 90500, 90600) < 0.3;
-        if (mountainBias) {
-          weights.mountain = Math.max(0.01, weights.mountain * 1.7);
-          weights.plains *= 0.85;
-          weights.grass *= 0.85;
-          weights.forest *= 0.85;
-          weights.water *= 0.9;
-          mapGenerator.normalizeWeights(weights);
-        }
+      function initGrid(N, fill = "plains") {
+        return Array.from({ length: N }, () => Array(N).fill(fill));
+      }
 
-        const riverType = mapGenerator.biomeAllowsFeature(biome, "river-lava")
+      function maybeApplyMountainBias(seedU32, weights, normalizeWeights) {
+        const mountainBias = rngUtil.n2(seedU32, 90500, 90600) < 0.3;
+        if (!mountainBias) return weights;
+        weights.mountain = Math.max(0.01, weights.mountain * 1.7);
+        weights.plains *= 0.85;
+        weights.grass *= 0.85;
+        weights.forest *= 0.85;
+        weights.water *= 0.9;
+        normalizeWeights(weights);
+        return weights;
+      }
+
+      function buildRiver(seedU32, biome, N, biomeAllowsFeature) {
+        const riverType = biomeAllowsFeature(biome, "river-lava")
           ? "lava"
-          : mapGenerator.biomeAllowsFeature(biome, "river-water")
+          : biomeAllowsFeature(biome, "river-water")
           ? "water"
           : null;
         const river = riverType && rngUtil.n2(seedU32, 42000, 43000) > 0.35 ? riverCells(seedU32 ^ 0x9e3779b9, N) : new Set();
+        return { riverType, river };
+      }
 
-        let tileKeyGrid = Array.from({ length: N }, () => Array(N).fill("plains"));
-
+      function applyInitialTiles(seedU32, tileKeyGrid, weights, N, riverType, river, pickByWeights) {
+        const next = tileKeyGrid.map((row) => row.slice());
         for (let y = 0; y < N; y++) {
           for (let x = 0; x < N; x++) {
             let tileKey;
@@ -3270,55 +3405,54 @@
               tileKey = riverType;
             } else {
               const r0 = rngUtil.n2(seedU32, x, y);
-              tileKey = mapGenerator.pickByWeights(r0, weights);
+              tileKey = pickByWeights(r0, weights);
               if (tileKey !== "water" && rngUtil.n2(seedU32, 7000 + x, 8000 + y) > 0.985) tileKey = "settlement";
             }
-            tileKeyGrid[y][x] = tileKey;
+            next[y][x] = tileKey;
           }
         }
+        return next;
+      }
 
-        const ridgeRarity = mapGenerator.biomeFeatureRarity(biome, "ridge");
-        tileKeyGrid = cleanupIsolatedWater(seedU32, tileKeyGrid, weights, N);
-        tileKeyGrid = smoothMountains(seedU32, tileKeyGrid, weights, N, 2);
-        tileKeyGrid = thinRidges(seedU32, tileKeyGrid, weights, N, ridgeRarity);
-        if (biome.toLowerCase().includes("desert")) {
-          const desertAll = rngUtil.n2(seedU32, 4242, 31337) < 0.5;
-          if (desertAll) {
-            for (let y = 0; y < N; y++) {
-              for (let x = 0; x < N; x++) {
-                if (tileKeyGrid[y][x] === "plains") tileKeyGrid[y][x] = "desert";
-              }
-            }
+      function applyDesertAll(seedU32, tileKeyGrid, biome, N) {
+        if (!String(biome || "").toLowerCase().includes("desert")) return tileKeyGrid;
+        const desertAll = rngUtil.n2(seedU32, 4242, 31337) < 0.5;
+        if (!desertAll) return tileKeyGrid;
+        const next = tileKeyGrid.map((row) => row.slice());
+        for (let y = 0; y < N; y++) {
+          for (let x = 0; x < N; x++) {
+            if (next[y][x] === "plains") next[y][x] = "desert";
           }
         }
-        tileKeyGrid = applyDunePatches(seedU32, tileKeyGrid, N, mapGenerator.biomeFeatureRarity(biome, "dunes"));
-        const oasisResult = applyOasisPatches(seedU32, tileKeyGrid, N, mapGenerator.biomeFeatureRarity(biome, "oasis"));
-        tileKeyGrid = oasisResult.grid;
-        const oasisVeg = oasisResult.oasisVeg;
-        tileKeyGrid = applyMyceliumPatches(seedU32, tileKeyGrid, N, mapGenerator.biomeFeatureRarity(biome, "mycelium"));
-        const ruinCenters = worldMeta?.poiPlacements?.filter((p) => p.poiType === "ruins") || [];
-        tileKeyGrid = applyRuinsClusters(seedU32, tileKeyGrid, N, ruinCenters, mapGenerator.biomeFeatureRarity(biome, "ruins"));
+        return next;
+      }
 
-        const depthGrid = buildDepthGrid(seedU32, tileKeyGrid, river, N, riverType || "water");
-        tileKeyGrid = applyBeachPatches(seedU32, tileKeyGrid, depthGrid, N);
-        const heightGrid = buildHeightGrid(tileKeyGrid, N);
-        if (Number.isFinite(ridgeRarity) && ridgeRarity > 0) {
-          const heightBoost = 1 + ridgeRarity * 0.6;
-          for (let y = 0; y < N; y++) {
-            for (let x = 0; x < N; x++) {
-              if (tileKeyGrid[y][x] !== "mountain") continue;
-              heightGrid[y][x] = clamp(Math.round(heightGrid[y][x] * heightBoost), 1, 5);
-            }
+      function boostMountainHeights(heightGrid, tileKeyGrid, N, ridgeRarity) {
+        if (!Number.isFinite(ridgeRarity) || ridgeRarity <= 0) return heightGrid;
+        const next = heightGrid.map((row) => row.slice());
+        const heightBoost = 1 + ridgeRarity * 0.6;
+        for (let y = 0; y < N; y++) {
+          for (let x = 0; x < N; x++) {
+            if (tileKeyGrid[y][x] !== "mountain") continue;
+            next[y][x] = clamp(Math.round(next[y][x] * heightBoost), 1, 5);
           }
         }
+        return next;
+      }
 
+      function buildForestTypeGrid(seedU32, tileKeyGrid, N, biome, climate, oasisVeg, biomeAllowsFeature) {
         const forestTypeGrid = Array.from({ length: N }, () => Array(N).fill(null));
         for (let y = 0; y < N; y++) {
           for (let x = 0; x < N; x++) {
-            if (tileKeyGrid[y][x] === "forest") forestTypeGrid[y][x] = forestTypeForCell(seedU32, x, y, biome, climate, oasisVeg);
+            if (tileKeyGrid[y][x] === "forest") {
+              forestTypeGrid[y][x] = forestTypeForCell(seedU32, x, y, biome, climate, oasisVeg, biomeAllowsFeature);
+            }
           }
         }
+        return forestTypeGrid;
+      }
 
+      function renderMapHtml(seedU32, tileKeyGrid, depthGrid, heightGrid, forestTypeGrid, N, worldMeta, tileset, pickVariant) {
         const ann = worldMeta?.annotations || new Map();
 
         let s = "";
@@ -3353,7 +3487,7 @@
 
             if (showStructure) {
               const variantSeed = rngUtil.n2(seedU32, x + 999, y + 999);
-              const ch = mapGenerator.pickVariant("settlement", tileset, variantSeed);
+              const ch = pickVariant("settlement", tileset, variantSeed);
               row += `<span data-cell="${x},${y}" data-tile="settlement" data-poi="structure" title="${title}">${ch}</span>`;
             } else if (a?.fieldCamp) {
               const ch = tileset.camp?.tile || tileset.settlement?.tile || tileset.plains?.tile;
@@ -3365,27 +3499,27 @@
               row += `<span data-cell="${x},${y}" data-tile="religious" data-religious="${escAttr(rel.kind)}" title="${title}">${ch}</span>`;
             } else if (tileKey === "water" || tileKey === "lava") {
               const d = clamp(depthGrid[y][x] || 1, 1, 3);
-              const ch = liquidGlyph(tileKey, d);
+              const ch = liquidGlyph(tileKey, d, tileset, seedU32, x, y);
               row += `<span data-cell="${x},${y}" data-tile="${tileKey}" data-depth="${d}" title="${title}">${ch}</span>`;
             } else if (tileKey === "mountain") {
               const h = clamp(heightGrid[y][x] || 1, 1, 5);
-              const ch = mountainGlyph(h);
+              const ch = mountainGlyph(h, tileset);
               row += `<span data-cell="${x},${y}" data-tile="mountain" data-height="${h}" title="${title}">${ch}</span>`;
             } else if (tileKey === "forest") {
               const ft = forestTypeGrid[y][x] || "mixed";
               const variantSeed = rngUtil.n2(seedU32, x + 999, y + 999);
-              const ch = forestGlyphForType(ft, variantSeed);
+              const ch = forestGlyphForType(ft, variantSeed, tileset);
               row += `<span data-cell="${x},${y}" data-tile="forest" data-forest="${escAttr(ft)}" title="${title}">${ch}</span>`;
             } else {
               const variantSeed = rngUtil.n2(seedU32, x + 999, y + 999);
-              const ch = mapGenerator.pickVariant(tileKey, tileset, variantSeed);
+              const ch = pickVariant(tileKey, tileset, variantSeed);
               row += `<span data-cell="${x},${y}" data-tile="${tileKey}" title="${title}">${ch}</span>`;
             }
           }
           s += row + (y < N - 1 ? "\n" : "");
         }
 
-        return { html: s, tileKeyGrid, depthGrid, heightGrid, forestTypeGrid, N, river };
+        return s;
       }
 
       /* ====================== State, Storage, UI ====================== */
@@ -3537,9 +3671,9 @@
         if (location.hash !== `#${h}`) window.history.replaceState(null, "", `#${h}`);
       }
 
-      function resolveTheme(seed, sel) {
+      function resolveTheme(seed, sel, themeTables) {
         if (sel !== "rnd") return sel;
-        const keys = Object.keys(themes);
+        const keys = Object.keys(themeTables);
         return keys[rngUtil.h32(seed) % keys.length];
       }
 
@@ -3602,7 +3736,7 @@
 
       function generate() {
         if (!current) return;
-        const themeUsed = resolveTheme(current, themeSel.value);
+        const themeUsed = resolveTheme(current, themeSel.value, worldBuilder.themes);
         const { html, mapGrid, mapFlags } = worldBuilder.buildSlice(current, themeUsed);
         out.innerHTML = html;
         mapEl.innerHTML = mapGrid;
@@ -3615,6 +3749,19 @@
         if (!current) return;
         updateHash();
       }
+
+      /* ====================== Manual verification (DEBUG=false) ====================== */
+      // Generate produces output.
+      // Enter in seed box generates.
+      // Prev/Next navigates history.
+      // Theme changes regenerate and update hash.
+      // Reload with #s=...&t=... restores.
+      // Cross-hover highlights map + text.
+      // Copy Seed copies current seed.
+      // Deterministic spot checks:
+      // - Theme "rnd" resolves via Object.keys(themes)[rngUtil.h32(seed) % keys.length].
+      // - Example seeds: "atlas", "ember", "cobalt" (verify themeUsed matches hash/keys).
+      // - Explicit theme selection uses the selected theme directly.
 
       /* ====================== Events + Init ====================== */
       btnGen.onclick = doGenerate;

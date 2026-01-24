@@ -1,52 +1,109 @@
+General rules
+- No new features unless explicitly listed.
+- Determinism is sacred: same seed + same theme must produce identical slice text + identical map HTML as before (byte-for-byte if practical).
+- Keep everything working in modern Chromium + Firefox.
+- Prefer small, reviewable commits/steps. After each section: run the app and sanity-check “Generate / Prev / Next / Copy Seed / URL hash restore / cross-hover”.
+- When you change signatures, update all call sites.
+- Maintain the “NO magic colors” intent: CSS controls colors; JS controls data + glyph choice.
 
-Class Refactor Plan (single file, behavior-preserving)
-Goal
-- Introduce clear classes around RNG, naming, world building, map generation, and UI.
-- Keep data tables and string arrays top-level.
-- Avoid changing algorithms; only move code into class methods.
 
-Proposed Classes and Responsibilities
-1) SeededRng
-- Inputs: seed string or u32 base.
-- Methods: h32, xs32, n2, randSeed, oneOf, pickWeighted, maybe, shuffleDet.
-- Notes: Keep standalone helpers for pure math if needed; class wraps per-seed ops.
 
-2) NameGenerator (existing)
-- Keep as-is but move into “Naming + Lexicon” section.
-- Owns NPC/faction naming where appropriate.
+- Every biome.features key is known (geoFeatures + any permitted extras like lagoon, watering hole, etc.).
+- Tileset has required shapes for each tile key (tile or depthGlyphs/height maps as appropriate).
+- Any referenced feature names exist in the canonical feature set.
+- If DEBUG=true, console.warn/assert with helpful messages. If DEBUG=false, do nothing.
 
-3) LexiconBuilder
-- Methods: buildLineages, buildToponyms, buildRegionsFromToponyms, buildNicknames, buildLexicon.
-- Exposes data needed by factionName/namedPOI.
 
-4) WorldBuilder
-- Inputs: rng, theme tables, tileset, tiles grid.
-- Methods: buildSettlementNames, placeWorldRefs, buildSlice (or buildSlice stays top-level but calls WorldBuilder).
-- Owns NPC/faction placement and annotation logic.
+TASK 3.3 — Canonical enums
+- Introduce canonical Sets:
+- FEATURE_SET
+- TILE_SET
+- Use them for validation only; do not change runtime logic beyond validation.
 
-5) MapGenerator
-- Inputs: rng, biome, tileset, optional worldMeta/climate.
-- Methods: genMap and map helper routines (rivers, depths, heights, patches).
-- Exposes map html and flags.
 
-6) UIController
-- Inputs: document, storage, WorldBuilder/MapGenerator.
-- Methods: load/save, renderLists, setCurrentSeed, generate, bindCrossHover, wireEvents.
-- Owns DOM queries and event handlers.
+============================================================
+SECTION 4 — Map Generation as a Pure, Testable Pipeline
+TASK 4.1 — Create a map generation pipeline
+- Reorganize map generation into explicit steps (functions):
+- init grid
+- apply rivers
+- initial random tiles
+- cleanup isolated water
+- smooth mountains
+- thin ridges
+- apply dunes/oasis/mycelium/beaches/ruins
+- derive depthGrid/heightGrid/forestTypeGrid
+- render map HTML
+- Each step should accept and return data, not mutate hidden globals.
+- Preserve output exactly.
 
-Class Refactor Tasks
-- Task: Create class skeletons with constructor signatures and stubs. (done)
-- Task: Move helper functions into class methods without changing bodies. (done)
-- Task: Replace free functions with class method calls. (done)
-- Task: Keep top-level string arrays and tables unchanged. (done)
-- Task: Keep init flow intact (generate, history, hash, UI events). (done)
 
-End-State Structure (single file)
-- Tables (themes, tileset, string pools; all arrays top-level)
-- RNG + Utilities (pure helpers, plus SeededRng class)
-- Naming + Lexicon (NameGenerator, LexiconBuilder)
-- World Placement (WorldBuilder)
-- Map Generation (MapGenerator)
-- Slice Composition (either WorldBuilder.buildSlice or top-level wrapper)
-- State + UI (UIController)
-- Events + Init (UIController wiring + init IIFE)
+TASK 4.2 — Consolidate repeated cell-picking helpers
+- Replace duplicated pickLandCell/pickDifferentLandCell variants with a single reusable helper:
+- pickCell({rng, cells, avoid, filter})
+- Keep behavior the same.
+
+
+TASK 4.3 — Keep rendering rules identical
+- The generated map HTML spans must keep the same:
+- glyphs
+- data-* attributes
+- title content format
+- newlines per row
+- Do not alter CSS selectors expectations.
+
+
+============================================================
+SECTION 5 — Output Rendering Boundaries (minimal change)
+TASK 5.1 — Keep `WorldBuilder.buildSlice()` returning the same fields
+- Maintain the interface: { html, mapGrid, mapFlags } to minimize UI changes for now.
+- Internally, you may create structured intermediate data, but final outputs must match previous behavior.
+
+
+TASK 5.2 — Make escaping/xref/linkification safer without changing output
+- Ensure linkifyRefs does not introduce regressions:
+- Keep escaping rules.
+- Keep ordering longest-first.
+- If you adjust regex boundaries, ONLY do so if output stays identical for existing names; otherwise leave it.
+
+
+============================================================
+SECTION 6 — Cleanup + Naming
+TASK 6.1 — Split SeededRng “utility bundle” into focused modules (still single-file)
+- Separate:
+- hash (h32)
+- rng factory (xs32)
+- noise (n2)
+- sampling helpers (oneOf, pickWeighted, shuffleDet, maybe)
+- Keep function behavior identical.
+
+
+TASK 6.2 — Remove dead code / unify naming
+- Remove unused helpers if truly unused.
+- Rename ambiguous identifiers ONLY if it doesn’t risk mistakes; update all call sites.
+
+
+============================================================
+SECTION 7 — Verification Checklist (must-do)
+TASK 7.1 — Manual verification steps (write them as comments)
+- With DEBUG=false:
+- Generate produces output
+- Enter in seed box generates
+- Prev/Next navigates history
+- Theme changes regenerate and update hash
+- Reload with #s=…&t=… restores
+- Cross-hover highlights map + text
+- Copy Seed copies current seed
+- Add a short list of “known deterministic spot checks” in comments:
+- Provide 2–3 example seeds and expected themeUsed resolution method (not full output).
+
+
+Constraints
+- Do not introduce external build tools.
+- Do not convert to TypeScript.
+- Do not add dependencies.
+- Keep CSS intact unless absolutely necessary (no visual redesign).
+- Prefer readability, explicit dependencies, and low coupling.
+
+
+Start by implementing Section 1, then proceed in order. After each section, run a quick sanity check and fix any regressions before moving on.
