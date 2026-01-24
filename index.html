@@ -1292,7 +1292,6 @@
         },
       };
             
-      
       const FIELD_MOTIVE_VERBS = [
         "mining",
         "harvesting",
@@ -1306,24 +1305,6 @@
         "charting",
         "reclaiming",
       ];
-
-      const BIOME_FEATURES_BY_NAME = (() => {
-        const out = {};
-        for (const tt of Object.values(T)) {
-          const biomes = tt?.biome || [];
-          for (const biome of biomes) {
-            if (!biome) continue;
-            if (typeof biome === "object") {
-              const name = String("name" in biome ? biome.name ?? "" : biome).toLowerCase();
-              if (name && !out[name]) out[name] = biome.features && typeof biome.features === "object" ? biome.features : {};
-            } else if (typeof biome === "string") {
-              const name = biome.toLowerCase();
-              if (!out[name]) out[name] = {};
-            }
-          }
-        }
-        return out;
-      })();
 
       const NPC_TASKS = {
         faction: [
@@ -1482,11 +1463,6 @@
         ],
       };
 
-
-      const SYL = ["al", "ur", "da", "ri", "ka", "lem", "vor", "zan", "ti", "sha", "mor", "bel", "oth", "ryn", "ser", "vak", "nel", "ios", "qar", "ume", "thal", "gre", "nor", "fen", "zir", "una", "vek", "cal", "mar", "ros", "ion", "kha", "zul", "ora", "sta", "dra", "pha"];
-
-      const namePost = [" Hold", " Castle", " Reach", " Fall", " Falls", " Gate", " Prime", " Camp", " Cliffs", " Fold", " Crown", " Wilds", " Hollow", " Vale", " Peaks", " Grove", " Keep", " Commune", " Verge", " Wastes", " Spire", " Fields", " Flats", " Basin", " Spine", " Fault", " Deep", " Steppe", " Maw", " Province"];
-
       /* ====================== Tileset (no colors here; CSS drives colors) ====================== */
       const tileset = {
         water: { depthGlyphs: { 1: "~", 2: "≈", 3: "≋" } },
@@ -1517,6 +1493,9 @@
       };
 
 
+      const SYL = ["al", "ur", "da", "ri", "ka", "lem", "vor", "zan", "ti", "sha", "mor", "bel", "oth", "ryn", "ser", "vak", "nel", "ios", "qar", "ume", "thal", "gre", "nor", "fen", "zir", "una", "vek", "cal", "mar", "ros", "ion", "kha", "zul", "ora", "sta", "dra", "pha"];
+
+      const namePost = [" Hold", " Castle", " Reach", " Fall", " Falls", " Gate", " Prime", " Camp", " Cliffs", " Fold", " Crown", " Wilds", " Hollow", " Vale", " Peaks", " Grove", " Keep", " Commune", " Verge", " Wastes", " Spire", " Fields", " Flats", " Basin", " Spine", " Fault", " Deep", " Steppe", " Maw", " Province"];
 
       const TEMPLATES = [
         { name: "Title+Lineage", weight: 12, build: (r, L) => `${oneOf(r, L.titles)} ${oneOf(r, L.lineages)}` },
@@ -1530,7 +1509,6 @@
         { name: "Hybrid", weight: 9, build: (r, L) => `${oneOf(r, L.titles)} ${oneOf(r, L.lineages)} ${oneOf(r, L.prepsOf)} ${oneOf(r, L.toponyms)}` },
         { name: "Role+Preposition+Site", weight: 6, build: (r, L) => `${oneOf(r, L.roles)} ${oneOf(r, L.prepsSite)} ${oneOf(r, L.sites)}` },
       ];
-
 
       /* ====================== Faction naming (fixed deterministic lexicon) ====================== */
       const DEFAULT_COLLECTIVES = ["Order", "Guild", "Clan", "Court", "Circle", "Syndicate", "Chapter", "Coven", "Brotherhood", "Company", "League", "Consulate", "Caravan", "Enclave", "Assembly", "Dominion", "Conclave", "Pact", "Sect", "Keep", "Banner", "Kin", "House", "Hollow", "Sanctum", "Forge", "Crusade", "March", "Host"];
@@ -1585,7 +1563,25 @@
         "wayhouse",
       ];
 
-      /* ====================== Deterministic Core ====================== */
+      const BIOME_FEATURES_BY_NAME = (() => {
+        const out = {};
+        for (const tt of Object.values(T)) {
+          const biomes = tt?.biome || [];
+          for (const biome of biomes) {
+            if (!biome) continue;
+            if (typeof biome === "object") {
+              const name = String("name" in biome ? biome.name ?? "" : biome).toLowerCase();
+              if (name && !out[name]) out[name] = biome.features && typeof biome.features === "object" ? biome.features : {};
+            } else if (typeof biome === "string") {
+              const name = biome.toLowerCase();
+              if (!out[name]) out[name] = {};
+            }
+          }
+        }
+        return out;
+      })();
+
+      /* ====================== RNG + Utilities ====================== */
       function h32(s) {
         let h = 5381 >>> 0;
         for (let i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0;
@@ -1615,31 +1611,6 @@
         if (crypto && crypto.getRandomValues) crypto.getRandomValues(a);
         else a[0] = (Math.random() * 4294967296) >>> 0;
         return a[0].toString(36);
-      }
-
-      class NameGenerator {
-        constructor(rng, { syllables = SYL, postfixes = namePost } = {}) {
-          this.r = rng;
-          this.syllables = syllables;
-          this.postfixes = postfixes;
-        }
-
-        baseName({ allowExtraSyllable = true } = {}) {
-          const n = 2 + (allowExtraSyllable && this.r() > 0.7);
-          let s = "";
-          for (let i = 0; i < n; i++) s += this.syllables[(this.r() * this.syllables.length) | 0];
-          return s.charAt(0).toUpperCase() + s.slice(1);
-        }
-
-        placeName() {
-          let s = this.baseName();
-          if (this.r() > 0.5) s += this.postfixes[(this.r() * this.postfixes.length) | 0];
-          return s;
-        }
-
-        npcName() {
-          return this.baseName();
-        }
       }
 
       function resolveInlineOptions(s, r) {
@@ -1714,11 +1685,6 @@
         return { name: String(biome), features: defaultFeatures };
       }
 
-      function maybe(rng, chance = 0.5) {
-        return typeof rng === "function" ? rng() < chance : Math.random() < chance;
-      }
-
-      /* ====================== Climate pick ====================== */
       function pickTempTier(r, tt) {
         const temp = tt?.temp;
         if (temp && typeof temp === "object" && !Array.isArray(temp)) {
@@ -1745,6 +1711,9 @@
         return { idx: 1, label: String(label) };
       }
 
+      function maybe(rng, chance = 0.5) {
+        return typeof rng === "function" ? rng() < chance : Math.random() < chance;
+      }
 
       function ensure(arr, fallback) {
         return Array.isArray(arr) && arr.length ? arr : fallback;
@@ -1772,6 +1741,77 @@
           if (roll < acc) return it;
         }
         return items[items.length - 1];
+      }
+
+      function normalizeWeights(weights) {
+        const total = Object.values(weights).reduce((a, b) => a + b, 0) || 1;
+        for (const k in weights) weights[k] /= total;
+      }
+
+      function shuffleDet(r, arr) {
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = (r() * (i + 1)) | 0;
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+      }
+
+      function escAttr(s) {
+        return String(s)
+          .replace(/&/g, "&amp;")
+          .replace(/"/g, "&quot;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      function escHtml(s) {
+        return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      }
+
+      function escRe(s) {
+        return String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      }
+
+      function xref(cell, label) {
+        return `<span class="xref" data-cell="${escAttr(cell)}">${escHtml(label)}</span>`;
+      }
+
+      function linkifyRefs(text, refs) {
+        let out = escHtml(text);
+        if (!Array.isArray(refs) || !refs.length) return out;
+        const ordered = refs.slice().sort((a, b) => b.name.length - a.name.length);
+        for (const ref of ordered) {
+          const re = new RegExp(escRe(escHtml(ref.name)), "g");
+          out = out.replace(re, xref(ref.cell, ref.name));
+        }
+        return out;
+      }
+
+      /* ====================== Naming + Lexicon ====================== */
+      class NameGenerator {
+        constructor(rng, { syllables = SYL, postfixes = namePost } = {}) {
+          this.r = rng;
+          this.syllables = syllables;
+          this.postfixes = postfixes;
+        }
+
+        baseName({ allowExtraSyllable = true } = {}) {
+          const n = 2 + (allowExtraSyllable && this.r() > 0.7);
+          let s = "";
+          for (let i = 0; i < n; i++) s += this.syllables[(this.r() * this.syllables.length) | 0];
+          return s.charAt(0).toUpperCase() + s.slice(1);
+        }
+
+        placeName() {
+          let s = this.baseName();
+          if (this.r() > 0.5) s += this.postfixes[(this.r() * this.postfixes.length) | 0];
+          return s;
+        }
+
+        npcName() {
+          return this.baseName();
+        }
       }
 
       function buildLineages(r, count = 12) {
@@ -1829,47 +1869,6 @@
         return template.build(r, L);
       }
 
-      /* ====================== World/Text ↔ Map Consistency Helpers ====================== */
-      function escAttr(s) {
-        return String(s)
-          .replace(/&/g, "&amp;")
-          .replace(/"/g, "&quot;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;");
-      }
-
-      function escHtml(s) {
-        return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      }
-
-      function escRe(s) {
-        return String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      }
-
-      function xref(cell, label) {
-        return `<span class="xref" data-cell="${escAttr(cell)}">${escHtml(label)}</span>`;
-      }
-
-      function linkifyRefs(text, refs) {
-        let out = escHtml(text);
-        if (!Array.isArray(refs) || !refs.length) return out;
-        const ordered = refs.slice().sort((a, b) => b.name.length - a.name.length);
-        for (const ref of ordered) {
-          const re = new RegExp(escRe(escHtml(ref.name)), "g");
-          out = out.replace(re, xref(ref.cell, ref.name));
-        }
-        return out;
-      }
-
-      function shuffleDet(r, arr) {
-        const a = arr.slice();
-        for (let i = a.length - 1; i > 0; i--) {
-          const j = (r() * (i + 1)) | 0;
-          [a[i], a[j]] = [a[j], a[i]];
-        }
-        return a;
-      }
-
       function namedPOI(nameGen, poiType) {
         const r = nameGen.r;
         const style = (r() * 4) | 0;
@@ -1888,6 +1887,7 @@
         return false;
       }
 
+      /* ====================== World Placement ====================== */
       function buildSettlementNames(nameGen, count) {
         return uniqN(count, () => nameGen.placeName());
       }
@@ -2050,73 +2050,114 @@
         return { annotations: ann, poiPlacements, factionPlacements, settlementNameByCell };
       }
 
-      /* ====================== ASCII Map ====================== */
-      function biomeHasFeatureAtLeast(biome, id, minRarity = 0) {
-        const { features } = normalizeBiome(biome);
-        const rarity = features?.[id];
-        return Number.isFinite(rarity) && rarity >= minRarity;
-      }
-
+      /* ====================== Map Generation ====================== */
       function biomeFeatureRarity(biome, id) {
         const { features } = normalizeBiome(biome);
         const rarity = features?.[id];
         return Number.isFinite(rarity) ? rarity : 0;
       }
 
-      function isMountainousBiome(biome) {
-        return biomeHasFeatureAtLeast(biome, "mountain", 0.3) || biomeHasFeatureAtLeast(biome, "ridge", 0.3);
-      }
-
-      function normalizeWeights(weights) {
-        const total = Object.values(weights).reduce((a, b) => a + b, 0) || 1;
-        for (const k in weights) weights[k] /= total;
+      function biomeAllowsFeature(biome, id, minRarity = 0.25) {
+        const { features } = normalizeBiome(biome);
+        const rarity = features?.[id];
+        return Number.isFinite(rarity) && rarity >= minRarity;
       }
 
       function tileWeightsForBiome(biome) {
         const baseWeights = { water: 0.12, mountain: 0.15, forest: 0.25, grass: 0.2, plains: 0.28 };
         const inc = (k, f) => (baseWeights[k] = Math.max(0.01, baseWeights[k] * f));
-        const s = String(biome || "").toLowerCase();
+        const { features } = normalizeBiome(biome);
+        const applyFeature = (id, minRarity, fn) => {
+          const rarity = features?.[id];
+          if (!Number.isFinite(rarity) || rarity < minRarity) return;
+          fn(rarity);
+        };
 
-        if (s.includes("desert") || s.includes("erg") || s.includes("salt")) {
-          inc("plains", 2.2);
-          inc("forest", 0.5);
-          inc("grass", 0.6);
-          inc("water", 0.4);
-          inc("mountain", 0.7);
-        }
-        if (s.includes("jungle") || s.includes("arboreal") || s.includes("overgrowth") || s.includes("fungal")) {
-          inc("forest", 1.9);
-          inc("grass", 1.4);
-          inc("plains", 0.7);
-          inc("water", 1.2);
-          inc("mountain", 0.8);
-        }
-        if (s.includes("wetland") || s.includes("bog") || s.includes("flood") || s.includes("canal")) {
-          inc("water", 2.2);
-          inc("grass", 1.5);
-          inc("forest", 1.2);
-          inc("plains", 0.7);
-        }
-        if (s.includes("island") || s.includes("oceanic") || s.includes("tidal") || s.includes("ring habitat")) {
-          inc("water", 2.4);
-          inc("forest", 0.9);
-          inc("grass", 0.9);
-          inc("plains", 0.7);
-          inc("mountain", 0.6);
-        }
-        if (isMountainousBiome(s)) {
-          inc("mountain", 2.0);
-          inc("plains", 1.2);
-          inc("forest", 0.9);
-          inc("grass", 0.9);
-        }
-        if (s.includes("barren") || s.includes("ruin") || s.includes("ruined") || s.includes("wasteland") || s.includes("megacity") || s.includes("scrapyard") || s.includes("lava")) {
-          inc("plains", 1.6);
-          inc("forest", 0.8);
-          inc("grass", 0.7);
-          inc("mountain", 1.1);
-          inc("water", 0.9);
-        }
+        applyFeature("dunes", 0.05, (rarity) => {
+          inc("plains", 1 + rarity * 1.2);
+          inc("forest", 1 - rarity * 0.6);
+          inc("grass", 1 - rarity * 0.4);
+          inc("water", 1 - rarity * 0.4);
+          inc("mountain", 1 - rarity * 0.2);
+        });
+
+        applyFeature("oasis", 0.05, (rarity) => {
+          inc("water", 1 + rarity * 1.5);
+          inc("grass", 1 + rarity * 0.8);
+          inc("forest", 1 + rarity * 0.4);
+          inc("plains", 1 - rarity * 0.2);
+        });
+
+        applyFeature("river-water", 0.05, (rarity) => {
+          inc("water", 1 + rarity * 1.0);
+          inc("plains", 1 - rarity * 0.1);
+        });
+
+        applyFeature("river-lava", 0.05, (rarity) => {
+          inc("mountain", 1 + rarity * 0.5);
+          inc("plains", 1 + rarity * 0.2);
+          inc("water", 1 - rarity * 0.4);
+        });
+
+        applyFeature("lake", 0.05, (rarity) => {
+          inc("water", 1 + rarity * 1.4);
+          inc("plains", 1 - rarity * 0.2);
+        });
+
+        applyFeature("reef", 0.05, (rarity) => {
+          inc("water", 1 + rarity * 1.6);
+          inc("plains", 1 - rarity * 0.3);
+        });
+
+        applyFeature("lagoon", 0.05, (rarity) => {
+          inc("water", 1 + rarity * 1.3);
+          inc("plains", 1 - rarity * 0.25);
+        });
+
+        applyFeature("beaches", 0.05, (rarity) => {
+          inc("water", 1 + rarity * 0.6);
+          inc("plains", 1 + rarity * 0.4);
+        });
+
+        applyFeature("mountain", 0.05, (rarity) => {
+          inc("mountain", 1 + rarity * 1.5);
+          inc("plains", 1 + rarity * 0.2);
+          inc("forest", 1 - rarity * 0.1);
+          inc("grass", 1 - rarity * 0.1);
+        });
+
+        applyFeature("ridge", 0.05, (rarity) => {
+          inc("mountain", 1 + rarity * 1.1);
+          inc("plains", 1 + rarity * 0.15);
+          inc("forest", 1 - rarity * 0.1);
+          inc("grass", 1 - rarity * 0.1);
+        });
+
+        applyFeature("ruins", 0.05, (rarity) => {
+          inc("plains", 1 + rarity * 0.6);
+          inc("forest", 1 - rarity * 0.2);
+          inc("grass", 1 - rarity * 0.3);
+          inc("mountain", 1 + rarity * 0.1);
+          inc("water", 1 - rarity * 0.1);
+        });
+
+        applyFeature("dead trees", 0.05, (rarity) => {
+          inc("forest", 1 - rarity * 0.4);
+          inc("grass", 1 - rarity * 0.3);
+          inc("plains", 1 + rarity * 0.2);
+        });
+
+        applyFeature("mycelium", 0.05, (rarity) => {
+          inc("forest", 1 + rarity * 0.4);
+          inc("grass", 1 + rarity * 0.2);
+          inc("plains", 1 - rarity * 0.2);
+        });
+
+        applyFeature("watering hole", 0.05, (rarity) => {
+          inc("water", 1 + rarity * 1.2);
+          inc("grass", 1 + rarity * 0.4);
+          inc("plains", 1 - rarity * 0.2);
+        });
 
         normalizeWeights(baseWeights);
         return baseWeights;
@@ -2227,14 +2268,6 @@
           }
         }
         return cells;
-      }
-
-      function biomeAllowsRiver(biome) {
-        return biomeHasFeatureAtLeast(biome, "river-water", 0.25);
-      }
-
-      function biomeAllowsLavaRiver(biome) {
-        return biomeHasFeatureAtLeast(biome, "river-lava", 0.25);
       }
 
       /* ====================== Shared grid helpers ====================== */
@@ -2738,7 +2771,7 @@
           const cy = Number(parts[1]);
           if (!Number.isFinite(cx) || !Number.isFinite(cy)) continue;
           const k = next[cy]?.[cx];
-          if (!k || k === "water" || k === "lava" || k === "mountain" || k === "settlement") continue;
+          if (!k || k === "water" || k === "lava" || k === "settlement") continue;
           next[cy][cx] = "ruins";
         }
 
@@ -2751,17 +2784,7 @@
         const tempTier = clamp(climate?.tempTier ?? 4, 1, 8);
         const rainIdx = clamp((climate?.rainIdx ?? 3) + 1, 1, 8);
 
-        const isDeadBiome =
-          s.includes("desert") ||
-          s.includes("badland") ||
-          s.includes("barren") ||
-          s.includes("ash") ||
-          s.includes("irradiat") ||
-          s.includes("scrapyard") ||
-          s.includes("ruin") ||
-          s.includes("ruined") ||
-          s.includes("wasteland") ||
-          s.includes("lava");
+        const isDeadBiome = biomeAllowsFeature(biome, "dead trees", 0.2);
 
         const isColdBiome = s.includes("tundra") || s.includes("taiga") || s.includes("ice") || s.includes("highland");
 
@@ -2786,13 +2809,6 @@
         return roll < 0.18 ? "coniferous" : "deciduous";
       }
 
-      function biomeHasDeadTrees(biome, climate) {
-        const tempTier = clamp(climate?.tempTier ?? 4, 1, 8);
-        const rainIdx = clamp((climate?.rainIdx ?? 3) + 1, 1, 8);
-        if (biomeHasFeatureAtLeast(biome, "dead trees", 0.2)) return true;
-        return tempTier >= 7 && rainIdx <= 2;
-      }
-
       function forestGlyphForType(ft, seed01) {
         const t = tileset.forest;
         const list = ft === "coniferous" ? t.coniferous : ft === "dead" ? t.dead : ft === "deciduous" ? t.deciduous : t.variants;
@@ -2814,7 +2830,7 @@
           normalizeWeights(weights);
         }
 
-        const riverType = biomeAllowsLavaRiver(biome) ? "lava" : biomeAllowsRiver(biome) ? "water" : null;
+        const riverType = biomeAllowsFeature(biome, "river-lava") ? "lava" : biomeAllowsFeature(biome, "river-water") ? "water" : null;
         const river = riverType && n2(seedU32, 42000, 43000) > 0.35 ? riverCells(seedU32 ^ 0x9e3779b9, N) : new Set();
 
         let tileKeyGrid = Array.from({ length: N }, () => Array(N).fill("plains"));
@@ -2933,7 +2949,7 @@
         return { html: s, tileKeyGrid, depthGrid, heightGrid, forestTypeGrid, N, river };
       }
 
-      /* ====================== Slice Builder (minimal; unchanged behavior) ====================== */
+      /* ====================== Slice Composition ====================== */
       function coord(r) {
         const lat = (r() * 160 - 80).toFixed(2),
           lon = (r() * 360 - 180).toFixed(2);
@@ -3270,7 +3286,7 @@
         html += `\nHook: ${hookHtml}\n`;
 
         const biomeLower = biomeName.toLowerCase();
-        const mapFlags = { deadTrees: biomeHasDeadTrees(biomeName, climate), desert: biomeLower.includes("desert") };
+        const mapFlags = { deadTrees: biomeAllowsFeature(biomeName, "dead trees", 0.2), desert: biomeLower.includes("desert") };
 
         return { html, mapGrid: map1.html, mapFlags };
       }
@@ -3466,7 +3482,7 @@
         updateHash();
       }
 
-      /* ====================== Wire up ====================== */
+      /* ====================== Events + Init ====================== */
       btnGen.onclick = doGenerate;
       seedIn.addEventListener("keydown", (e) => {
         if (e.key === "Enter") doGenerate();

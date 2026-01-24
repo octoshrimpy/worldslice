@@ -7,39 +7,39 @@ Goal
 
 Plan Sections and Tasks
 1) Data Tables and Constants
-- Task: Move all top-level string arrays into a single “Tables” section.
-- Task: Keep GEO_FEATURES, FIELD_MOTIVE_VERBS, NPC_TASKS, tileset, and T together.
-- Task: Keep arrays untouched; no content edits.
+- Task: Move all top-level string arrays into a single “Tables” section. (done)
+- Task: Keep GEO_FEATURES, FIELD_MOTIVE_VERBS, NPC_TASKS, tileset, and T together. (done)
+- Task: Keep arrays untouched; no content edits. (done)
 
 2) RNG + Utilities
-- Task: Group hash/RNG helpers (h32, xs32, n2, randSeed).
-- Task: Group selection/normalization helpers (oneOf, pickWeighted, normalizeWeights, normalizeBiome, etc.).
-- Task: Group text helpers (escHtml, escAttr, escRe, xref, linkifyRefs).
+- Task: Group hash/RNG helpers (h32, xs32, n2, randSeed). (done)
+- Task: Group selection/normalization helpers (oneOf, pickWeighted, normalizeWeights, normalizeBiome, etc.). (done)
+- Task: Group text helpers (escHtml, escAttr, escRe, xref, linkifyRefs). (done)
 
 3) Naming + Lexicon
-- Task: Keep NameGenerator class in this section.
-- Task: Place toponyms/lineages/regions/nicknames and lexicon builders here.
-- Task: Keep factionName and namedPOI in this section.
+- Task: Keep NameGenerator class in this section. (done)
+- Task: Place toponyms/lineages/regions/nicknames and lexicon builders here. (done)
+- Task: Keep factionName and namedPOI in this section. (done)
 
 4) World Placement
-- Task: Group settlement/poi/faction placement helpers here.
-- Task: Keep placeWorldRefs and its nested helpers intact.
+- Task: Group settlement/poi/faction placement helpers here. (done)
+- Task: Keep placeWorldRefs and its nested helpers intact. (done)
 
 5) Map Generation
-- Task: Group grid generation, rivers, depths/heights, patches, glyph pickers.
-- Task: Keep genMap as the section’s public entry.
+- Task: Group grid generation, rivers, depths/heights, patches, glyph pickers. (done)
+- Task: Keep genMap as the section’s public entry. (done)
 
 6) Slice Composition
-- Task: Group coord, resolvePlaceholders, composeHook, composeMotive.
-- Task: Keep buildSlice as the section’s public entry.
+- Task: Group coord, resolvePlaceholders, composeHook, composeMotive. (done)
+- Task: Keep buildSlice as the section’s public entry. (done)
 
 7) State + UI
-- Task: Group DOM lookups, localStorage, history/favorites, render helpers.
-- Task: Keep generate() near UI state helpers.
+- Task: Group DOM lookups, localStorage, history/favorites, render helpers. (done)
+- Task: Keep generate() near UI state helpers. (done)
 
 8) Events + Init
-- Task: Group event bindings and init IIFE at the end.
-- Task: Keep cross-hover binding near generate or in this section.
+- Task: Group event bindings and init IIFE at the end. (done)
+- Task: Keep cross-hover binding near generate or in this section. (done)
 
 ---
 
