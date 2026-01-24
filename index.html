@@ -55,25 +55,29 @@
         --tile-water-1: var(--sw10);
         --tile-water-2: var(--sw9);
         --tile-water-3: var(--sw8);
+        --tile-lava-1: var(--sw2);
+        --tile-lava-2: var(--sw3);
+        --tile-lava-3: var(--sw4);
 
-        --tile-mountain: var(--sw13);
-        --tile-mountain-1: var(--sw13);
-        --tile-mountain-2: var(--sw12);
-        --tile-mountain-3: var(--sw12);
-        --tile-mountain-4: var(--sw4);
-        --tile-mountain-5: var(--sw11);
+        --tile-mountain-1: var(--sw14);
+        --tile-mountain-2: var(--sw13);
+        --tile-mountain-3: var(--sw13);
+        --tile-mountain-4: var(--sw13);
+        --tile-mountain-5: var(--sw12);
 
         --tile-forest: var(--sw6);
         --tile-forest-deciduous: var(--sw6);
         --tile-forest-coniferous: var(--sw7);
         --tile-forest-dead: color-mix(in srgb, var(--sw4) 20%, var(--sw1));
+        --tile-mycelium: color-mix(in srgb, var(--sw9) 50%, var(--sw2));
 
         --tile-grass: var(--sw6);
         --tile-grass-dead: color-mix(in srgb, var(--tile-grass) 60%, var(--sw1));
-        --tile-plains: var(--sw15);
+        --tile-plains: color-mix(in srgb, var(--sw5) 50%, var(--sw0));
         --tile-settlement: var(--sw2);
         --tile-camp: var(--sw3);
-        --tile-desert: var(--sw4);
+        --tile-ruins: var(--sw14);
+        --tile-desert: color-mix(in srgb, var(--sw4) 70%, var(--sw1));
         --tile-religious-death: var(--sw3);
         --tile-religious-monastery: var(--sw11);
       }
@@ -273,10 +277,17 @@
       #map span[data-tile="water"][data-depth="3"] {
         color: var(--tile-water-3);
       }
-
-      #map span[data-tile="mountain"] {
-        color: var(--tile-mountain);
+      #map span[data-tile="lava"][data-depth="1"] {
+        color: var(--tile-lava-1);
       }
+      #map span[data-tile="lava"][data-depth="2"] {
+        color: var(--tile-lava-2);
+      }
+      #map span[data-tile="lava"][data-depth="3"] {
+        color: var(--tile-lava-3);
+      }
+
+
       #map span[data-tile="mountain"][data-height="1"] {
         color: var(--tile-mountain-1);
       }
@@ -305,11 +316,15 @@
       #map span[data-tile="forest"][data-forest="dead"] {
         color: var(--tile-forest-dead);
       }
+      #map span[data-tile="mycelium"] {
+        color: var(--tile-mycelium);
+      }
 
       #map span[data-tile="grass"] {
         color: var(--tile-grass);
       }
-      #map[data-dead-trees="1"] span[data-tile="grass"] {
+      #map[data-dead-trees="1"] span[data-tile="grass"],
+      #map[data-desert="1"] span[data-tile="grass"] {
         color: var(--tile-grass-dead);
       }
       #map span[data-tile="plains"] {
@@ -318,10 +333,16 @@
       #map span[data-tile="settlement"] {
         color: var(--tile-settlement);
       }
+      #map span[data-tile="ruins"] {
+        color: var(--tile-ruins);
+      }
       #map span[data-tile="camp"] {
         color: var(--tile-camp);
       }
       #map span[data-tile="desert"] {
+        color: var(--tile-desert);
+      }
+      #map span[data-tile="beach"] {
         color: var(--tile-desert);
       }
       #map span[data-tile="religious"][data-religious="death"] {
@@ -563,14 +584,13 @@
         "river-water",
         "river-lava",
         "mountain",
-        "lake",
-        "watering hole",
+        "lake", // not implemented yet
+        "beaches", // not implemented yet
         "dunes",
         "oasis",
         "ruins",
         "ridge",
-        "reef",
-        "lagoon",
+        "reef", // not implemented yet
         "mycelium",
         "dead trees",
       ];
@@ -1470,7 +1490,9 @@
       /* ====================== Tileset (no colors here; CSS drives colors) ====================== */
       const tileset = {
         water: { depthGlyphs: { 1: "~", 2: "≈", 3: "≋" } },
+        lava: { depthGlyphs: { 1: "~", 2: "≈", 3: "≋" } },
         plains: { tile: "·", variants: ["‧", "∙"] },
+        beach: { tile: "·", variants: ["‧", "∙"] },
         grass: { tile: "ᵞ", variants: ["ᵞ", "˯", "ˬ", "ˇ", "…", "ⵈ", '"', "'"] },
         forest: {
           tile: "⯭",
@@ -1482,14 +1504,14 @@
         desert: { tile: "~", variants: [
           "~", 
           "≈", 
-          "≋"
         ] },
+        mycelium: { tile: "ᵠ", variants: ["ⵈ", "·", "‧", "∙",] },
         mountain: {
           tile: "^",
-          height: { 1: "^", 2: "ᨈ", 3: "∧", 4: "Λ", 5: "𐘠" },
-          variants: ["˄", "Λ", "∧", "𐘠", "⌃", "ᨈ"],
+          height: { 1: "꘍", 2: "ᨈ", 3: "ᴧ", 4: "Λ", 5: "Δ" },
         },
         settlement: { tile: "⛩", variants: ["⌂", "𐘮", "𐙁", "𐛅", "𐛘", "𐝡", "𐀁", "𐁍", "𐂧", "𐃀"] },
+        ruins: { tile: "⌂", variants: ["⌂", "𐘮", "𐙁", "𐛅", "𐛘", "𐝡", "𐀁", "𐁍", "𐂧", "𐃀"] },
         camp: { tile: "ᗑ" },
         religious: { death: "⚱", monastery: "⛨" },
       };
@@ -1870,7 +1892,7 @@
         return uniqN(count, () => nameGen.placeName());
       }
 
-      function placeWorldRefs(seedU32, theme, tileKeyGrid, N, poiTypes, factions, rText) {
+      function placeWorldRefs(seedU32, theme, tileKeyGrid, N, poiTypes, factions, rText, biome) {
         const r = xs32(seedU32 ^ 0xa53c9e17);
 
         const settlements = [];
@@ -1880,7 +1902,7 @@
           for (let x = 0; x < N; x++) {
             const k = tileKeyGrid[y][x];
             const key = `${x},${y}`;
-            if (k !== "water") land.push(key);
+            if (k !== "water" && k !== "lava") land.push(key);
             if (k === "settlement") settlements.push(key);
           }
         }
@@ -1894,12 +1916,33 @@
         settlements.forEach((cell, i) => settlementNameByCell.set(cell, settlementNames[i % settlementNames.length]));
 
         const poiPlacements = [];
-        for (let i = 0; i < poiTypes.length; i++) {
-          const poiType = poiTypes[i];
+        const poiTypesExpanded = poiTypes.slice();
+        const ruinsRarity = biomeFeatureRarity(biome, "ruins");
+        let ruinCount = 0;
+        if (ruinsRarity > 0) {
+          ruinCount = 1 + Math.floor(ruinsRarity * 2);
+          if (r() < ruinsRarity * 0.6) ruinCount += 1;
+        }
+
+        for (let i = 0; i < poiTypesExpanded.length; i++) {
+          const poiType = poiTypesExpanded[i];
           const poiName = namedPOI(nameGen, poiType);
 
           const cell = settlementOrder[i] || landOrder[i] || `${(seedU32 % N) | 0},${((seedU32 >>> 8) % N) | 0}`;
           poiPlacements.push({ poiType, poiName, cell });
+        }
+
+        if (ruinCount > 0) {
+          let rIdx = 0;
+          for (let i = 0; i < ruinCount; i++) {
+            while (rIdx < landOrder.length && (settlementNameByCell.has(landOrder[rIdx]) || poiPlacements.some((p) => p.cell === landOrder[rIdx]))) {
+              rIdx++;
+            }
+            const cell = landOrder[rIdx++] || landOrder[0] || `${(seedU32 % N) | 0},${((seedU32 >>> 8) % N) | 0}`;
+            const poiType = "ruins";
+            const poiName = namedPOI(nameGen, poiType);
+            poiPlacements.push({ poiType, poiName, cell });
+          }
         }
 
         const used = new Set(poiPlacements.map((p) => p.cell));
@@ -2012,6 +2055,12 @@
         const { features } = normalizeBiome(biome);
         const rarity = features?.[id];
         return Number.isFinite(rarity) && rarity >= minRarity;
+      }
+
+      function biomeFeatureRarity(biome, id) {
+        const { features } = normalizeBiome(biome);
+        const rarity = features?.[id];
+        return Number.isFinite(rarity) ? rarity : 0;
       }
 
       function isMountainousBiome(biome) {
@@ -2184,6 +2233,10 @@
         return biomeHasFeatureAtLeast(biome, "river-water", 0.25);
       }
 
+      function biomeAllowsLavaRiver(biome) {
+        return biomeHasFeatureAtLeast(biome, "river-lava", 0.25);
+      }
+
       /* ====================== Shared grid helpers ====================== */
       function clamp(v, lo, hi) {
         return Math.max(lo, Math.min(hi, v));
@@ -2305,11 +2358,12 @@
       }
 
       /* ====================== Water depth via distance-to-land + smoothing ====================== */
-      function waterGlyph(depth) {
-        return tileset.water.depthGlyphs[depth] || tileset.water.depthGlyphs[1] || tileset.plains?.tile;
+      function liquidGlyph(tileKey, depth) {
+        const t = tileset[tileKey] || tileset.water;
+        return t.depthGlyphs[depth] || t.depthGlyphs[1] || tileset.plains?.tile;
       }
 
-      function distToNonWater(tileKeyGrid, N) {
+      function distToNonLiquid(tileKeyGrid, N, liquidKey) {
         const INF = 1e9;
         const dist = Array.from({ length: N }, () => Array(N).fill(INF));
 
@@ -2320,7 +2374,7 @@
 
         for (let y = 0; y < N; y++) {
           for (let x = 0; x < N; x++) {
-            if (tileKeyGrid[y][x] !== "water") {
+            if (tileKeyGrid[y][x] !== liquidKey) {
               dist[y][x] = 0;
               qx[tail] = x;
               qy[tail] = y;
@@ -2348,12 +2402,12 @@
         return dist;
       }
 
-      function smoothDepthsTodo2(seedU32, tileKeyGrid, depthGrid, N) {
+      function smoothDepthsTodo2(seedU32, tileKeyGrid, depthGrid, N, liquidKey) {
         const next = depthGrid.map((row) => row.slice());
 
         for (let y = 0; y < N; y++) {
           for (let x = 0; x < N; x++) {
-            if (tileKeyGrid[y][x] !== "water") continue;
+            if (tileKeyGrid[y][x] !== liquidKey) continue;
             if (next[y][x] <= 1) continue;
 
             let hasPlainsOrGrass = false;
@@ -2371,12 +2425,12 @@
         const next2 = next.map((row) => row.slice());
         for (let y = 0; y < N; y++) {
           for (let x = 0; x < N; x++) {
-            if (tileKeyGrid[y][x] !== "water") continue;
+            if (tileKeyGrid[y][x] !== liquidKey) continue;
             if (next[y][x] !== 3) continue;
 
             let touches1 = false;
             for (const [nx, ny] of neighbors4(N, x, y)) {
-              if (tileKeyGrid[ny][nx] === "water" && next[ny][nx] === 1) {
+              if (tileKeyGrid[ny][nx] === liquidKey && next[ny][nx] === 1) {
                 touches1 = true;
                 break;
               }
@@ -2391,16 +2445,16 @@
         return next2;
       }
 
-      function bumpDepthCenters(tileKeyGrid, depthGrid, N) {
+      function bumpDepthCenters(tileKeyGrid, depthGrid, N, liquidKey) {
         const next = depthGrid.map((row) => row.slice());
         for (let y = 0; y < N; y++) {
           for (let x = 0; x < N; x++) {
-            if (tileKeyGrid[y][x] !== "water") continue;
+            if (tileKeyGrid[y][x] !== liquidKey) continue;
             const d = depthGrid[y][x];
             if (d >= 3) continue;
             let sameOrHigher = true;
             for (const [nx, ny] of neighbors4(N, x, y)) {
-              if (tileKeyGrid[ny][nx] !== "water" || depthGrid[ny][nx] < d) {
+              if (tileKeyGrid[ny][nx] !== liquidKey || depthGrid[ny][nx] < d) {
                 sameOrHigher = false;
                 break;
               }
@@ -2411,21 +2465,21 @@
         return next;
       }
 
-      function buildDepthGrid(seedU32, tileKeyGrid, river, N) {
-        const dist = distToNonWater(tileKeyGrid, N);
+      function buildDepthGrid(seedU32, tileKeyGrid, river, N, liquidKey = "water") {
+        const dist = distToNonLiquid(tileKeyGrid, N, liquidKey);
 
         const depthGrid = Array.from({ length: N }, () => Array(N).fill(0));
         for (let y = 0; y < N; y++) {
           for (let x = 0; x < N; x++) {
-            if (tileKeyGrid[y][x] !== "water") continue;
+            if (tileKeyGrid[y][x] !== liquidKey) continue;
             let d = clamp(dist[y][x], 1, 3);
             if (river?.has(`${x},${y}`)) d = Math.max(d, 2);
             depthGrid[y][x] = d;
           }
         }
 
-        const smoothed = smoothDepthsTodo2(seedU32, tileKeyGrid, depthGrid, N);
-        return bumpDepthCenters(tileKeyGrid, smoothed, N);
+        const smoothed = smoothDepthsTodo2(seedU32, tileKeyGrid, depthGrid, N, liquidKey);
+        return bumpDepthCenters(tileKeyGrid, smoothed, N, liquidKey);
       }
 
       /* ====================== Mountain height via distance-to-non-mountain ====================== */
@@ -2485,8 +2539,214 @@
         return tileset.mountain.height[h] || tileset.mountain.height[1] || tileset.mountain?.tile || tileset.plains?.tile;
       }
 
+      function applyDunePatches(seedU32, tileKeyGrid, N, rarity) {
+        if (rarity <= 0) return tileKeyGrid;
+        const next = tileKeyGrid.map((row) => row.slice());
+        const rand = xs32(seedU32 ^ 0x3e9b1d2f);
+        const patches = Math.max(1, Math.floor(1 + rarity * 4));
+        const totalCells = Math.floor(N * N * (0.05 + rarity * 0.12));
+        const stepsPerPatch = Math.max(10, Math.floor(totalCells / patches));
+        const dirs = [
+          [1, 0],
+          [-1, 0],
+          [0, 1],
+          [0, -1],
+        ];
+
+        const pickStart = () => {
+          for (let tries = 0; tries < 100; tries++) {
+            const x = (rand() * N) | 0;
+            const y = (rand() * N) | 0;
+            const k = next[y][x];
+            if (k !== "water" && k !== "mountain" && k !== "settlement") return { x, y };
+          }
+          return { x: (rand() * N) | 0, y: (rand() * N) | 0 };
+        };
+
+        for (let p = 0; p < patches; p++) {
+          let { x, y } = pickStart();
+          for (let i = 0; i < stepsPerPatch; i++) {
+            if (x < 0 || x >= N || y < 0 || y >= N) break;
+            const k = next[y][x];
+            if (k !== "water" && k !== "mountain" && k !== "settlement") next[y][x] = "desert";
+            const d = dirs[(rand() * dirs.length) | 0];
+            if (rand() < 0.2) {
+              x = clamp(x + d[0] + (rand() < 0.5 ? d[0] : 0), 0, N - 1);
+              y = clamp(y + d[1] + (rand() < 0.5 ? d[1] : 0), 0, N - 1);
+            } else {
+              x = clamp(x + d[0], 0, N - 1);
+              y = clamp(y + d[1], 0, N - 1);
+            }
+          }
+        }
+
+        return next;
+      }
+
+      function applyOasisPatches(seedU32, tileKeyGrid, N, rarity) {
+        const oasisVeg = new Set();
+        if (rarity <= 0) return { grid: tileKeyGrid, oasisVeg };
+        const next = tileKeyGrid.map((row) => row.slice());
+        const rand = xs32(seedU32 ^ 0x7f4a7c1b);
+        const patches = Math.max(1, Math.floor(1 + rarity * 3));
+        const maxRadius = 1 + Math.floor(rarity * 2);
+
+        const pickStart = () => {
+          for (let tries = 0; tries < 120; tries++) {
+            const x = (rand() * N) | 0;
+            const y = (rand() * N) | 0;
+            const k = next[y][x];
+            if (k !== "water" && k !== "mountain" && k !== "settlement") return { x, y };
+          }
+          return { x: (rand() * N) | 0, y: (rand() * N) | 0 };
+        };
+
+        for (let p = 0; p < patches; p++) {
+          const { x: cx, y: cy } = pickStart();
+          const bigBonus = rand() < 0.35 ? 1 : 0;
+          const r = 1 + ((rand() * maxRadius) | 0) + bigBonus;
+
+          for (let y = cy - r - 2; y <= cy + r + 2; y++) {
+            for (let x = cx - r - 2; x <= cx + r + 2; x++) {
+              if (x < 0 || x >= N || y < 0 || y >= N) continue;
+              const dx = x - cx;
+              const dy = y - cy;
+              const dist = Math.abs(dx) + Math.abs(dy);
+              if (dist > r + 2) continue;
+              const k = next[y][x];
+              if (k === "mountain" || k === "settlement") continue;
+              if (dist <= r) {
+                next[y][x] = "water";
+              } else if (k !== "water") {
+                if (dist === r + 2 && rand() < 0.4) continue;
+                next[y][x] = rand() < (dist === r + 2 ? 0.7 : 0.6) ? "grass" : "forest";
+                oasisVeg.add(`${x},${y}`);
+              }
+            }
+          }
+        }
+
+        return { grid: next, oasisVeg };
+      }
+
+      function applyMyceliumPatches(seedU32, tileKeyGrid, N, rarity) {
+        if (rarity <= 0) return tileKeyGrid;
+        const next = tileKeyGrid.map((row) => row.slice());
+        const rand = xs32(seedU32 ^ 0x91a2f5c3);
+        const patches = Math.max(1, Math.floor(1 + rarity * 4));
+        const totalCells = Math.floor(N * N * (0.03 + rarity * 0.1));
+        const stepsPerPatch = Math.max(12, Math.floor(totalCells / patches));
+        const dirs = [
+          [1, 0],
+          [-1, 0],
+          [0, 1],
+          [0, -1],
+          [1, 1],
+          [-1, 1],
+          [1, -1],
+          [-1, -1],
+        ];
+
+        const isBlocked = (k) =>
+          k === "water" || k === "lava" || k === "mountain" || k === "settlement" || k === "desert" || k === "ruins";
+
+        const pickStart = () => {
+          for (let tries = 0; tries < 140; tries++) {
+            const x = (rand() * N) | 0;
+            const y = (rand() * N) | 0;
+            const k = next[y][x];
+            if (k === "forest") return { x, y };
+            if (!isBlocked(k) && rand() < 0.65) return { x, y };
+          }
+          return { x: (rand() * N) | 0, y: (rand() * N) | 0 };
+        };
+
+        for (let p = 0; p < patches; p++) {
+          let { x, y } = pickStart();
+          for (let i = 0; i < stepsPerPatch; i++) {
+            if (x < 0 || x >= N || y < 0 || y >= N) break;
+            const k = next[y][x];
+            if (!isBlocked(k)) next[y][x] = "mycelium";
+            const d = dirs[(rand() * dirs.length) | 0];
+            if (rand() < 0.25) {
+              x = clamp(x + d[0] + (rand() < 0.5 ? d[0] : 0), 0, N - 1);
+              y = clamp(y + d[1] + (rand() < 0.5 ? d[1] : 0), 0, N - 1);
+            } else {
+              x = clamp(x + d[0], 0, N - 1);
+              y = clamp(y + d[1], 0, N - 1);
+            }
+          }
+        }
+
+        return next;
+      }
+
+      function applyBeachPatches(seedU32, tileKeyGrid, depthGrid, N) {
+        const next = tileKeyGrid.map((row) => row.slice());
+        const rand = xs32(seedU32 ^ 0x2b9f5ac1);
+        const centers = [];
+
+        for (let y = 0; y < N; y++) {
+          for (let x = 0; x < N; x++) {
+            const k = tileKeyGrid[y][x];
+            if (k !== "plains") continue;
+            let shallowNeighbor = false;
+            for (const [nx, ny] of neighbors4(N, x, y)) {
+              if (tileKeyGrid[ny][nx] === "water" && (depthGrid?.[ny]?.[nx] || 1) === 1) {
+                shallowNeighbor = true;
+                break;
+              }
+            }
+            if (!shallowNeighbor) continue;
+            if (rand() < 0.38) centers.push({ x, y });
+          }
+        }
+
+        const touchesShallowWater = (x, y) => {
+          for (const [nx, ny] of neighbors4(N, x, y)) {
+            if (tileKeyGrid[ny][nx] === "water" && (depthGrid?.[ny]?.[nx] || 1) === 1) return true;
+          }
+          return false;
+        };
+
+        for (const c of centers) {
+          const r = 2 + ((rand() * 4) | 0);
+          for (let y = c.y - r - 1; y <= c.y + r + 1; y++) {
+            for (let x = c.x - r - 1; x <= c.x + r + 1; x++) {
+              if (x < 0 || x >= N || y < 0 || y >= N) continue;
+              const k = next[y][x];
+              if (k !== "plains") continue;
+              const dist = Math.abs(x - c.x) + Math.abs(y - c.y);
+              if (dist > r) continue;
+              if (dist === r && rand() < 0.35) continue;
+              if (!touchesShallowWater(x, y)) continue;
+              next[y][x] = "beach";
+            }
+          }
+        }
+
+        return next;
+      }
+
+      function applyRuinsClusters(seedU32, tileKeyGrid, N, ruinCenters, rarity) {
+        if (!Array.isArray(ruinCenters) || !ruinCenters.length || rarity <= 0) return tileKeyGrid;
+        const next = tileKeyGrid.map((row) => row.slice());
+
+        for (const center of ruinCenters) {
+          const parts = String(center?.cell || "").split(",");
+          const cx = Number(parts[0]);
+          const cy = Number(parts[1]);
+          if (!Number.isFinite(cx) || !Number.isFinite(cy)) continue;
+          const k = next[cy]?.[cx];
+          if (!k || k === "water" || k === "lava" || k === "mountain" || k === "settlement") continue;
+          next[cy][cx] = "ruins";
+        }
+
+        return next;
+      }
+
       /* ====================== Forest typing (biome + climate) ====================== */
-      function forestTypeForCell(seedU32, x, y, biome, climate) {
+      function forestTypeForCell(seedU32, x, y, biome, climate, oasisVeg) {
         const s = String(biome || "").toLowerCase();
         const tempTier = clamp(climate?.tempTier ?? 4, 1, 8);
         const rainIdx = clamp((climate?.rainIdx ?? 3) + 1, 1, 8);
@@ -2506,6 +2766,7 @@
         const isColdBiome = s.includes("tundra") || s.includes("taiga") || s.includes("ice") || s.includes("highland");
 
         if (isDeadBiome) {
+          if (oasisVeg?.has(`${x},${y}`)) return "deciduous";
           const roll = n2(seedU32, 70000 + x, 70100 + y);
           if (rainIdx >= 6 && roll < 0.18) return "deciduous";
           return "dead";
@@ -2514,6 +2775,7 @@
         if (isColdBiome || tempTier <= 3) return "coniferous";
 
         if (tempTier >= 7 && rainIdx <= 2) {
+          if (oasisVeg?.has(`${x},${y}`)) return "deciduous";
           const roll = n2(seedU32, 70200 + x, 70300 + y);
           return roll < 0.6 ? "dead" : "deciduous";
         }
@@ -2552,15 +2814,16 @@
           normalizeWeights(weights);
         }
 
-        const river = biomeAllowsRiver(biome) && n2(seedU32, 42000, 43000) > 0.35 ? riverCells(seedU32 ^ 0x9e3779b9, N) : new Set();
+        const riverType = biomeAllowsLavaRiver(biome) ? "lava" : biomeAllowsRiver(biome) ? "water" : null;
+        const river = riverType && n2(seedU32, 42000, 43000) > 0.35 ? riverCells(seedU32 ^ 0x9e3779b9, N) : new Set();
 
         let tileKeyGrid = Array.from({ length: N }, () => Array(N).fill("plains"));
 
         for (let y = 0; y < N; y++) {
           for (let x = 0; x < N; x++) {
             let tileKey;
-            if (river.has(`${x},${y}`)) {
-              tileKey = "water";
+            if (riverType && river.has(`${x},${y}`)) {
+              tileKey = riverType;
             } else {
               const r0 = n2(seedU32, x, y);
               tileKey = pickByWeights(r0, weights);
@@ -2582,14 +2845,22 @@
             }
           }
         }
+        tileKeyGrid = applyDunePatches(seedU32, tileKeyGrid, N, biomeFeatureRarity(biome, "dunes"));
+        const oasisResult = applyOasisPatches(seedU32, tileKeyGrid, N, biomeFeatureRarity(biome, "oasis"));
+        tileKeyGrid = oasisResult.grid;
+        const oasisVeg = oasisResult.oasisVeg;
+        tileKeyGrid = applyMyceliumPatches(seedU32, tileKeyGrid, N, biomeFeatureRarity(biome, "mycelium"));
+        const ruinCenters = worldMeta?.poiPlacements?.filter((p) => p.poiType === "ruins") || [];
+        tileKeyGrid = applyRuinsClusters(seedU32, tileKeyGrid, N, ruinCenters, biomeFeatureRarity(biome, "ruins"));
 
-        const depthGrid = buildDepthGrid(seedU32, tileKeyGrid, river, N);
+        const depthGrid = buildDepthGrid(seedU32, tileKeyGrid, river, N, riverType || "water");
+        tileKeyGrid = applyBeachPatches(seedU32, tileKeyGrid, depthGrid, N);
         const heightGrid = buildHeightGrid(tileKeyGrid, N);
 
         const forestTypeGrid = Array.from({ length: N }, () => Array(N).fill(null));
         for (let y = 0; y < N; y++) {
           for (let x = 0; x < N; x++) {
-            if (tileKeyGrid[y][x] === "forest") forestTypeGrid[y][x] = forestTypeForCell(seedU32, x, y, biome, climate);
+            if (tileKeyGrid[y][x] === "forest") forestTypeGrid[y][x] = forestTypeForCell(seedU32, x, y, biome, climate, oasisVeg);
           }
         }
 
@@ -2605,7 +2876,7 @@
 
             const bits = [];
             bits.push(`${tileKey} @ (${x},${y})`);
-            if (tileKey === "water") bits.push(`depth: ${clamp(depthGrid[y][x] || 1, 1, 3)}`);
+            if (tileKey === "water" || tileKey === "lava") bits.push(`depth: ${clamp(depthGrid[y][x] || 1, 1, 3)}`);
             if (tileKey === "mountain") bits.push(`height: ${clamp(heightGrid[y][x] || 1, 1, 5)}`);
             if (tileKey === "forest") bits.push(`forest: ${forestTypeGrid[y][x] || "mixed"}`);
             if (a?.settlementName) bits.push(`Settlement: ${a.settlementName}`);
@@ -2613,7 +2884,7 @@
             if (a?.poi?.length) {
               for (const p of a.poi) {
                 if (a?.religious && p.type === "religious") continue;
-                bits.push(`POI: ${p.name} [${p.type}]`);
+                bits.push(`POI: ${p.name}`);
               }
             }
             if (a?.factions?.length) for (const f of a.factions) bits.push(`Faction: ${f.name}`);
@@ -2637,10 +2908,10 @@
               const fallbackRel = tileset.religious?.death || tileset.religious?.monastery || tileset.settlement?.tile || tileset.plains?.tile;
               const ch = rel.glyph || tileset.religious?.[rel.kind] || fallbackRel;
               row += `<span data-cell="${x},${y}" data-tile="religious" data-religious="${escAttr(rel.kind)}" title="${title}">${ch}</span>`;
-            } else if (tileKey === "water") {
+            } else if (tileKey === "water" || tileKey === "lava") {
               const d = clamp(depthGrid[y][x] || 1, 1, 3);
-              const ch = waterGlyph(d);
-              row += `<span data-cell="${x},${y}" data-tile="water" data-depth="${d}" title="${title}">${ch}</span>`;
+              const ch = liquidGlyph(tileKey, d);
+              row += `<span data-cell="${x},${y}" data-tile="${tileKey}" data-depth="${d}" title="${title}">${ch}</span>`;
             } else if (tileKey === "mountain") {
               const h = clamp(heightGrid[y][x] || 1, 1, 5);
               const ch = mountainGlyph(h);
@@ -2763,7 +3034,7 @@
             if (map0.tileKeyGrid[y][x] !== "water") landCells.push(`${x},${y}`);
           }
         }
-        const worldMeta = placeWorldRefs(mapSeed, theme, map0.tileKeyGrid, map0.N, poiTypes, factions, r);
+        const worldMeta = placeWorldRefs(mapSeed, theme, map0.tileKeyGrid, map0.N, poiTypes, factions, r, biomeName);
         const settlementEntries = Array.from(worldMeta.settlementNameByCell.entries());
         const poiRefs = worldMeta.poiPlacements.map((p) => ({ name: p.poiName, cell: p.cell }));
         const poiNames = poiRefs.map((p) => p.name);
@@ -2998,7 +3269,8 @@
 
         html += `\nHook: ${hookHtml}\n`;
 
-        const mapFlags = { deadTrees: biomeHasDeadTrees(biomeName, climate) };
+        const biomeLower = biomeName.toLowerCase();
+        const mapFlags = { deadTrees: biomeHasDeadTrees(biomeName, climate), desert: biomeLower.includes("desert") };
 
         return { html, mapGrid: map1.html, mapFlags };
       }
@@ -3185,6 +3457,7 @@
         out.innerHTML = html;
         mapEl.innerHTML = mapGrid;
         mapEl.dataset.deadTrees = mapFlags?.deadTrees ? "1" : "";
+        mapEl.dataset.desert = mapFlags?.desert ? "1" : "";
         bindCrossHover();
       }
 
