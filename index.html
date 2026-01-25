@@ -72,7 +72,11 @@
         --tile-mycelium: color-mix(in srgb, var(--sw9) 50%, var(--sw2));
 
         --tile-grass: var(--sw6);
-        --tile-grass-dead: color-mix(in srgb, var(--tile-grass) 60%, var(--sw1));
+        --tile-grass-dead: color-mix(
+          in srgb,
+          var(--tile-grass) 60%,
+          var(--sw1)
+        );
         --tile-plains: color-mix(in srgb, var(--sw5) 50%, var(--sw0));
         --tile-settlement: var(--sw2);
         --tile-camp: var(--sw3);
@@ -91,7 +95,13 @@
         padding: 0;
         background: var(--bg);
         color: var(--fg);
-        font-family: "unifontex", system-ui, Segoe UI, Roboto, Inter, sans-serif;
+        font-family:
+          "unifontex",
+          system-ui,
+          Segoe UI,
+          Roboto,
+          Inter,
+          sans-serif;
       }
 
       header {
@@ -218,7 +228,13 @@
         white-space: pre;
         overflow: auto;
         margin: 0;
-        font-family: "unifontex", system-ui, Segoe UI, Roboto, Inter, sans-serif;
+        font-family:
+          "unifontex",
+          system-ui,
+          Segoe UI,
+          Roboto,
+          Inter,
+          sans-serif;
       }
 
       #out {
@@ -286,7 +302,6 @@
       #map span[data-tile="lava"][data-depth="3"] {
         color: var(--tile-lava-3);
       }
-
 
       #map span[data-tile="mountain"][data-height="1"] {
         color: var(--tile-mountain-1);
@@ -560,12 +575,14 @@
         </div>
         <div class="sep"></div>
         <div class="head favs">
-          <strong>Favorites</strong><button id="clrFav" class="pill small">Clear</button>
+          <strong>Favorites</strong
+          ><button id="clrFav" class="pill small">Clear</button>
         </div>
         <ul id="favs" class="list"></ul>
         <div class="sep"></div>
         <div class="small mut">
-          Tip: press <strong>Enter</strong> in the seed box to use that seed once.
+          Tip: press <strong>Enter</strong> in the seed box to use that seed
+          once.
         </div>
       </div>
     </div>
@@ -585,7 +602,7 @@
         "river-lava",
         "mountain",
         "lake", // not implemented yet
-        "beaches", 
+        "beaches",
         "dunes",
         "oasis",
         "ruins",
@@ -604,7 +621,10 @@
 
       function validateFeatureName(id, context) {
         if (!DEBUG) return;
-        if (!FEATURE_SET.has(id)) debugWarn(`Unknown feature "${id}"${context ? ` in ${context}` : ""}`);
+        if (!FEATURE_SET.has(id))
+          debugWarn(
+            `Unknown feature "${id}"${context ? ` in ${context}` : ""}`,
+          );
       }
 
       const themes = {
@@ -741,7 +761,16 @@
             7: "sultry",
             8: "searing",
           },
-          rain: ["parched", "dry", "breezy", "misty", "drizzled", "rain-washed", "monsoonal", "storm-lashed"],
+          rain: [
+            "parched",
+            "dry",
+            "breezy",
+            "misty",
+            "drizzled",
+            "rain-washed",
+            "monsoonal",
+            "storm-lashed",
+          ],
           climateAdj: [
             "rocky",
             "dusty",
@@ -800,7 +829,22 @@
             "March",
             "Host",
           ],
-          factionsN2: ["of the", "of", "for the", "under", "against the", "beneath the", "among the", "beyond the", "within the", "beside the", "before the", "after the", "toward the", "upon the"],
+          factionsN2: [
+            "of the",
+            "of",
+            "for the",
+            "under",
+            "against the",
+            "beneath the",
+            "among the",
+            "beyond the",
+            "within the",
+            "beside the",
+            "before the",
+            "after the",
+            "toward the",
+            "upon the",
+          ],
           roles: [
             "Wardens",
             "Archivists",
@@ -827,8 +871,31 @@
             "Thornwatch",
             "Miststriders",
           ],
-          motives: ["cleansing", "binding", "awakening", "silencing", "tending", "unlocking", "consecrating"],
-          motiveGlue: ["the only remaining", "a", "an ancient", "a forgotten", "a cursed", "the last", "a sacred", "a sealed", "an abandoned", "a hidden", "a buried", "a ruined", "a lost", "a reclaimed"],
+          motives: [
+            "cleansing",
+            "binding",
+            "awakening",
+            "silencing",
+            "tending",
+            "unlocking",
+            "consecrating",
+          ],
+          motiveGlue: [
+            "the only remaining",
+            "a",
+            "an ancient",
+            "a forgotten",
+            "a cursed",
+            "the last",
+            "a sacred",
+            "a sealed",
+            "an abandoned",
+            "a hidden",
+            "a buried",
+            "a ruined",
+            "a lost",
+            "a reclaimed",
+          ],
           relicAdjectives: [
             "ancient",
             "forgotten",
@@ -849,7 +916,28 @@
             "star-forged",
             "bone-carved",
           ],
-          relicNouns: ["tablet", "idol", "scroll", "blade", "mask", "sigil", "key", "horn", "stone", "ring", "crown", "lens", "staff", "seal", "totem", "mirror", "lock", "gem", "vessel", "pendant"],
+          relicNouns: [
+            "tablet",
+            "idol",
+            "scroll",
+            "blade",
+            "mask",
+            "sigil",
+            "key",
+            "horn",
+            "stone",
+            "ring",
+            "crown",
+            "lens",
+            "staff",
+            "seal",
+            "totem",
+            "mirror",
+            "lock",
+            "gem",
+            "vessel",
+            "pendant",
+          ],
           pois: [
             "relic line",
             "forgotten cairn",
@@ -916,8 +1004,27 @@
             "a sigil appears",
             "the well runs dry",
           ],
-          hookMods: ["near the <poi>", "within the biome", "during <weather> conditions", "beneath the <poi>", "around the <poi>", "when passing through the biome", "when the wind shifted to <weather>"],
-          hookGlue: ["and", "but", "while", "as", "yet", "then", "though", "because", "when", "just as"],
+          hookMods: [
+            "near the <poi>",
+            "within the biome",
+            "during <weather> conditions",
+            "beneath the <poi>",
+            "around the <poi>",
+            "when passing through the biome",
+            "when the wind shifted to <weather>",
+          ],
+          hookGlue: [
+            "and",
+            "but",
+            "while",
+            "as",
+            "yet",
+            "then",
+            "though",
+            "because",
+            "when",
+            "just as",
+          ],
         },
 
         scifi: {
@@ -1029,8 +1136,26 @@
               },
             },
           ],
-          temp: { 1: "cryonic", 2: "subzero", 3: "brisk", 4: "temperate", 5: "warm", 6: "tropic", 7: "equatorial", 8: "thermic" },
-          rain: ["arid", "dry winds", "breezy", "humid", "mist-laden", "rainy", "storm-charged", "ion-saturated"],
+          temp: {
+            1: "cryonic",
+            2: "subzero",
+            3: "brisk",
+            4: "temperate",
+            5: "warm",
+            6: "tropic",
+            7: "equatorial",
+            8: "thermic",
+          },
+          rain: [
+            "arid",
+            "dry winds",
+            "breezy",
+            "humid",
+            "mist-laden",
+            "rainy",
+            "storm-charged",
+            "ion-saturated",
+          ],
           climateAdj: [
             "rocky",
             "dusty",
@@ -1085,17 +1210,117 @@
             "Security Cluster",
             "Mining Authority",
           ],
-          factionsN2: ["of", "for", "operating in", "under", "over", "near", "within", "against", "aligned with", "based in"],
-          roles: ["Surveyors", "Archivists", "Salvagers", "Datawrights", "Terraformers", "Smugglers", "Peacekeepers", "Prospectors", "Hackers", "Vigil AIs", "Skyfarers", "Signalers", "Cryotechs", "Synthbinders"],
-          motives: ["activating", "decrypting", "hacking", "monitoring", "rebooting"],
-          motiveGlue: ["the only remaining", "a", "an old", "a sealed", "a forgotten", "a derelict", "a hidden", "an encrypted"],
-          relicAdjectives: ["encrypted", "forgotten", "sealed", "quantum", "bio-locked", "holographic", "corrupted", "archived"],
-          relicNouns: ["core", "drive", "node", "key", "vault", "chip", "beacon", "archive", "relay", "protocol"],
-          pois: ["orbital spine", "seed vault", "phase-burned crater", "maglev trench", "signal relay", "data vault", "drift station"],
-          weather: ["static rain", "an ion flash", "dust drift", "signal interference", "electrical haze", "solar flare scatter"],
-          hooks: ["a ghost ping repeats each dusk", "a vault opens for the first time", "a comms blackout spreads", "a relay node reboots unexpectedly", "a drone fails to report", "a beacon activates without command"],
-          hookMods: ["near the <poi>", "inside the <poi>", "during <weather>", "as <weather> builds", "after <weather> clears"],
-          hookGlue: ["and", "but", "while", "as", "yet", "then", "though", "because", "even as", "just as"],
+          factionsN2: [
+            "of",
+            "for",
+            "operating in",
+            "under",
+            "over",
+            "near",
+            "within",
+            "against",
+            "aligned with",
+            "based in",
+          ],
+          roles: [
+            "Surveyors",
+            "Archivists",
+            "Salvagers",
+            "Datawrights",
+            "Terraformers",
+            "Smugglers",
+            "Peacekeepers",
+            "Prospectors",
+            "Hackers",
+            "Vigil AIs",
+            "Skyfarers",
+            "Signalers",
+            "Cryotechs",
+            "Synthbinders",
+          ],
+          motives: [
+            "activating",
+            "decrypting",
+            "hacking",
+            "monitoring",
+            "rebooting",
+          ],
+          motiveGlue: [
+            "the only remaining",
+            "a",
+            "an old",
+            "a sealed",
+            "a forgotten",
+            "a derelict",
+            "a hidden",
+            "an encrypted",
+          ],
+          relicAdjectives: [
+            "encrypted",
+            "forgotten",
+            "sealed",
+            "quantum",
+            "bio-locked",
+            "holographic",
+            "corrupted",
+            "archived",
+          ],
+          relicNouns: [
+            "core",
+            "drive",
+            "node",
+            "key",
+            "vault",
+            "chip",
+            "beacon",
+            "archive",
+            "relay",
+            "protocol",
+          ],
+          pois: [
+            "orbital spine",
+            "seed vault",
+            "phase-burned crater",
+            "maglev trench",
+            "signal relay",
+            "data vault",
+            "drift station",
+          ],
+          weather: [
+            "static rain",
+            "an ion flash",
+            "dust drift",
+            "signal interference",
+            "electrical haze",
+            "solar flare scatter",
+          ],
+          hooks: [
+            "a ghost ping repeats each dusk",
+            "a vault opens for the first time",
+            "a comms blackout spreads",
+            "a relay node reboots unexpectedly",
+            "a drone fails to report",
+            "a beacon activates without command",
+          ],
+          hookMods: [
+            "near the <poi>",
+            "inside the <poi>",
+            "during <weather>",
+            "as <weather> builds",
+            "after <weather> clears",
+          ],
+          hookGlue: [
+            "and",
+            "but",
+            "while",
+            "as",
+            "yet",
+            "then",
+            "though",
+            "because",
+            "even as",
+            "just as",
+          ],
         },
 
         apocalypse: {
@@ -1218,8 +1443,26 @@
               },
             },
           ],
-          temp: { 1: "frost-bit", 2: "cold", 3: "cool", 4: "mild", 5: "warm", 6: "hot", 7: "blistering", 8: "oven-hot" },
-          rain: ["powder-dry", "dry gusts", "dusty", "clammy", "drizzle", "rain-battered", "monsoon-bent", "electric storms"],
+          temp: {
+            1: "frost-bit",
+            2: "cold",
+            3: "cool",
+            4: "mild",
+            5: "warm",
+            6: "hot",
+            7: "blistering",
+            8: "oven-hot",
+          },
+          rain: [
+            "powder-dry",
+            "dry gusts",
+            "dusty",
+            "clammy",
+            "drizzle",
+            "rain-battered",
+            "monsoon-bent",
+            "electric storms",
+          ],
           climateAdj: [
             "rocky",
             "dusty",
@@ -1246,21 +1489,126 @@
             "ruined",
             "hollow",
           ],
-          factionsN1: ["Remnants", "Road Kings", "Canal Commune", "Vault Kin", "Scrap Choir", "Spore Ward", "Signal House"],
-          factionsN2: ["of", "at", "over", "under", "through", "against", "within", "near", "beyond", "inside", "along", "beneath"],
-          roles: ["Scavvers", "Archivists", "Pickers", "Claimants", "Watchers", "Riggers", "Spanners", "Guides", "Slingers"],
+          factionsN1: [
+            "Remnants",
+            "Road Kings",
+            "Canal Commune",
+            "Vault Kin",
+            "Scrap Choir",
+            "Spore Ward",
+            "Signal House",
+          ],
+          factionsN2: [
+            "of",
+            "at",
+            "over",
+            "under",
+            "through",
+            "against",
+            "within",
+            "near",
+            "beyond",
+            "inside",
+            "along",
+            "beneath",
+          ],
+          roles: [
+            "Scavvers",
+            "Archivists",
+            "Pickers",
+            "Claimants",
+            "Watchers",
+            "Riggers",
+            "Spanners",
+            "Guides",
+            "Slingers",
+          ],
           motives: ["claiming", "fighting", "hoarding", "towing", "trading"],
-          motiveGlue: ["the only remaining", "a", "an old", "a sealed", "a flooded", "a broken", "a buried", "a rusted", "a forgotten"],
-          relicAdjectives: ["sealed", "rusted", "burned", "coded", "scrapped", "buried", "cracked", "patched", "irradiated", "forgotten"],
-          relicNouns: ["vault", "badge", "drive", "mask", "chip", "tag", "key", "module", "canister", "token", "seal", "crate"],
-          pois: ["interchange", "metro mouth", "signal tower", "mall", "canal gate", "rail cathedral", "salt pit", "water plant"],
-          weather: ["static rain", "polluted snow", "heat shimmer", "metallic drizzle", "smoke squalls", "acid mist", "radio interference"],
-          hooks: ["a treaty flag burns", "a convoy goes missing", "a bunker door opens on its own", "a warning light blinks without power", "a flare goes up with no claim"],
-          hookMods: ["near the <poi>", "inside the <poi>", "during <weather>", "as <weather> builds", "after <weather> clears"],
-          hookGlue: ["and", "but", "while", "as", "yet", "then", "though", "because", "even as", "just as"],
+          motiveGlue: [
+            "the only remaining",
+            "a",
+            "an old",
+            "a sealed",
+            "a flooded",
+            "a broken",
+            "a buried",
+            "a rusted",
+            "a forgotten",
+          ],
+          relicAdjectives: [
+            "sealed",
+            "rusted",
+            "burned",
+            "coded",
+            "scrapped",
+            "buried",
+            "cracked",
+            "patched",
+            "irradiated",
+            "forgotten",
+          ],
+          relicNouns: [
+            "vault",
+            "badge",
+            "drive",
+            "mask",
+            "chip",
+            "tag",
+            "key",
+            "module",
+            "canister",
+            "token",
+            "seal",
+            "crate",
+          ],
+          pois: [
+            "interchange",
+            "metro mouth",
+            "signal tower",
+            "mall",
+            "canal gate",
+            "rail cathedral",
+            "salt pit",
+            "water plant",
+          ],
+          weather: [
+            "static rain",
+            "polluted snow",
+            "heat shimmer",
+            "metallic drizzle",
+            "smoke squalls",
+            "acid mist",
+            "radio interference",
+          ],
+          hooks: [
+            "a treaty flag burns",
+            "a convoy goes missing",
+            "a bunker door opens on its own",
+            "a warning light blinks without power",
+            "a flare goes up with no claim",
+          ],
+          hookMods: [
+            "near the <poi>",
+            "inside the <poi>",
+            "during <weather>",
+            "as <weather> builds",
+            "after <weather> clears",
+          ],
+          hookGlue: [
+            "and",
+            "but",
+            "while",
+            "as",
+            "yet",
+            "then",
+            "though",
+            "because",
+            "even as",
+            "just as",
+          ],
         },
       };
-            
+
       const fieldMotiveVerbs = [
         "guarding",
         "defending",
@@ -1280,6 +1628,10 @@
         "charting",
         "reclaiming",
         "repairing",
+        "constructing",
+        "investigating",
+        "surveying",
+        "patrolling",
       ];
 
       const npcTasks = {
@@ -1441,11 +1793,14 @@
 
       /* ====================== Tileset (no colors here; CSS drives colors) ====================== */
       const tileset = {
-        water: { depthGlyphs: { 1: ["~","∾","˜","∿"], 2: "≈", 3: "≋" } },
-        lava: { depthGlyphs: { 1: ["~","∾","˜","∿"], 2: "≈", 3: "≋" } },
+        water: { depthGlyphs: { 1: ["~", "∾", "˜", "∿"], 2: "≈", 3: "≋" } },
+        lava: { depthGlyphs: { 1: ["~", "∾", "˜", "∿"], 2: "≈", 3: "≋" } },
         plains: { tile: "·", variants: ["‧", "∙"] },
         beach: { tile: "·", variants: ["‧", "∙"] },
-        grass: { tile: "ᵞ", variants: ["ᵞ", "˯", "ˬ", "ˇ", "…", "ⵈ", '"', "'"] },
+        grass: {
+          tile: "ᵞ",
+          variants: ["ᵞ", "˯", "ˬ", "ˇ", "…", "ⵈ", '"', "'"],
+        },
         forest: {
           tile: "⯭",
           coniferous: ["⏃", "𐙢", "𐊾"],
@@ -1453,17 +1808,20 @@
           deciduous: ["𐌒", "Ọ"],
           variants: ["𐙘", "↑", "⏃", "𐌒", "Ọ", "𐙢", "𐊾", "↟"],
         },
-        desert: { tile: "~", variants: [
-          "~", 
-          "≈", 
-        ] },
-        mycelium: { tile: "ᵠ", variants: ["ⵈ", "·", "‧", "∙",] },
+        desert: { tile: "~", variants: ["~", "≈"] },
+        mycelium: { tile: "ᵠ", variants: ["ⵈ", "·", "‧", "∙"] },
         mountain: {
           tile: "^",
           height: { 1: "꘍", 2: "ᨈ", 3: "ᴧ", 4: "Λ", 5: "Δ" },
         },
-        settlement: { tile: "⛩", variants: ["⌂", "𐘮", "𐙁", "𐛅", "𐛘", "𐝡", "𐀁", "𐁍", "𐂧", "𐃀"] },
-        ruins: { tile: "⌂", variants: ["⌂", "𐘮", "𐙁", "𐛅", "𐛘", "𐝡", "𐀁", "𐁍", "𐂧", "𐃀"] },
+        settlement: {
+          tile: "⛩",
+          variants: ["⌂", "𐘮", "𐙁", "𐛅", "𐛘", "𐝡", "𐀁", "𐁍", "𐂧", "𐃀"],
+        },
+        ruins: {
+          tile: "⌂",
+          variants: ["⌂", "𐘮", "𐙁", "𐛅", "𐛘", "𐝡", "𐀁", "𐁍", "𐂧", "𐃀"],
+        },
         camp: { tile: "ᗑ" },
         religious: { death: "⚱", monastery: "⛨" },
       };
@@ -1484,7 +1842,8 @@
               continue;
             }
             for (const depth of [1, 2, 3]) {
-              if (!def.depthGlyphs[depth]) debugWarn(`Tileset "${key}" missing depthGlyphs[${depth}]`);
+              if (!def.depthGlyphs[depth])
+                debugWarn(`Tileset "${key}" missing depthGlyphs[${depth}]`);
             }
             continue;
           }
@@ -1494,12 +1853,16 @@
               continue;
             }
             for (const h of [1, 2, 3, 4, 5]) {
-              if (!def.height[h]) debugWarn(`Tileset "mountain" missing height[${h}]`);
+              if (!def.height[h])
+                debugWarn(`Tileset "mountain" missing height[${h}]`);
             }
             continue;
           }
           if (key === "religious") {
-            if (!def.death || !def.monastery) debugWarn(`Tileset "religious" missing glyphs for death/monastery`);
+            if (!def.death || !def.monastery)
+              debugWarn(
+                `Tileset "religious" missing glyphs for death/monastery`,
+              );
             continue;
           }
           if (!def.tile) debugWarn(`Tileset "${key}" missing tile glyph`);
@@ -1508,45 +1871,581 @@
 
       validateTileset(tileset);
 
+      const syllablePool = [
+        "al",
+        "ur",
+        "da",
+        "ri",
+        "ka",
+        "lem",
+        "vor",
+        "zan",
+        "ti",
+        "sha",
+        "mor",
+        "bel",
+        "oth",
+        "ryn",
+        "ser",
+        "vak",
+        "nel",
+        "ios",
+        "qar",
+        "ume",
+        "thal",
+        "gre",
+        "nor",
+        "fen",
+        "zir",
+        "una",
+        "vek",
+        "cal",
+        "mar",
+        "ros",
+        "ion",
+        "kha",
+        "zul",
+        "ora",
+        "sta",
+        "dra",
+        "pha",
+      ];
 
-      const syllablePool = ["al", "ur", "da", "ri", "ka", "lem", "vor", "zan", "ti", "sha", "mor", "bel", "oth", "ryn", "ser", "vak", "nel", "ios", "qar", "ume", "thal", "gre", "nor", "fen", "zir", "una", "vek", "cal", "mar", "ros", "ion", "kha", "zul", "ora", "sta", "dra", "pha"];
-
-      const namePostfixes = [" Hold", " Castle", " Reach", " Fall", " Falls", " Gate", " Prime", " Camp", " Cliffs", " Fold", " Crown", " Wilds", " Hollow", " Vale", " Peaks", " Grove", " Keep", " Commune", " Verge", " Wastes", " Spire", " Fields", " Flats", " Basin", " Spine", " Fault", " Deep", " Steppe", " Maw", " Province"];
+      const namePostfixes = [
+        " Hold",
+        " Castle",
+        " Reach",
+        " Fall",
+        " Falls",
+        " Gate",
+        " Prime",
+        " Camp",
+        " Cliffs",
+        " Fold",
+        " Crown",
+        " Wilds",
+        " Hollow",
+        " Vale",
+        " Peaks",
+        " Grove",
+        " Keep",
+        " Commune",
+        " Verge",
+        " Wastes",
+        " Spire",
+        " Fields",
+        " Flats",
+        " Basin",
+        " Spine",
+        " Fault",
+        " Deep",
+        " Steppe",
+        " Maw",
+        " Province",
+      ];
 
       const factionNameTemplates = [
-        { name: "Title+Lineage", weight: 12, build: (r, L) => `${rngUtil.oneOf(r, L.titles)} ${rngUtil.oneOf(r, L.lineages)}` },
-        { name: "Title+Toponym", weight: 6, build: (r, L) => `${rngUtil.oneOf(r, L.titles)} ${rngUtil.oneOf(r, L.toponyms)}` },
-        { name: "The+Collective+of+Role", weight: 16, build: (r, L) => `The ${rngUtil.oneOf(r, L.collectives)} ${rngUtil.oneOf(r, L.prepsOf)} ${rngUtil.oneOf(r, L.roles)}` },
-        { name: "Role+of+Toponym", weight: 14, build: (r, L) => `${rngUtil.oneOf(r, L.roles)} ${rngUtil.oneOf(r, L.prepsOf)} ${rngUtil.oneOf(r, L.toponyms)}` },
-        { name: "The+Collective+of+Toponym", weight: 12, build: (r, L) => `The ${rngUtil.oneOf(r, L.collectives)} ${rngUtil.oneOf(r, L.prepsOf)} ${rngUtil.oneOf(r, L.toponyms)}` },
-        { name: "Abstract+of+Region", weight: 10, build: (r, L) => `${rngUtil.oneOf(r, L.abstracts)} ${rngUtil.oneOf(r, L.prepsOf)} ${rngUtil.oneOf(r, L.regions)}` },
-        { name: "Toponym+Company", weight: 8, build: (r, L) => `${rngUtil.oneOf(r, L.toponyms)} ${rngUtil.oneOf(r, L.tradeBodies)}` },
-        { name: "The+Nickname", weight: 7, build: (r, L) => `The ${rngUtil.oneOf(r, L.nicknames)}` },
-        { name: "Hybrid", weight: 9, build: (r, L) => `${rngUtil.oneOf(r, L.titles)} ${rngUtil.oneOf(r, L.lineages)} ${rngUtil.oneOf(r, L.prepsOf)} ${rngUtil.oneOf(r, L.toponyms)}` },
-        { name: "Role+Preposition+Site", weight: 6, build: (r, L) => `${rngUtil.oneOf(r, L.roles)} ${rngUtil.oneOf(r, L.prepsSite)} ${rngUtil.oneOf(r, L.sites)}` },
+        {
+          name: "Title+Lineage",
+          weight: 12,
+          build: (r, L) =>
+            `${rngUtil.oneOf(r, L.titles)} ${rngUtil.oneOf(r, L.lineages)}`,
+        },
+        {
+          name: "Title+Toponym",
+          weight: 6,
+          build: (r, L) =>
+            `${rngUtil.oneOf(r, L.titles)} ${rngUtil.oneOf(r, L.toponyms)}`,
+        },
+        {
+          name: "The+Collective+of+Role",
+          weight: 16,
+          build: (r, L) =>
+            `The ${rngUtil.oneOf(r, L.collectives)} ${rngUtil.oneOf(r, L.prepsOf)} ${rngUtil.oneOf(r, L.roles)}`,
+        },
+        {
+          name: "Role+of+Toponym",
+          weight: 14,
+          build: (r, L) =>
+            `${rngUtil.oneOf(r, L.roles)} ${rngUtil.oneOf(r, L.prepsOf)} ${rngUtil.oneOf(r, L.toponyms)}`,
+        },
+        {
+          name: "The+Collective+of+Toponym",
+          weight: 12,
+          build: (r, L) =>
+            `The ${rngUtil.oneOf(r, L.collectives)} ${rngUtil.oneOf(r, L.prepsOf)} ${rngUtil.oneOf(r, L.toponyms)}`,
+        },
+        {
+          name: "Abstract+of+Region",
+          weight: 10,
+          build: (r, L) =>
+            `${rngUtil.oneOf(r, L.abstracts)} ${rngUtil.oneOf(r, L.prepsOf)} ${rngUtil.oneOf(r, L.regions)}`,
+        },
+        {
+          name: "Toponym+Company",
+          weight: 8,
+          build: (r, L) =>
+            `${rngUtil.oneOf(r, L.toponyms)} ${rngUtil.oneOf(r, L.tradeBodies)}`,
+        },
+        {
+          name: "The+Nickname",
+          weight: 7,
+          build: (r, L) => `The ${rngUtil.oneOf(r, L.nicknames)}`,
+        },
+        {
+          name: "Hybrid",
+          weight: 9,
+          build: (r, L) =>
+            `${rngUtil.oneOf(r, L.titles)} ${rngUtil.oneOf(r, L.lineages)} ${rngUtil.oneOf(r, L.prepsOf)} ${rngUtil.oneOf(r, L.toponyms)}`,
+        },
+        {
+          name: "Role+Preposition+Site",
+          weight: 6,
+          build: (r, L) =>
+            `${rngUtil.oneOf(r, L.roles)} ${rngUtil.oneOf(r, L.prepsSite)} ${rngUtil.oneOf(r, L.sites)}`,
+        },
       ];
 
       /* ====================== Faction naming (fixed deterministic lexicon) ====================== */
-      const defaultCollectives = ["Order", "Guild", "Clan", "Court", "Circle", "Syndicate", "Chapter", "Coven", "Brotherhood", "Company", "League", "Consulate", "Caravan", "Enclave", "Assembly", "Dominion", "Conclave", "Pact", "Sect", "Keep", "Banner", "Kin", "House", "Hollow", "Sanctum", "Forge", "Crusade", "March", "Host"];
-      const defaultRoles = ["Wardens", "Archivists", "Bonepickers", "Skyfarers", "Prospectors", "Scribes", "Wayfinders", "Stormcallers", "Reclaimers", "Oathkeepers", "Lamplighters", "Seers", "Witchbinders", "Lorehunters", "Pathmakers", "Gravetenders", "Runesmiths", "Beastwalkers", "Spellweavers", "Hearthguard", "Frostborn", "Flamebearers", "Thornwatch", "Miststriders"];
-      const lineageRoots = ["Var", "Tor", "Ash", "Hale", "Brenn", "Keth", "Mor", "Vale", "Dun", "Rav", "Fen", "Grey", "Orv", "Nyx", "Cal"];
-      const lineageSuffixes = ["yn", "ell", "ath", "ek", "ar", "os", "en", "ard", "ir", "an", "oth", "ic", "as"];
-      const toponymRoots = ["Ash", "Red", "Thorn", "Hollow", "River", "Stone", "Mist", "Oak", "Wolf", "Raven", "Sun", "Star", "Ember", "Frost", "Gold", "Mire", "Holt", "Rev", "Shale", "Writ"];
-      const toponymSuffixes = ["mere", "holt", "gate", "brig", "brook", "field", "wood", "veld", "keep", "bridge", "ward", "reach", "shire", "watch", "march", "moor", "ford", "fell", "crest", "vale", "dell", "dale", "fen", "scythe", "glen", "ryn"];
-      const regionQualifiers = ["Low", "Upper", "High", "Outer", "Far", "Near", "Old", "New"];
-      const regionPlurals = ["Marches", "Hills", "Moors", "Flats", "Wastes", "Reaches", "Wards", "Downs"];
-      const nicknameColors = ["Black", "Red", "Grey", "White", "Gold", "Green", "Blue", "Umber", "Sable", "Crimson", "Azure"];
-      const nicknameThings = ["Thorn", "Hand", "Lantern", "Crow", "Hound", "Spear", "Moth", "Mason", "Key", "Hammer", "Watch"];
-      const prepsOf = ["of", "of the"];
-      const prepsSite = ["at", "under", "within", "beside", "along", "near"];
-      const abstractTerms = ["Pact", "Dominion", "March", "Compact", "Confederacy", "Concord", "Mandate", "League", "Charter"];
-      const tradeBodies = ["Company", "Charter", "Shipping", "Freight", "Exchange", "Syndicate", "Cartage"];
-      const titleWords = ["House", "Clan", "Order", "Circle", "Court", "Conclave", "Banner", "Keep", "Forge", "Sanctum", "Host"];
-      const siteBases = ["Gate", "Bridge", "Wayhouse", "Watch", "Spire", "Hollow", "Vault", "Crossing", "Ford", "Hall", "Tower", "Works"];
-      const deathMarkers = ["ossuary", "cairn", "vault", "necropolis", "catacombs", "burial ground", "funerary mound", "memorial", "tomb", "crypt", "graveyard", "sepulchre", "cemetery", "mausoleum", "crematorium"];
-      const monasteryMarkers = ["Shrine", "Synagogue", "Pagoda", "Zendo", "Monastery", "Abbey", "Hermitage", "Sacred Grove", "Sacred Spring", "Temple", "Chapel", "Sanctum", "Sanctuary", "Stone Circle", "Oratory"];
-      const deathGroups = ["mourners", "undertakers", "gravediggers", "deathwatch", "ossuary wardens", "memorialists", "grievers", "kin", "bereaved", "lamenters"];
-      const religiousGroups = ["devout", "ascetics", "clergy", "monks", "priests", "hermits", "pilgrims", "zealots", "brothers", "sisters", "cultists", "missionaries", "nuns", "friars", "elders", "druids", "seekers", "wayfarers", "penitents", "acolytes", "undertakers", "mediums", "shamans", "oracles", "prophets", "necromancers"];
+      const defaultCollectives = [
+        "Order",
+        "Guild",
+        "Clan",
+        "Court",
+        "Circle",
+        "Syndicate",
+        "Chapter",
+        "Coven",
+        "Brotherhood",
+        "Company",
+        "League",
+        "Consulate",
+        "Caravan",
+        "Enclave",
+        "Assembly",
+        "Dominion",
+        "Conclave",
+        "Pact",
+        "Sect",
+        "Keep",
+        "Banner",
+        "Kin",
+        "House",
+        "Hollow",
+        "Sanctum",
+        "Forge",
+        "Crusade",
+        "March",
+        "Host",
+      ];
+      const defaultRoles = [
+        "Wardens",
+        "Archivists",
+        "Bonepickers",
+        "Skyfarers",
+        "Prospectors",
+        "Scribes",
+        "Wayfinders",
+        "Stormcallers",
+        "Reclaimers",
+        "Oathkeepers",
+        "Lamplighters",
+        "Seers",
+        "Witchbinders",
+        "Lorehunters",
+        "Pathmakers",
+        "Gravetenders",
+        "Runesmiths",
+        "Beastwalkers",
+        "Spellweavers",
+        "Hearthguard",
+        "Frostborn",
+        "Flamebearers",
+        "Thornwatch",
+        "Miststriders",
+      ];
+      const lineageRoots = [
+        "Var",
+        "Tor",
+        "Ash",
+        "Hale",
+        "Brenn",
+        "Keth",
+        "Mor",
+        "Vale",
+        "Dun",
+        "Rav",
+        "Fen",
+        "Grey",
+        "Orv",
+        "Nyx",
+        "Cal",
+        "Zan",
+        "Luth",
+        "Syl",
+        "Drak",
+        "Ael",
+        "Jor",
+        "Kor",
+        "Lyr",
+        "Vel",
+        "Xan",
+      ];
+      const lineageSuffixes = [
+        "yn",
+        "ell",
+        "ath",
+        "ek",
+        "ar",
+        "os",
+        "en",
+        "ard",
+        "ir",
+        "an",
+        "oth",
+        "ic",
+        "as",
+        "is",
+        "or",
+        "ul",
+        "em",
+        "irn",
+        "ur",
+        "il",
+        "eus",
+        "ias",
+      ];
+      const toponymRoots = [
+        "Ash",
+        "Red",
+        "Thorn",
+        "Hollow",
+        "River",
+        "Stone",
+        "Mist",
+        "Oak",
+        "Wolf",
+        "Raven",
+        "Sun",
+        "Star",
+        "Ember",
+        "Frost",
+        "Gold",
+        "Mire",
+        "Holt",
+        "Rev",
+        "Shale",
+        "Writ",
+        "Wind",
+      ];
+      const toponymSuffixes = [
+        "mere",
+        "holt",
+        "gate",
+        "brig",
+        "brook",
+        "field",
+        "wood",
+        "veld",
+        "keep",
+        "bridge",
+        "ward",
+        "reach",
+        "shire",
+        "watch",
+        "march",
+        "moor",
+        "ford",
+        "fell",
+        "crest",
+        "vale",
+        "dell",
+        "dale",
+        "fen",
+        "scythe",
+        "glen",
+        "ryn",
+      ];
+      const regionQualifiers = [
+        "Low",
+        "Upper",
+        "High",
+        "Outer",
+        "Far",
+        "Near",
+        "Old",
+        "New",
+        "North",
+        "South",
+        "East",
+        "West",
+        "Great",
+        "Little",
+        "Deep",
+        "Bright",
+        "Dark",
+        "Cold",
+        "Windy",
+        "Silent",
+      ];
+      const regionPlurals = [
+        "Marches",
+        "Hills",
+        "Moors",
+        "Flats",
+        "Wastes",
+        "Reaches",
+        "Wards",
+        "Downs",
+        "Heaths",
+        "Fells",
+        "Glades",
+        "Steppes",
+        "Shires",
+        "Dales",
+        "Crests",
+        "Vales",
+        "Bogs",
+        "Swamps",
+        "Wilds",
+        "Bluffs",
+      ];
+      const nicknameColors = [
+        "Black",
+        "Red",
+        "Grey",
+        "White",
+        "Gold",
+        "Green",
+        "Blue",
+        "Silver",
+        "White",
+        "Ash",
+        "Umber",
+        "Sable",
+        "Crimson",
+        "Azure",
+        "Silver",
+        "Bronze",
+        "Ivory",
+        "Onyx",
+        "Jade",
+        "Copper",
+        "Scarlet",
+        "Vermilion",
+        "Cobalt",
+        "Emerald",
+        "Ruby",
+        "Obsidian",
+        "Topaz",
+      ];
+      const nicknameThings = [
+        "Thorn",
+        "Hand",
+        "Lantern",
+        "Crow",
+        "Hound",
+        "Spear",
+        "Moth",
+        "Mason",
+        "Key",
+        "Hammer",
+        "Watch",
+        "Blade",
+        "Wolf",
+        "Fox",
+        "Raven",
+        "Bear",
+        "Stag",
+        "Serpent",
+        "Shield",
+        "Arrow",
+        "Flame",
+        "Fang",
+        "Briar",
+        "Star",
+        "Stone",
+        "Branch",
+        "Root",
+      ];
+      const prepsOf = [
+        "of",
+        "of the",
+        "from",
+        "from the",
+        "in",
+        "in the",
+        "for",
+        "for the",
+      ];
+      const prepsSite = [
+        "at",
+        "under",
+        "within",
+        "beside",
+        "along",
+        "near",
+        "by",
+        "beyond",
+        "above",
+        "below",
+      ];
+      const abstractTerms = [
+        "Pact",
+        "Dominion",
+        "March",
+        "Compact",
+        "Confederacy",
+        "Concord",
+        "Mandate",
+        "League",
+        "Charter",
+        "Accord",
+        "Covenant",
+        "Unity",
+        "Alliance",
+        "Fellowship",
+        "Union",
+      ];
+      const tradeBodies = [
+        "Company",
+        "Charter",
+        "Shipping",
+        "Freight",
+        "Exchange",
+        "Syndicate",
+        "Cartage",
+        "Caravan",
+        "Consortium",
+        "Traders",
+        "Merchants",
+        "Outfit",
+      ];
+      const titleWords = [
+        "House",
+        "Clan",
+        "Order",
+        "Circle",
+        "Court",
+        "Conclave",
+        "Banner",
+        "Keep",
+        "Forge",
+        "Sanctum",
+        "Host",
+        "Enclave",
+        "Dominion",
+        "Assembly",
+        "Coven",
+        "Brotherhood",
+        "Guild",
+        "Sect",
+        "Kin",
+        "Company",
+      ];
+      const siteBases = [
+        "Gate",
+        "Bridge",
+        "Wayhouse",
+        "Watch",
+        "Spire",
+        "Hollow",
+        "Vault",
+        "Crossing",
+        "Ford",
+        "Hall",
+        "Tower",
+        "Works",
+        "Outpost",
+        "Station",
+        "Relay",
+        "Point",
+        "Post",
+        "Hold",
+        "Camp",
+        "Fort",
+      ];
+      const deathMarkers = [
+        "ossuary",
+        "cairn",
+        "vault",
+        "necropolis",
+        "catacombs",
+        "burial ground",
+        "funerary mound",
+        "memorial",
+        "tomb",
+        "crypt",
+        "graveyard",
+        "sepulchre",
+        "cemetery",
+        "mausoleum",
+        "crematorium",
+        "monument",
+      ];
+      const monasteryMarkers = [
+        "Shrine",
+        "Synagogue",
+        "Pagoda",
+        "Zendo",
+        "Monastery",
+        "Abbey",
+        "Hermitage",
+        "Sacred Grove",
+        "Sacred Spring",
+        "Temple",
+        "Chapel",
+        "Sanctum",
+        "Sanctuary",
+        "Stone Circle",
+        "Oratory",
+        "Cloister",
+        "Mission",
+        "Convent",
+        "Cathedral",
+        "Basilica",
+        "Grotto",
+      ];
+      const deathGroups = [
+        "mourners",
+        "undertakers",
+        "gravediggers",
+        "deathwatch",
+        "ossuary wardens",
+        "memorialists",
+        "grievers",
+        "kin",
+        "bereaved",
+        "lamenters",
+      ];
+      const religiousGroups = [
+        "devout",
+        "ascetics",
+        "clergy",
+        "monks",
+        "priests",
+        "hermits",
+        "pilgrims",
+        "zealots",
+        "brothers",
+        "sisters",
+        "cultists",
+        "missionaries",
+        "nuns",
+        "friars",
+        "elders",
+        "druids",
+        "seekers",
+        "wayfarers",
+        "penitents",
+        "acolytes",
+        "undertakers",
+        "mediums",
+        "shamans",
+        "oracles",
+        "prophets",
+        "necromancers",
+      ];
       const poiStructureKeywords = [
         "abbey",
         "bunker",
@@ -1586,8 +2485,14 @@
           for (const biome of biomes) {
             if (!biome) continue;
             if (typeof biome === "object") {
-              const name = String("name" in biome ? biome.name ?? "" : biome).toLowerCase();
-              if (name && !out[name]) out[name] = biome.features && typeof biome.features === "object" ? biome.features : {};
+              const name = String(
+                "name" in biome ? (biome.name ?? "") : biome,
+              ).toLowerCase();
+              if (name && !out[name])
+                out[name] =
+                  biome.features && typeof biome.features === "object"
+                    ? biome.features
+                    : {};
             } else if (typeof biome === "string") {
               const name = biome.toLowerCase();
               if (!out[name]) out[name] = {};
@@ -1602,7 +2507,10 @@
         if (typeof s !== "string") return s;
         const rand = typeof r === "function" ? r : Math.random;
         return s.replace(/\{([^{}]+)\}/g, (_, body) => {
-          const parts = body.split("|").map((p) => p.trim()).filter((p) => p.length);
+          const parts = body
+            .split("|")
+            .map((p) => p.trim())
+            .filter((p) => p.length);
           if (!parts.length) return "";
           return parts[(rand() * parts.length) | 0];
         });
@@ -1621,7 +2529,8 @@
 
       function cartesian(a, b) {
         const out = [];
-        for (let i = 0; i < a.length; i++) for (let j = 0; j < b.length; j++) out.push([a[i], b[j]]);
+        for (let i = 0; i < a.length; i++)
+          for (let j = 0; j < b.length; j++) out.push([a[i], b[j]]);
         return out;
       }
 
@@ -1634,7 +2543,10 @@
       }
 
       function escHtml(s) {
-        return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        return String(s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
       }
 
       function escRe(s) {
@@ -1666,7 +2578,8 @@
       function h32(s) {
         let h = 5381 >>> 0;
         const str = String(s ?? "");
-        for (let i = 0; i < str.length; i++) h = ((h * 33) ^ str.charCodeAt(i)) >>> 0;
+        for (let i = 0; i < str.length; i++)
+          h = ((h * 33) ^ str.charCodeAt(i)) >>> 0;
         return h >>> 0;
       }
 
@@ -1722,7 +2635,9 @@
       }
 
       function maybe(rng, chance = 0.5) {
-        return typeof rng === "function" ? rng() < chance : Math.random() < chance;
+        return typeof rng === "function"
+          ? rng() < chance
+          : Math.random() < chance;
       }
 
       function shuffleDet(r, arr) {
@@ -1742,7 +2657,10 @@
 
       /* ====================== Naming + Lexicon ====================== */
       class NameGenerator {
-        constructor(rng, { syllables = syllablePool, postfixes = namePostfixes } = {}) {
+        constructor(
+          rng,
+          { syllables = syllablePool, postfixes = namePostfixes } = {},
+        ) {
           this.r = rng;
           this.syllables = syllables;
           this.postfixes = postfixes;
@@ -1751,13 +2669,15 @@
         baseName({ allowExtraSyllable = true } = {}) {
           const n = 2 + (allowExtraSyllable && this.r() > 0.7);
           let s = "";
-          for (let i = 0; i < n; i++) s += this.syllables[(this.r() * this.syllables.length) | 0];
+          for (let i = 0; i < n; i++)
+            s += this.syllables[(this.r() * this.syllables.length) | 0];
           return s.charAt(0).toUpperCase() + s.slice(1);
         }
 
         placeName() {
           let s = this.baseName();
-          if (this.r() > 0.5) s += this.postfixes[(this.r() * this.postfixes.length) | 0];
+          if (this.r() > 0.5)
+            s += this.postfixes[(this.r() * this.postfixes.length) | 0];
           return s;
         }
 
@@ -1773,11 +2693,21 @@
         }
 
         buildLineages(r, count = 12) {
-          return uniqN(count, () => lineageRoots[(r() * lineageRoots.length) | 0] + lineageSuffixes[(r() * lineageSuffixes.length) | 0]);
+          return uniqN(
+            count,
+            () =>
+              lineageRoots[(r() * lineageRoots.length) | 0] +
+              lineageSuffixes[(r() * lineageSuffixes.length) | 0],
+          );
         }
 
         buildToponyms(r, count = 20) {
-          return uniqN(count, () => toponymRoots[(r() * toponymRoots.length) | 0] + toponymSuffixes[(r() * toponymSuffixes.length) | 0]);
+          return uniqN(
+            count,
+            () =>
+              toponymRoots[(r() * toponymRoots.length) | 0] +
+              toponymSuffixes[(r() * toponymSuffixes.length) | 0],
+          );
         }
 
         buildRegionsFromToponyms(r, tops, count = 10, regionizer_chance = 0.5) {
@@ -1796,7 +2726,9 @@
         }
 
         buildNicknames(r) {
-          return cartesian(nicknameColors, nicknameThings).map(([c, t]) => `${c} ${t}${rngUtil.maybe(r, 0.5) ? "s" : ""}`);
+          return cartesian(nicknameColors, nicknameThings).map(
+            ([c, t]) => `${c} ${t}${rngUtil.maybe(r, 0.5) ? "s" : ""}`,
+          );
         }
 
         buildLexicon(tt, r) {
@@ -1808,7 +2740,9 @@
           const regions = this.buildRegionsFromToponyms(r, toponyms, 10);
           const nicknames = this.buildNicknames(r);
 
-          const sites = siteBases.map((s) => (rngUtil.maybe(r, 0.5) ? `the ${s}` : s));
+          const sites = siteBases.map((s) =>
+            rngUtil.maybe(r, 0.5) ? `the ${s}` : s,
+          );
 
           return {
             roles,
@@ -1841,7 +2775,8 @@
         const base = nameGen.placeName();
         if (style === 0) return `${base} ${poiType}`;
         if (style === 1) return `The ${poiType} of ${base}`;
-        if (style === 2) return `${poiType.charAt(0).toUpperCase() + poiType.slice(1)} at ${base}`;
+        if (style === 2)
+          return `${poiType.charAt(0).toUpperCase() + poiType.slice(1)} at ${base}`;
         return `${base}'s ${poiType}`;
       }
 
@@ -1897,7 +2832,9 @@
 
         resolvePlaceholders(s, ctx, r) {
           const base = resolveInlineOptions(s, r);
-          return base.replace(/<poi>/g, () => ctx.poi?.() ?? "site").replace(/<weather>/g, () => ctx.weather?.() ?? "weather");
+          return base
+            .replace(/<poi>/g, () => ctx.poi?.() ?? "site")
+            .replace(/<weather>/g, () => ctx.weather?.() ?? "weather");
         }
 
         stem(s) {
@@ -1906,7 +2843,9 @@
 
         composeHook(r, tt, ctx = {}) {
           const h1 = rngUtil.oneOf(r, tt.hooks);
-          const m1 = rngUtil.maybe(r, 0.6) ? this.resolvePlaceholders(rngUtil.oneOf(r, tt.hookMods), ctx, r) : null;
+          const m1 = rngUtil.maybe(r, 0.6)
+            ? this.resolvePlaceholders(rngUtil.oneOf(r, tt.hookMods), ctx, r)
+            : null;
 
           const hasSecond = rngUtil.maybe(r, 0.65);
           if (!hasSecond) return m1 ? `${h1} ${m1}.` : `${h1}.`;
@@ -1918,11 +2857,16 @@
             let guard = 0;
             do {
               v = rngUtil.oneOf(r, tt.hooks);
-            } while ((v === h1 || this.stem(v) === this.stem(h1)) && guard++ < 5);
+            } while (
+              (v === h1 || this.stem(v) === this.stem(h1)) &&
+              guard++ < 5
+            );
             return v;
           })();
 
-          const m2 = rngUtil.maybe(r, 0.6) ? this.resolvePlaceholders(rngUtil.oneOf(r, tt.hookMods), ctx, r) : null;
+          const m2 = rngUtil.maybe(r, 0.6)
+            ? this.resolvePlaceholders(rngUtil.oneOf(r, tt.hookMods), ctx, r)
+            : null;
 
           let left = m1 ? `${h1} ${m1}` : h1;
           const right = m2 ? `${h2} ${m2}` : h2;
@@ -1931,7 +2875,11 @@
           return `${left}, ${glue} ${right}.`;
         }
 
-        composeMotive(r, tt, { adjChance = 0.6, forceAdj = false, normalizeSpacing = true } = {}) {
+        composeMotive(
+          r,
+          tt,
+          { adjChance = 0.6, forceAdj = false, normalizeSpacing = true } = {},
+        ) {
           const motive = rngUtil.oneOf(r, fieldMotiveVerbs.concat(tt.motives));
           const glue = rngUtil.oneOf(r, tt.motiveGlue);
           const includeAdj = forceAdj || rngUtil.maybe(r, adjChance);
@@ -1947,7 +2895,16 @@
           return uniqN(count, () => nameGen.placeName());
         }
 
-        placeWorldRefs(seedU32, theme, tileKeyGrid, N, poiTypes, factions, rText, biome) {
+        placeWorldRefs(
+          seedU32,
+          theme,
+          tileKeyGrid,
+          N,
+          poiTypes,
+          factions,
+          rText,
+          biome,
+        ) {
           const r = rngUtil.xs32(seedU32 ^ 0xa53c9e17);
 
           const settlements = [];
@@ -1966,9 +2923,17 @@
           const landOrder = rngUtil.shuffleDet(r, land);
 
           const nameGen = new NameGenerator(rText);
-          const settlementNames = this.buildSettlementNames(nameGen, Math.max(6, settlements.length));
+          const settlementNames = this.buildSettlementNames(
+            nameGen,
+            Math.max(6, settlements.length),
+          );
           const settlementNameByCell = new Map();
-          settlements.forEach((cell, i) => settlementNameByCell.set(cell, settlementNames[i % settlementNames.length]));
+          settlements.forEach((cell, i) =>
+            settlementNameByCell.set(
+              cell,
+              settlementNames[i % settlementNames.length],
+            ),
+          );
 
           const poiPlacements = [];
           const poiTypesExpanded = poiTypes.slice();
@@ -1983,17 +2948,27 @@
             const poiType = poiTypesExpanded[i];
             const poiName = namedPOI(nameGen, poiType);
 
-            const cell = settlementOrder[i] || landOrder[i] || `${(seedU32 % N) | 0},${((seedU32 >>> 8) % N) | 0}`;
+            const cell =
+              settlementOrder[i] ||
+              landOrder[i] ||
+              `${(seedU32 % N) | 0},${((seedU32 >>> 8) % N) | 0}`;
             poiPlacements.push({ poiType, poiName, cell });
           }
 
           if (ruinCount > 0) {
             let rIdx = 0;
             for (let i = 0; i < ruinCount; i++) {
-              while (rIdx < landOrder.length && (settlementNameByCell.has(landOrder[rIdx]) || poiPlacements.some((p) => p.cell === landOrder[rIdx]))) {
+              while (
+                rIdx < landOrder.length &&
+                (settlementNameByCell.has(landOrder[rIdx]) ||
+                  poiPlacements.some((p) => p.cell === landOrder[rIdx]))
+              ) {
                 rIdx++;
               }
-              const cell = landOrder[rIdx++] || landOrder[0] || `${(seedU32 % N) | 0},${((seedU32 >>> 8) % N) | 0}`;
+              const cell =
+                landOrder[rIdx++] ||
+                landOrder[0] ||
+                `${(seedU32 % N) | 0},${((seedU32 >>> 8) % N) | 0}`;
               const poiType = "ruins";
               const poiName = namedPOI(nameGen, poiType);
               poiPlacements.push({ poiType, poiName, cell });
@@ -2009,16 +2984,26 @@
           for (let i = 0; i < factions.length; i++) {
             let cell = null;
 
-            while (sIdx < settlementOrder.length && used.has(settlementOrder[sIdx])) sIdx++;
+            while (
+              sIdx < settlementOrder.length &&
+              used.has(settlementOrder[sIdx])
+            )
+              sIdx++;
             if (sIdx < settlementOrder.length) cell = settlementOrder[sIdx++];
 
             if (!cell) {
-              while (lIdx < landOrder.length && used.has(landOrder[lIdx])) lIdx++;
-              cell = landOrder[lIdx++] || landOrder[0] || `${i % N},${(i * 7) % N}`;
+              while (lIdx < landOrder.length && used.has(landOrder[lIdx]))
+                lIdx++;
+              cell =
+                landOrder[lIdx++] || landOrder[0] || `${i % N},${(i * 7) % N}`;
             }
 
             used.add(cell);
-            factionPlacements.push({ factionName: factions[i].name, motive: factions[i].motive, cell });
+            factionPlacements.push({
+              factionName: factions[i].name,
+              motive: factions[i].motive,
+              cell,
+            });
           }
 
           const ann = new Map();
@@ -2063,7 +3048,11 @@
           };
 
           const deathCount = rollCount(baseDeathChance, decay, maxPerKind);
-          const monasteryCount = rollCount(baseMonasteryChance, decay, maxPerKind);
+          const monasteryCount = rollCount(
+            baseMonasteryChance,
+            decay,
+            maxPerKind,
+          );
           let li = 0;
 
           const placeReligious = (kind, count) => {
@@ -2084,15 +3073,26 @@
               } else {
                 label = rngUtil.oneOf(r, monasteryMarkers);
               }
-              const group = kind === "death" ? rngUtil.oneOf(r, deathGroupsList) : rngUtil.oneOf(r, religiousGroupsList);
+              const group =
+                kind === "death"
+                  ? rngUtil.oneOf(r, deathGroupsList)
+                  : rngUtil.oneOf(r, religiousGroupsList);
               const deity = nameGen.baseName();
               label = `${label}: ${group} of ${deity}`;
 
               const o = ensureCell(cell);
-              const rel = { kind, label, glyph: this.tileset?.religious?.[kind] };
+              const rel = {
+                kind,
+                label,
+                glyph: this.tileset?.religious?.[kind],
+              };
               o.religious = rel;
               o.poi.push({ name: label, type: "religious" });
-              poiPlacements.push({ poiType: "religious", poiName: label, cell });
+              poiPlacements.push({
+                poiType: "religious",
+                poiName: label,
+                cell,
+              });
               reserved.add(cell);
             }
           };
@@ -2100,7 +3100,12 @@
           placeReligious("death", deathCount);
           placeReligious("monastery", monasteryCount);
 
-          return { annotations: ann, poiPlacements, factionPlacements, settlementNameByCell };
+          return {
+            annotations: ann,
+            poiPlacements,
+            factionPlacements,
+            settlementNameByCell,
+          };
         }
 
         buildSlice(seedStr, theme) {
@@ -2123,7 +3128,13 @@
           const climA = rngUtil.oneOf(r, tt.climateAdj);
           const coords = this.coord(r);
 
-          const climate = { tempTier: tempPick.tier, tempLabel: tempPick.label, rainIdx: rainPick.idx, rainLabel: rainPick.label, adj: climA };
+          const climate = {
+            tempTier: tempPick.tier,
+            tempLabel: tempPick.label,
+            rainIdx: rainPick.idx,
+            rainLabel: rainPick.label,
+            adj: climA,
+          };
 
           const fCount = 1 + ((r() * 3) | 0);
           const pCount = 2 + ((r() * 3) | 0);
@@ -2136,21 +3147,43 @@
           }
 
           const poiTypes = [];
-          for (let i = 0; i < pCount; i++) poiTypes.push(rngUtil.oneOf(r, tt.pois));
+          for (let i = 0; i < pCount; i++)
+            poiTypes.push(rngUtil.oneOf(r, tt.pois));
 
           const weatherNow = rngUtil.oneOf(r, tt.weather);
 
           const mapSeed = rngUtil.h32(seedStr + "|map|" + theme);
-          const map0 = this.mapGen.genMap(mapSeed, biomeName, this.tileset, null, climate);
+          const map0 = this.mapGen.genMap(
+            mapSeed,
+            biomeName,
+            this.tileset,
+            null,
+            climate,
+          );
           const landCells = [];
           for (let y = 0; y < map0.N; y++) {
             for (let x = 0; x < map0.N; x++) {
-              if (map0.tileKeyGrid[y][x] !== "water") landCells.push(`${x},${y}`);
+              if (map0.tileKeyGrid[y][x] !== "water")
+                landCells.push(`${x},${y}`);
             }
           }
-          const worldMeta = this.placeWorldRefs(mapSeed, theme, map0.tileKeyGrid, map0.N, poiTypes, factions, r, biomeName);
-          const settlementEntries = Array.from(worldMeta.settlementNameByCell.entries());
-          const poiRefs = worldMeta.poiPlacements.map((p) => ({ name: p.poiName, cell: p.cell }));
+          const worldMeta = this.placeWorldRefs(
+            mapSeed,
+            theme,
+            map0.tileKeyGrid,
+            map0.N,
+            poiTypes,
+            factions,
+            r,
+            biomeName,
+          );
+          const settlementEntries = Array.from(
+            worldMeta.settlementNameByCell.entries(),
+          );
+          const poiRefs = worldMeta.poiPlacements.map((p) => ({
+            name: p.poiName,
+            cell: p.cell,
+          }));
           const poiNames = poiRefs.map((p) => p.name);
           const npcLocationKinds = Object.keys(npcTasks);
           const npcs = [];
@@ -2158,15 +3191,23 @@
           let guard = 0;
           const fieldMotiveVerbSet = new Set(fieldMotiveVerbs);
 
-          const pickCell = ({ rng, cells, avoid = null, filter = null, fallback = "0,0" }) => {
+          const pickCell = ({
+            rng,
+            cells,
+            avoid = null,
+            filter = null,
+            fallback = "0,0",
+          }) => {
             const list = Array.isArray(cells) ? cells : [];
             if (!list.length) return fallback;
             const pool = filter ? list.filter(filter) : list;
             if (!pool.length) return null;
-            if (avoid === null || avoid === undefined) return pool[(rng() * pool.length) | 0] || fallback;
+            if (avoid === null || avoid === undefined)
+              return pool[(rng() * pool.length) | 0] || fallback;
             if (pool.length <= 1) return pool[0] || fallback;
             let cell = avoid;
-            for (let i = 0; i < 8 && cell === avoid; i++) cell = pool[(rng() * pool.length) | 0] || avoid;
+            for (let i = 0; i < 8 && cell === avoid; i++)
+              cell = pool[(rng() * pool.length) | 0] || avoid;
             if (cell === avoid) {
               const idx = pool.indexOf(avoid);
               if (idx >= 0) return pool[(idx + 1) % pool.length];
@@ -2176,7 +3217,8 @@
 
           const pickLandCell = () => pickCell({ rng: npcR, cells: landCells });
 
-          const pickLandCellForOps = () => pickCell({ rng: factionOpR, cells: landCells });
+          const pickLandCellForOps = () =>
+            pickCell({ rng: factionOpR, cells: landCells });
 
           function pickDifferentLandCell(avoidCell) {
             return pickCell({ rng: npcR, cells: landCells, avoid: avoidCell });
@@ -2187,7 +3229,8 @@
             const parts = String(targetCell).split(",");
             const tx = Number(parts[0]);
             const ty = Number(parts[1]);
-            if (!Number.isFinite(tx) || !Number.isFinite(ty)) return pickLandCell();
+            if (!Number.isFinite(tx) || !Number.isFinite(ty))
+              return pickLandCell();
             const near = pickCell({
               rng: npcR,
               cells: landCells,
@@ -2208,7 +3251,8 @@
             const parts = String(targetCell).split(",");
             const tx = Number(parts[0]);
             const ty = Number(parts[1]);
-            if (!Number.isFinite(tx) || !Number.isFinite(ty)) return pickLandCell();
+            if (!Number.isFinite(tx) || !Number.isFinite(ty))
+              return pickLandCell();
             const near = pickCell({
               rng: npcR,
               cells: landCells,
@@ -2232,32 +3276,62 @@
             const ay = Number(pa[1]);
             const bx = Number(pb[0]);
             const by = Number(pb[1]);
-            if (!Number.isFinite(ax) || !Number.isFinite(ay) || !Number.isFinite(bx) || !Number.isFinite(by)) return Infinity;
+            if (
+              !Number.isFinite(ax) ||
+              !Number.isFinite(ay) ||
+              !Number.isFinite(bx) ||
+              !Number.isFinite(by)
+            )
+              return Infinity;
             return Math.abs(ax - bx) + Math.abs(ay - by);
           };
 
           const pickAltLocation = (avoidCell) => {
             const pool = [];
-            for (const [cell, name] of settlementEntries) pool.push({ prep: "in", label: name, cell });
-            for (const p of worldMeta.poiPlacements) pool.push({ prep: "at", label: p.poiName, cell: p.cell });
+            for (const [cell, name] of settlementEntries)
+              pool.push({ prep: "in", label: name, cell });
+            for (const p of worldMeta.poiPlacements)
+              pool.push({ prep: "at", label: p.poiName, cell: p.cell });
             const filtered = pool.filter((p) => p.cell !== avoidCell);
-            if (filtered.length) return filtered[(npcR() * filtered.length) | 0];
-            return { prep: "out in", label: "the wilds", cell: pickDifferentLandCell(avoidCell) };
+            if (filtered.length)
+              return filtered[(npcR() * filtered.length) | 0];
+            return {
+              prep: "out in",
+              label: "the wilds",
+              cell: pickDifferentLandCell(avoidCell),
+            };
           };
 
           const pickFactionOpLocation = (avoidCell) => {
             if (factionOpR() < 0.3) {
-              return { prep: "out in", label: "the wilds", cell: pickLandCellNear(avoidCell, 10) };
+              return {
+                prep: "out in",
+                label: "the wilds",
+                cell: pickLandCellNear(avoidCell, 10),
+              };
             }
             const pool = [];
-            for (const [cell, name] of settlementEntries) pool.push({ prep: "in", label: name, cell });
-            for (const p of worldMeta.poiPlacements) pool.push({ prep: "at", label: p.poiName, cell: p.cell });
-            const filtered = pool.filter((p) => p.cell !== avoidCell && cellDist(p.cell, avoidCell) <= 10);
-            if (filtered.length) return filtered[(factionOpR() * filtered.length) | 0];
-            return { prep: "out in", label: "the wilds", cell: pickLandCellNear(avoidCell, 10) };
+            for (const [cell, name] of settlementEntries)
+              pool.push({ prep: "in", label: name, cell });
+            for (const p of worldMeta.poiPlacements)
+              pool.push({ prep: "at", label: p.poiName, cell: p.cell });
+            const filtered = pool.filter(
+              (p) => p.cell !== avoidCell && cellDist(p.cell, avoidCell) <= 10,
+            );
+            if (filtered.length)
+              return filtered[(factionOpR() * filtered.length) | 0];
+            return {
+              prep: "out in",
+              label: "the wilds",
+              cell: pickLandCellNear(avoidCell, 10),
+            };
           };
 
-          const motiveVerb = (motive) => String(motive || "").trim().split(/\s+/)[0]?.toLowerCase() || "";
+          const motiveVerb = (motive) =>
+            String(motive || "")
+              .trim()
+              .split(/\s+/)[0]
+              ?.toLowerCase() || "";
 
           const npcLocationFor = (kind) => {
             if (kind === "faction") {
@@ -2269,14 +3343,23 @@
                     prep: alt.prep,
                     label: alt.label,
                     cell: alt.cell,
-                    affiliation: { prep: "for", label: pick.factionName, cell: pick.cell },
+                    affiliation: {
+                      prep: "for",
+                      label: pick.factionName,
+                      cell: pick.cell,
+                    },
                   };
                 }
-                return { prep: "with", label: pick.factionName, cell: pick.cell };
+                return {
+                  prep: "with",
+                  label: pick.factionName,
+                  cell: pick.cell,
+                };
               }
             }
             if (kind === "settlement" && settlementEntries.length) {
-              const [cell, name] = settlementEntries[(npcR() * settlementEntries.length) | 0];
+              const [cell, name] =
+                settlementEntries[(npcR() * settlementEntries.length) | 0];
               return { prep: "in", label: name, cell };
             }
             return { prep: "out in", label: "the wilds", cell: pickLandCell() };
@@ -2291,22 +3374,43 @@
             const name = npcGen.npcName();
             if (seenNpcNames.has(name)) continue;
             seenNpcNames.add(name);
-            const kind = npcLocationKinds[(npcR() * npcLocationKinds.length) | 0];
+            const kind =
+              npcLocationKinds[(npcR() * npcLocationKinds.length) | 0];
             const taskTemplate = rngUtil.oneOf(npcR, npcTasks[kind]);
             const taskPoi = npcPoiName();
-            const task = this.resolvePlaceholders(taskTemplate, { poi: () => taskPoi, weather: () => weatherNow }, npcR);
+            const task = this.resolvePlaceholders(
+              taskTemplate,
+              { poi: () => taskPoi, weather: () => weatherNow },
+              npcR,
+            );
             const taskHtml = linkifyRefs(task, poiRefs);
             let loc = npcLocationFor(kind);
             const taskUsesPoi = taskTemplate.includes("<poi>");
-            const poiMatch = taskUsesPoi ? poiRefs.find((p) => p.name === taskPoi) : null;
+            const poiMatch = taskUsesPoi
+              ? poiRefs.find((p) => p.name === taskPoi)
+              : null;
             if (poiMatch) {
               // If the task already names a POI, keep the location in the wilds nearby.
-              loc = { prep: "out in", label: "the wilds", cell: pickLandCellNearDifferent(poiMatch.cell, 5), affiliation: loc.affiliation };
+              loc = {
+                prep: "out in",
+                label: "the wilds",
+                cell: pickLandCellNearDifferent(poiMatch.cell, 5),
+                affiliation: loc.affiliation,
+              };
             } else if (loc.prep === "out in" && loc.label === "the wilds") {
               const nearMatch = poiRefs.find((p) => p.name === taskPoi);
-              if (nearMatch) loc.cell = pickLandCellNearDifferent(nearMatch.cell, 5);
+              if (nearMatch)
+                loc.cell = pickLandCellNearDifferent(nearMatch.cell, 5);
             }
-            npcs.push({ name, task, taskHtml, prep: loc.prep, label: loc.label, cell: loc.cell, affiliation: loc.affiliation });
+            npcs.push({
+              name,
+              task,
+              taskHtml,
+              prep: loc.prep,
+              label: loc.label,
+              cell: loc.cell,
+              affiliation: loc.affiliation,
+            });
           }
 
           const factionOps = worldMeta.factionPlacements.map((fp) => {
@@ -2315,7 +3419,12 @@
             const roll = factionOpR();
             if (roll > 0.45) {
               if (roll < 0.85) {
-                return { verb, prep: "out in", label: "the wilds", cell: pickLandCellNear(fp.cell, 10) };
+                return {
+                  verb,
+                  prep: "out in",
+                  label: "the wilds",
+                  cell: pickLandCellNear(fp.cell, 10),
+                };
               }
               return null;
             }
@@ -2344,12 +3453,23 @@
             a.npcs.push({ name: npc.name, task: npc.task });
           }
 
-          const map1 = this.mapGen.genMap(mapSeed, biomeName, this.tileset, worldMeta, climate);
+          const map1 = this.mapGen.genMap(
+            mapSeed,
+            biomeName,
+            this.tileset,
+            worldMeta,
+            climate,
+          );
           const hookPick = rngUtil.oneOf(r, worldMeta.poiPlacements);
-          const hookPOIName = hookPick ? hookPick.poiName : rngUtil.oneOf(r, tt.pois);
+          const hookPOIName = hookPick
+            ? hookPick.poiName
+            : rngUtil.oneOf(r, tt.pois);
           const hookPOICell = hookPick ? hookPick.cell : null;
 
-          const hook = this.composeHook(r, tt, { poi: () => hookPOIName, weather: () => rngUtil.oneOf(r, tt.weather) });
+          const hook = this.composeHook(r, tt, {
+            poi: () => hookPOIName,
+            weather: () => rngUtil.oneOf(r, tt.weather),
+          });
 
           let hookHtml = escHtml(hook);
           if (hookPick && hookPOIName) {
@@ -2368,7 +3488,9 @@
           html += `Factions (${factions.length}):\n`;
           worldMeta.factionPlacements.forEach((fp, i) => {
             const baseAnn = worldMeta.annotations.get(fp.cell);
-            const baseName = baseAnn?.settlementName ? baseAnn.settlementName : "Field Camp";
+            const baseName = baseAnn?.settlementName
+              ? baseAnn.settlementName
+              : "Field Camp";
             html += `  ${i + 1}. ${xref(fp.cell, fp.factionName)}\n`;
             const op = factionOps[i];
             html += `\t- ${escHtml(fp.motive)}`;
@@ -2394,14 +3516,23 @@
           html += `Points of Interest (${worldMeta.poiPlacements.length}):\n`;
           worldMeta.poiPlacements.forEach((p) => {
             const a = worldMeta.annotations.get(p.cell);
-            const near = a?.settlementName ? `, near ${xref(p.cell, a.settlementName)}` : "";
+            const near = a?.settlementName
+              ? `, near ${xref(p.cell, a.settlementName)}`
+              : "";
             html += `  - ${xref(p.cell, p.poiName)}${near} @ (${escHtml(p.cell)})\n`;
           });
 
           html += `\nHook: ${hookHtml}\n`;
 
           const biomeLower = biomeName.toLowerCase();
-          const mapFlags = { deadTrees: this.mapGen.biomeAllowsFeature(biomeName, "dead trees", 0.2), desert: biomeLower.includes("desert") };
+          const mapFlags = {
+            deadTrees: this.mapGen.biomeAllowsFeature(
+              biomeName,
+              "dead trees",
+              0.2,
+            ),
+            desert: biomeLower.includes("desert"),
+          };
 
           return { html, mapGrid: map1.html, mapFlags };
         }
@@ -2429,7 +3560,9 @@
               }
               if (f && typeof f === "object") {
                 const id = "id" in f ? f.id : "name" in f ? f.name : "";
-                const rarity = Number.isFinite(f.rarity) ? clampRarity(Number(f.rarity)) : fallbackRarity;
+                const rarity = Number.isFinite(f.rarity)
+                  ? clampRarity(Number(f.rarity))
+                  : fallbackRarity;
                 if (id) {
                   validateFeatureName(String(id), "biome.features");
                   out[String(id)] = rarity;
@@ -2443,7 +3576,9 @@
             for (const [key, value] of Object.entries(features)) {
               if (!key) continue;
               validateFeatureName(String(key), "biome.features");
-              const rarity = Number.isFinite(value) ? clampRarity(Number(value)) : fallbackRarity;
+              const rarity = Number.isFinite(value)
+                ? clampRarity(Number(value))
+                : fallbackRarity;
               out[String(key)] = rarity;
             }
             return out;
@@ -2455,15 +3590,26 @@
           const defaultFeatures = {};
           if (!biome) return { name: "", features: {} };
           if (typeof biome === "string") {
-            const known = this.normalizeBiomeFeatures(biomeFeaturesByName[biome.toLowerCase()]);
-            return { name: biome, features: Object.keys(known).length ? known : defaultFeatures };
+            const known = this.normalizeBiomeFeatures(
+              biomeFeaturesByName[biome.toLowerCase()],
+            );
+            return {
+              name: biome,
+              features: Object.keys(known).length ? known : defaultFeatures,
+            };
           }
           if (typeof biome === "object") {
-            const name = "name" in biome ? String(biome.name ?? "") : String(biome);
+            const name =
+              "name" in biome ? String(biome.name ?? "") : String(biome);
             const features = this.normalizeBiomeFeatures(biome.features);
             if (Object.keys(features).length) return { name, features };
-            const known = this.normalizeBiomeFeatures(biomeFeaturesByName[name.toLowerCase()]);
-            return { name, features: Object.keys(known).length ? known : defaultFeatures };
+            const known = this.normalizeBiomeFeatures(
+              biomeFeaturesByName[name.toLowerCase()],
+            );
+            return {
+              name,
+              features: Object.keys(known).length ? known : defaultFeatures,
+            };
           }
           return { name: String(biome), features: defaultFeatures };
         }
@@ -2483,8 +3629,15 @@
         }
 
         tileWeightsForBiome(biome) {
-          const baseWeights = { water: 0.12, mountain: 0.15, forest: 0.25, grass: 0.2, plains: 0.28 };
-          const inc = (k, f) => (baseWeights[k] = Math.max(0.01, baseWeights[k] * f));
+          const baseWeights = {
+            water: 0.12,
+            mountain: 0.15,
+            forest: 0.25,
+            grass: 0.2,
+            plains: 0.28,
+          };
+          const inc = (k, f) =>
+            (baseWeights[k] = Math.max(0.01, baseWeights[k] * f));
           const { features } = this.normalizeBiome(biome);
           const applyFeature = (id, minRarity, fn) => {
             const rarity = features?.[id];
@@ -2591,7 +3744,9 @@
 
         pickVariant(tileKey, tileset, seed) {
           const def = tileset[tileKey] || tileset.plains;
-          const variants = [def?.tile, ...((def && def.variants) || [])].filter(Boolean);
+          const variants = [def?.tile, ...((def && def.variants) || [])].filter(
+            Boolean,
+          );
           const index = Math.floor(seed * variants.length);
           return variants[index] || tileset.plains?.tile || "?";
         }
@@ -2604,28 +3759,103 @@
           const biomeAllowsFeature = this.biomeAllowsFeature.bind(this);
           const biomeFeatureRarity = this.biomeFeatureRarity.bind(this);
           maybeApplyMountainBias(seedU32, weights, normalizeWeights);
-          const { riverType, river } = buildRiver(seedU32, biome, N, biomeAllowsFeature);
+          const { riverType, river } = buildRiver(
+            seedU32,
+            biome,
+            N,
+            biomeAllowsFeature,
+          );
           let tileKeyGrid = initGrid(N, "plains");
-          tileKeyGrid = applyInitialTiles(seedU32, tileKeyGrid, weights, N, riverType, river, pickByWeights);
+          tileKeyGrid = applyInitialTiles(
+            seedU32,
+            tileKeyGrid,
+            weights,
+            N,
+            riverType,
+            river,
+            pickByWeights,
+          );
 
           const ridgeRarity = biomeFeatureRarity(biome, "ridge");
-          tileKeyGrid = cleanupIsolatedWater(seedU32, tileKeyGrid, weights, N, pickByWeights);
-          tileKeyGrid = smoothMountains(seedU32, tileKeyGrid, weights, N, 2, pickByWeights);
-          tileKeyGrid = thinRidges(seedU32, tileKeyGrid, weights, N, ridgeRarity, pickByWeights);
+          tileKeyGrid = cleanupIsolatedWater(
+            seedU32,
+            tileKeyGrid,
+            weights,
+            N,
+            pickByWeights,
+          );
+          tileKeyGrid = smoothMountains(
+            seedU32,
+            tileKeyGrid,
+            weights,
+            N,
+            2,
+            pickByWeights,
+          );
+          tileKeyGrid = thinRidges(
+            seedU32,
+            tileKeyGrid,
+            weights,
+            N,
+            ridgeRarity,
+            pickByWeights,
+          );
           tileKeyGrid = applyDesertAll(seedU32, tileKeyGrid, biome, N);
-          tileKeyGrid = applyDunePatches(seedU32, tileKeyGrid, N, biomeFeatureRarity(biome, "dunes"));
-          const oasisResult = applyOasisPatches(seedU32, tileKeyGrid, N, biomeFeatureRarity(biome, "oasis"));
+          tileKeyGrid = applyDunePatches(
+            seedU32,
+            tileKeyGrid,
+            N,
+            biomeFeatureRarity(biome, "dunes"),
+          );
+          const oasisResult = applyOasisPatches(
+            seedU32,
+            tileKeyGrid,
+            N,
+            biomeFeatureRarity(biome, "oasis"),
+          );
           tileKeyGrid = oasisResult.grid;
           const oasisVeg = oasisResult.oasisVeg;
-          tileKeyGrid = applyMyceliumPatches(seedU32, tileKeyGrid, N, biomeFeatureRarity(biome, "mycelium"));
-          const ruinCenters = worldMeta?.poiPlacements?.filter((p) => p.poiType === "ruins") || [];
-          tileKeyGrid = applyRuinsClusters(seedU32, tileKeyGrid, N, ruinCenters, biomeFeatureRarity(biome, "ruins"));
+          tileKeyGrid = applyMyceliumPatches(
+            seedU32,
+            tileKeyGrid,
+            N,
+            biomeFeatureRarity(biome, "mycelium"),
+          );
+          const ruinCenters =
+            worldMeta?.poiPlacements?.filter((p) => p.poiType === "ruins") ||
+            [];
+          tileKeyGrid = applyRuinsClusters(
+            seedU32,
+            tileKeyGrid,
+            N,
+            ruinCenters,
+            biomeFeatureRarity(biome, "ruins"),
+          );
 
-          const depthGrid = buildDepthGrid(seedU32, tileKeyGrid, river, N, riverType || "water");
+          const depthGrid = buildDepthGrid(
+            seedU32,
+            tileKeyGrid,
+            river,
+            N,
+            riverType || "water",
+          );
           tileKeyGrid = applyBeachPatches(seedU32, tileKeyGrid, depthGrid, N);
           let heightGrid = buildHeightGrid(tileKeyGrid, N);
-          heightGrid = boostMountainHeights(heightGrid, tileKeyGrid, N, ridgeRarity);
-          const forestTypeGrid = buildForestTypeGrid(seedU32, tileKeyGrid, N, biome, climate, oasisVeg, biomeAllowsFeature);
+          heightGrid = boostMountainHeights(
+            heightGrid,
+            tileKeyGrid,
+            N,
+            ridgeRarity,
+          );
+          const forestTypeGrid = buildForestTypeGrid(
+            seedU32,
+            tileKeyGrid,
+            N,
+            biome,
+            climate,
+            oasisVeg,
+            biomeAllowsFeature,
+          );
           const html = renderMapHtml(
             seedU32,
             tileKeyGrid,
@@ -2638,7 +3868,15 @@
             this.pickVariant.bind(this),
           );
 
-          return { html, tileKeyGrid, depthGrid, heightGrid, forestTypeGrid, N, river };
+          return {
+            html,
+            tileKeyGrid,
+            depthGrid,
+            heightGrid,
+            forestTypeGrid,
+            N,
+            river,
+          };
         }
       }
 
@@ -2677,7 +3915,10 @@
 
         const pickDir = () => dirs[(rand() * dirs.length) | 0];
         const downhillAngle = rand() * Math.PI * 2;
-        const downhill = { x: Math.cos(downhillAngle), y: Math.sin(downhillAngle) };
+        const downhill = {
+          x: Math.cos(downhillAngle),
+          y: Math.sin(downhillAngle),
+        };
         const margin = Math.max(3, Math.floor(N * 0.08));
         const startFromEdge = () => {
           if (Math.abs(downhill.x) > Math.abs(downhill.y)) {
@@ -2726,7 +3967,7 @@
           x: startPos.x,
           y: startPos.y,
           len: lenMain,
-          width: 1,
+          width: 2,
           branchChance: 0.03,
           turnChance: 0.32,
           dir: pickBiasedDir(startPos.x, startPos.y),
@@ -2749,7 +3990,7 @@
                 x,
                 y,
                 len: Math.floor(p.len * (0.45 + rand() * 0.2)),
-                width: 1,
+                width: 2,
                 branchChance: p.branchChance * 0.6,
                 turnChance: p.turnChance * 0.85,
                 dir: pickBiasedDir(x, y),
@@ -2765,7 +4006,13 @@
             x += dx;
             y += dy;
 
-            if (x < -margin || x > N - 1 + margin || y < -margin || y > N - 1 + margin) break;
+            if (
+              x < -margin ||
+              x > N - 1 + margin ||
+              y < -margin ||
+              y > N - 1 + margin
+            )
+              break;
           }
         }
         return cells;
@@ -2800,7 +4047,8 @@
 
       function countNeighbors8Of(tileKeyGrid, N, x, y, key) {
         let c = 0;
-        for (const [nx, ny] of neighbors8(N, x, y)) if (tileKeyGrid[ny][nx] === key) c++;
+        for (const [nx, ny] of neighbors8(N, x, y))
+          if (tileKeyGrid[ny][nx] === key) c++;
         return c;
       }
 
@@ -2811,7 +4059,13 @@
         return c;
       }
 
-      function cleanupIsolatedWater(seedU32, tileKeyGrid, weights, N, pickByWeights) {
+      function cleanupIsolatedWater(
+        seedU32,
+        tileKeyGrid,
+        weights,
+        N,
+        pickByWeights,
+      ) {
         const next = tileKeyGrid.map((row) => row.slice());
         for (let y = 0; y < N; y++) {
           for (let x = 0; x < N; x++) {
@@ -2831,7 +4085,9 @@
               const entries = Array.from(cand.entries());
               entries.sort((a, b) => b[1] - a[1]);
               const topCount = entries[0][1];
-              const tied = entries.filter((e) => e[1] === topCount).map((e) => e[0]);
+              const tied = entries
+                .filter((e) => e[1] === topCount)
+                .map((e) => e[0]);
               if (tied.length === 1) replacement = tied[0];
               else {
                 const roll = rngUtil.n2(seedU32, 19000 + x, 19100 + y);
@@ -2854,7 +4110,14 @@
       }
 
       // Deterministic "make ranges" pass.
-      function smoothMountains(seedU32, tileKeyGrid, weights, N, rounds = 2, pickByWeights) {
+      function smoothMountains(
+        seedU32,
+        tileKeyGrid,
+        weights,
+        N,
+        rounds = 2,
+        pickByWeights,
+      ) {
         let cur = tileKeyGrid.map((row) => row.slice());
 
         for (let round = 0; round < rounds; round++) {
@@ -2866,7 +4129,11 @@
               if (k === "water" || k === "settlement") continue;
 
               const m8 = countNeighbors8Of(cur, N, x, y, "mountain");
-              const roll = rngUtil.n2(seedU32, 54000 + round * 1000 + x, 54100 + round * 1000 + y);
+              const roll = rngUtil.n2(
+                seedU32,
+                54000 + round * 1000 + x,
+                54100 + round * 1000 + y,
+              );
 
               if (k === "mountain") {
                 if (m8 <= 2 && roll < 0.8) {
@@ -2874,7 +4141,8 @@
                   delete w2.water;
                   delete w2.settlement;
                   delete w2.mountain;
-                  const total = Object.values(w2).reduce((a, b) => a + b, 0) || 1;
+                  const total =
+                    Object.values(w2).reduce((a, b) => a + b, 0) || 1;
                   for (const kk in w2) w2[kk] /= total;
                   next[y][x] = pickByWeights(roll, w2);
                 } else if (m8 === 3 && roll < 0.35) {
@@ -2882,7 +4150,8 @@
                   delete w2.water;
                   delete w2.settlement;
                   delete w2.mountain;
-                  const total = Object.values(w2).reduce((a, b) => a + b, 0) || 1;
+                  const total =
+                    Object.values(w2).reduce((a, b) => a + b, 0) || 1;
                   for (const kk in w2) w2[kk] /= total;
                   next[y][x] = pickByWeights(roll, w2);
                 }
@@ -2899,13 +4168,22 @@
         return cur;
       }
 
-      function thinRidges(seedU32, tileKeyGrid, weights, N, ridgeRarity, pickByWeights) {
-        if (!Number.isFinite(ridgeRarity) || ridgeRarity <= 0) return tileKeyGrid;
+      function thinRidges(
+        seedU32,
+        tileKeyGrid,
+        weights,
+        N,
+        ridgeRarity,
+        pickByWeights,
+      ) {
+        if (!Number.isFinite(ridgeRarity) || ridgeRarity <= 0)
+          return tileKeyGrid;
         let cur = tileKeyGrid.map((row) => row.slice());
         const erosionChance = clamp(0.35 + ridgeRarity * 0.35, 0.35, 0.75);
         const growthChance = clamp(0.1 + ridgeRarity * 0.2, 0.1, 0.35);
 
-        const isMountain = (x, y, grid) => x >= 0 && y >= 0 && x < N && y < N && grid[y][x] === "mountain";
+        const isMountain = (x, y, grid) =>
+          x >= 0 && y >= 0 && x < N && y < N && grid[y][x] === "mountain";
         const isStraight = (x, y, grid) => {
           const north = isMountain(x, y - 1, grid);
           const south = isMountain(x, y + 1, grid);
@@ -2923,7 +4201,11 @@
 
               const m8 = countNeighbors8Of(cur, N, x, y, "mountain");
               const straight = isStraight(x, y, cur);
-              const roll = rngUtil.n2(seedU32, 56000 + round * 1000 + x, 56100 + round * 1000 + y);
+              const roll = rngUtil.n2(
+                seedU32,
+                56000 + round * 1000 + x,
+                56100 + round * 1000 + y,
+              );
 
               if (k === "mountain") {
                 if (!straight && m8 <= 3 && roll < erosionChance) {
@@ -2931,14 +4213,17 @@
                   delete w2.water;
                   delete w2.settlement;
                   delete w2.mountain;
-                  const total = Object.values(w2).reduce((a, b) => a + b, 0) || 1;
+                  const total =
+                    Object.values(w2).reduce((a, b) => a + b, 0) || 1;
                   for (const kk in w2) w2[kk] /= total;
                   next[y][x] = pickByWeights(roll, w2);
                 }
               } else {
                 const straightNeighbor = isStraight(x, y, cur);
-                if (straightNeighbor && roll < growthChance * 1.8) next[y][x] = "mountain";
-                else if (m8 >= 6 && roll < growthChance) next[y][x] = "mountain";
+                if (straightNeighbor && roll < growthChance * 1.8)
+                  next[y][x] = "mountain";
+                else if (m8 >= 6 && roll < growthChance)
+                  next[y][x] = "mountain";
               }
             }
           }
@@ -2950,10 +4235,18 @@
       /* ====================== Water depth via distance-to-land + smoothing ====================== */
       function liquidGlyph(tileKey, depth, tileset, seedU32, x, y) {
         const t = tileset[tileKey] || tileset.water;
-        const glyph = t.depthGlyphs[depth] || t.depthGlyphs[1] || tileset.plains?.tile;
+        const glyph =
+          t.depthGlyphs[depth] || t.depthGlyphs[1] || tileset.plains?.tile;
         if (Array.isArray(glyph)) {
-          const roll = Number.isFinite(seedU32) ? rngUtil.n2(seedU32, 88000 + x, 88100 + y) : Math.random();
-          return glyph[Math.floor(roll * glyph.length)] || glyph[0] || tileset.plains?.tile || "?";
+          const roll = Number.isFinite(seedU32)
+            ? rngUtil.n2(seedU32, 88000 + x, 88100 + y)
+            : Math.random();
+          return (
+            glyph[Math.floor(roll * glyph.length)] ||
+            glyph[0] ||
+            tileset.plains?.tile ||
+            "?"
+          );
         }
         return glyph;
       }
@@ -2997,7 +4290,13 @@
         return dist;
       }
 
-      function smoothDepthsTodo2(seedU32, tileKeyGrid, depthGrid, N, liquidKey) {
+      function smoothDepthsTodo2(
+        seedU32,
+        tileKeyGrid,
+        depthGrid,
+        N,
+        liquidKey,
+      ) {
         const next = depthGrid.map((row) => row.slice());
 
         for (let y = 0; y < N; y++) {
@@ -3007,7 +4306,10 @@
 
             let hasPlainsOrGrass = false;
             for (const [nx, ny] of neighbors8(N, x, y)) {
-              if (tileKeyGrid[ny][nx] === "plains" || tileKeyGrid[ny][nx] === "grass") {
+              if (
+                tileKeyGrid[ny][nx] === "plains" ||
+                tileKeyGrid[ny][nx] === "grass"
+              ) {
                 hasPlainsOrGrass = true;
                 break;
               }
@@ -3060,7 +4362,13 @@
         return next;
       }
 
-      function buildDepthGrid(seedU32, tileKeyGrid, river, N, liquidKey = "water") {
+      function buildDepthGrid(
+        seedU32,
+        tileKeyGrid,
+        river,
+        N,
+        liquidKey = "water",
+      ) {
         const dist = distToNonLiquid(tileKeyGrid, N, liquidKey);
 
         const depthGrid = Array.from({ length: N }, () => Array(N).fill(0));
@@ -3073,7 +4381,13 @@
           }
         }
 
-        const smoothed = smoothDepthsTodo2(seedU32, tileKeyGrid, depthGrid, N, liquidKey);
+        const smoothed = smoothDepthsTodo2(
+          seedU32,
+          tileKeyGrid,
+          depthGrid,
+          N,
+          liquidKey,
+        );
         return bumpDepthCenters(tileKeyGrid, smoothed, N, liquidKey);
       }
 
@@ -3131,7 +4445,12 @@
       }
 
       function mountainGlyph(h, tileset) {
-        return tileset.mountain.height[h] || tileset.mountain.height[1] || tileset.mountain?.tile || tileset.plains?.tile;
+        return (
+          tileset.mountain.height[h] ||
+          tileset.mountain.height[1] ||
+          tileset.mountain?.tile ||
+          tileset.plains?.tile
+        );
       }
 
       function applyDunePatches(seedU32, tileKeyGrid, N, rarity) {
@@ -3153,7 +4472,8 @@
             const x = (rand() * N) | 0;
             const y = (rand() * N) | 0;
             const k = next[y][x];
-            if (k !== "water" && k !== "mountain" && k !== "settlement") return { x, y };
+            if (k !== "water" && k !== "mountain" && k !== "settlement")
+              return { x, y };
           }
           return { x: (rand() * N) | 0, y: (rand() * N) | 0 };
         };
@@ -3163,7 +4483,8 @@
           for (let i = 0; i < stepsPerPatch; i++) {
             if (x < 0 || x >= N || y < 0 || y >= N) break;
             const k = next[y][x];
-            if (k !== "water" && k !== "mountain" && k !== "settlement") next[y][x] = "desert";
+            if (k !== "water" && k !== "mountain" && k !== "settlement")
+              next[y][x] = "desert";
             const d = dirs[(rand() * dirs.length) | 0];
             if (rand() < 0.2) {
               x = clamp(x + d[0] + (rand() < 0.5 ? d[0] : 0), 0, N - 1);
@@ -3191,7 +4512,8 @@
             const x = (rand() * N) | 0;
             const y = (rand() * N) | 0;
             const k = next[y][x];
-            if (k !== "water" && k !== "mountain" && k !== "settlement") return { x, y };
+            if (k !== "water" && k !== "mountain" && k !== "settlement")
+              return { x, y };
           }
           return { x: (rand() * N) | 0, y: (rand() * N) | 0 };
         };
@@ -3214,7 +4536,8 @@
                 next[y][x] = "water";
               } else if (k !== "water") {
                 if (dist === r + 2 && rand() < 0.4) continue;
-                next[y][x] = rand() < (dist === r + 2 ? 0.7 : 0.6) ? "grass" : "forest";
+                next[y][x] =
+                  rand() < (dist === r + 2 ? 0.7 : 0.6) ? "grass" : "forest";
                 oasisVeg.add(`${x},${y}`);
               }
             }
@@ -3243,7 +4566,12 @@
         ];
 
         const isBlocked = (k) =>
-          k === "water" || k === "lava" || k === "mountain" || k === "settlement" || k === "desert" || k === "ruins";
+          k === "water" ||
+          k === "lava" ||
+          k === "mountain" ||
+          k === "settlement" ||
+          k === "desert" ||
+          k === "ruins";
 
         const pickStart = () => {
           for (let tries = 0; tries < 140; tries++) {
@@ -3287,7 +4615,10 @@
             if (k !== "plains") continue;
             let shallowNeighbor = false;
             for (const [nx, ny] of neighbors4(N, x, y)) {
-              if (tileKeyGrid[ny][nx] === "water" && (depthGrid?.[ny]?.[nx] || 1) === 1) {
+              if (
+                tileKeyGrid[ny][nx] === "water" &&
+                (depthGrid?.[ny]?.[nx] || 1) === 1
+              ) {
                 shallowNeighbor = true;
                 break;
               }
@@ -3299,7 +4630,11 @@
 
         const touchesShallowWater = (x, y) => {
           for (const [nx, ny] of neighbors4(N, x, y)) {
-            if (tileKeyGrid[ny][nx] === "water" && (depthGrid?.[ny]?.[nx] || 1) === 1) return true;
+            if (
+              tileKeyGrid[ny][nx] === "water" &&
+              (depthGrid?.[ny]?.[nx] || 1) === 1
+            )
+              return true;
           }
           return false;
         };
@@ -3323,8 +4658,15 @@
         return next;
       }
 
-      function applyRuinsClusters(seedU32, tileKeyGrid, N, ruinCenters, rarity) {
-        if (!Array.isArray(ruinCenters) || !ruinCenters.length || rarity <= 0) return tileKeyGrid;
+      function applyRuinsClusters(
+        seedU32,
+        tileKeyGrid,
+        N,
+        ruinCenters,
+        rarity,
+      ) {
+        if (!Array.isArray(ruinCenters) || !ruinCenters.length || rarity <= 0)
+          return tileKeyGrid;
         const next = tileKeyGrid.map((row) => row.slice());
 
         for (const center of ruinCenters) {
@@ -3333,7 +4675,8 @@
           const cy = Number(parts[1]);
           if (!Number.isFinite(cx) || !Number.isFinite(cy)) continue;
           const k = next[cy]?.[cx];
-          if (!k || k === "water" || k === "lava" || k === "settlement") continue;
+          if (!k || k === "water" || k === "lava" || k === "settlement")
+            continue;
           next[cy][cx] = "ruins";
         }
 
@@ -3341,14 +4684,26 @@
       }
 
       /* ====================== Forest typing (biome + climate) ====================== */
-      function forestTypeForCell(seedU32, x, y, biome, climate, oasisVeg, biomeAllowsFeature) {
+      function forestTypeForCell(
+        seedU32,
+        x,
+        y,
+        biome,
+        climate,
+        oasisVeg,
+        biomeAllowsFeature,
+      ) {
         const s = String(biome || "").toLowerCase();
         const tempTier = clamp(climate?.tempTier ?? 4, 1, 8);
         const rainIdx = clamp((climate?.rainIdx ?? 3) + 1, 1, 8);
 
         const isDeadBiome = biomeAllowsFeature(biome, "dead trees", 0.2);
 
-        const isColdBiome = s.includes("tundra") || s.includes("taiga") || s.includes("ice") || s.includes("highland");
+        const isColdBiome =
+          s.includes("tundra") ||
+          s.includes("taiga") ||
+          s.includes("ice") ||
+          s.includes("highland");
         const isWetBiome =
           s.includes("wetland") ||
           s.includes("bog") ||
@@ -3393,7 +4748,14 @@
 
       function forestGlyphForType(ft, seed01, tileset) {
         const t = tileset.forest;
-        const list = ft === "coniferous" ? t.coniferous : ft === "dead" ? t.dead : ft === "deciduous" ? t.deciduous : t.variants;
+        const list =
+          ft === "coniferous"
+            ? t.coniferous
+            : ft === "dead"
+              ? t.dead
+              : ft === "deciduous"
+                ? t.deciduous
+                : t.variants;
         const idx = Math.floor(seed01 * list.length);
         return list[idx] || t.tile;
       }
@@ -3418,13 +4780,24 @@
         const riverType = biomeAllowsFeature(biome, "river-lava")
           ? "lava"
           : biomeAllowsFeature(biome, "river-water")
-          ? "water"
-          : null;
-        const river = riverType && rngUtil.n2(seedU32, 42000, 43000) > 0.35 ? riverCells(seedU32 ^ 0x9e3779b9, N) : new Set();
+            ? "water"
+            : null;
+        const river =
+          riverType && rngUtil.n2(seedU32, 42000, 43000) > 0.35
+            ? riverCells(seedU32 ^ 0x9e3779b9, N)
+            : new Set();
         return { riverType, river };
       }
 
-      function applyInitialTiles(seedU32, tileKeyGrid, weights, N, riverType, river, pickByWeights) {
+      function applyInitialTiles(
+        seedU32,
+        tileKeyGrid,
+        weights,
+        N,
+        riverType,
+        river,
+        pickByWeights,
+      ) {
         const next = tileKeyGrid.map((row) => row.slice());
         for (let y = 0; y < N; y++) {
           for (let x = 0; x < N; x++) {
@@ -3434,7 +4807,11 @@
             } else {
               const r0 = rngUtil.n2(seedU32, x, y);
               tileKey = pickByWeights(r0, weights);
-              if (tileKey !== "water" && rngUtil.n2(seedU32, 7000 + x, 8000 + y) > 0.985) tileKey = "settlement";
+              if (
+                tileKey !== "water" &&
+                rngUtil.n2(seedU32, 7000 + x, 8000 + y) > 0.985
+              )
+                tileKey = "settlement";
             }
             next[y][x] = tileKey;
           }
@@ -3443,7 +4820,12 @@
       }
 
       function applyDesertAll(seedU32, tileKeyGrid, biome, N) {
-        if (!String(biome || "").toLowerCase().includes("desert")) return tileKeyGrid;
+        if (
+          !String(biome || "")
+            .toLowerCase()
+            .includes("desert")
+        )
+          return tileKeyGrid;
         const desertAll = rngUtil.n2(seedU32, 4242, 31337) < 0.5;
         if (!desertAll) return tileKeyGrid;
         const next = tileKeyGrid.map((row) => row.slice());
@@ -3456,7 +4838,8 @@
       }
 
       function boostMountainHeights(heightGrid, tileKeyGrid, N, ridgeRarity) {
-        if (!Number.isFinite(ridgeRarity) || ridgeRarity <= 0) return heightGrid;
+        if (!Number.isFinite(ridgeRarity) || ridgeRarity <= 0)
+          return heightGrid;
         const next = heightGrid.map((row) => row.slice());
         const heightBoost = 1 + ridgeRarity * 0.6;
         for (let y = 0; y < N; y++) {
@@ -3468,19 +4851,47 @@
         return next;
       }
 
-      function buildForestTypeGrid(seedU32, tileKeyGrid, N, biome, climate, oasisVeg, biomeAllowsFeature) {
-        const forestTypeGrid = Array.from({ length: N }, () => Array(N).fill(null));
+      function buildForestTypeGrid(
+        seedU32,
+        tileKeyGrid,
+        N,
+        biome,
+        climate,
+        oasisVeg,
+        biomeAllowsFeature,
+      ) {
+        const forestTypeGrid = Array.from({ length: N }, () =>
+          Array(N).fill(null),
+        );
         for (let y = 0; y < N; y++) {
           for (let x = 0; x < N; x++) {
             if (tileKeyGrid[y][x] === "forest") {
-              forestTypeGrid[y][x] = forestTypeForCell(seedU32, x, y, biome, climate, oasisVeg, biomeAllowsFeature);
+              forestTypeGrid[y][x] = forestTypeForCell(
+                seedU32,
+                x,
+                y,
+                biome,
+                climate,
+                oasisVeg,
+                biomeAllowsFeature,
+              );
             }
           }
         }
         return forestTypeGrid;
       }
 
-      function renderMapHtml(seedU32, tileKeyGrid, depthGrid, heightGrid, forestTypeGrid, N, worldMeta, tileset, pickVariant) {
+      function renderMapHtml(
+        seedU32,
+        tileKeyGrid,
+        depthGrid,
+        heightGrid,
+        forestTypeGrid,
+        N,
+        worldMeta,
+        tileset,
+        pickVariant,
+      ) {
         const ann = worldMeta?.annotations || new Map();
 
         let s = "";
@@ -3493,9 +4904,12 @@
 
             const bits = [];
             bits.push(`${tileKey} @ (${x},${y})`);
-            if (tileKey === "water" || tileKey === "lava") bits.push(`depth: ${clamp(depthGrid[y][x] || 1, 1, 3)}`);
-            if (tileKey === "mountain") bits.push(`height: ${clamp(heightGrid[y][x] || 1, 1, 5)}`);
-            if (tileKey === "forest") bits.push(`forest: ${forestTypeGrid[y][x] || "mixed"}`);
+            if (tileKey === "water" || tileKey === "lava")
+              bits.push(`depth: ${clamp(depthGrid[y][x] || 1, 1, 3)}`);
+            if (tileKey === "mountain")
+              bits.push(`height: ${clamp(heightGrid[y][x] || 1, 1, 5)}`);
+            if (tileKey === "forest")
+              bits.push(`forest: ${forestTypeGrid[y][x] || "mixed"}`);
             if (a?.settlementName) bits.push(`Settlement: ${a.settlementName}`);
             if (a?.fieldCamp) bits.push("Field Camp");
             if (a?.poi?.length) {
@@ -3504,26 +4918,42 @@
                 bits.push(`POI: ${p.name}`);
               }
             }
-            if (a?.factions?.length) for (const f of a.factions) bits.push(`Faction: ${f.name}`);
-            if (a?.factionOps?.length) for (const f of a.factionOps) bits.push(`Faction Activity: ${f.name} — ${f.verb}`);
-            if (a?.npcs?.length) for (const n of a.npcs) bits.push(`NPC: ${n.name} — ${n.task}`);
+            if (a?.factions?.length)
+              for (const f of a.factions) bits.push(`Faction: ${f.name}`);
+            if (a?.factionOps?.length)
+              for (const f of a.factionOps)
+                bits.push(`Faction Activity: ${f.name} — ${f.verb}`);
+            if (a?.npcs?.length)
+              for (const n of a.npcs) bits.push(`NPC: ${n.name} — ${n.task}`);
             if (a?.religious) bits.push(a.religious.label);
 
             const title = escAttr(bits.join("\n"));
 
-            const showStructure = a?.poiStructure && !a?.fieldCamp && !a?.religious && tileKey !== "water";
+            const showStructure =
+              a?.poiStructure &&
+              !a?.fieldCamp &&
+              !a?.religious &&
+              tileKey !== "water";
 
             if (showStructure) {
               const variantSeed = rngUtil.n2(seedU32, x + 999, y + 999);
               const ch = pickVariant("settlement", tileset, variantSeed);
               row += `<span data-cell="${x},${y}" data-tile="settlement" data-poi="structure" title="${title}">${ch}</span>`;
             } else if (a?.fieldCamp) {
-              const ch = tileset.camp?.tile || tileset.settlement?.tile || tileset.plains?.tile;
+              const ch =
+                tileset.camp?.tile ||
+                tileset.settlement?.tile ||
+                tileset.plains?.tile;
               row += `<span data-cell="${x},${y}" data-tile="camp" title="${title}">${ch}</span>`;
             } else if (a?.religious) {
               const rel = a.religious;
-              const fallbackRel = tileset.religious?.death || tileset.religious?.monastery || tileset.settlement?.tile || tileset.plains?.tile;
-              const ch = rel.glyph || tileset.religious?.[rel.kind] || fallbackRel;
+              const fallbackRel =
+                tileset.religious?.death ||
+                tileset.religious?.monastery ||
+                tileset.settlement?.tile ||
+                tileset.plains?.tile;
+              const ch =
+                rel.glyph || tileset.religious?.[rel.kind] || fallbackRel;
               row += `<span data-cell="${x},${y}" data-tile="religious" data-religious="${escAttr(rel.kind)}" title="${title}">${ch}</span>`;
             } else if (tileKey === "water" || tileKey === "lava") {
               const d = clamp(depthGrid[y][x] || 1, 1, 3);
@@ -3593,16 +5023,21 @@
         seedShow = $("#seedShow"),
         themeSel = $("#theme");
 
-      const ui = new UIController(document, localStorage, worldBuilder, mapGenerator);
+      const ui = new UIController(
+        document,
+        localStorage,
+        worldBuilder,
+        mapGenerator,
+      );
 
       const btnGen = $("#gen"),
         // btnSave = $("#save"),
         btnPrev = $("#prev"),
         btnNext = $("#next");
 
-      const btnCopySeed = $("#copySeed")
-        // btnCopyOut = $("#copyOut"),
-        // btnShare = $("#share");
+      const btnCopySeed = $("#copySeed");
+      // btnCopyOut = $("#copyOut"),
+      // btnShare = $("#share");
 
       const histList = $("#hist"),
         favList = $("#favs"),
@@ -3663,7 +5098,8 @@
 
       function pushHistory(s) {
         if (!s) return;
-        if (histArr.length === 0 || histArr[histArr.length - 1] !== s) histArr.push(s);
+        if (histArr.length === 0 || histArr[histArr.length - 1] !== s)
+          histArr.push(s);
         if (histArr.length > MAXH) histArr = histArr.slice(-MAXH);
         idx = histArr.length - 1;
         ui.save();
@@ -3689,14 +5125,18 @@
         const params = new URLSearchParams(h.includes("=") ? h : "");
         const s = params.get("s"),
           t = params.get("t");
-        return { s: s ? decodeURIComponent(s) : null, t: t ? decodeURIComponent(t) : null };
+        return {
+          s: s ? decodeURIComponent(s) : null,
+          t: t ? decodeURIComponent(t) : null,
+        };
       }
 
       function updateHash() {
         if (!current) return;
         const t = themeSel.value;
         const h = `s=${encodeURIComponent(current)}&t=${encodeURIComponent(t)}`;
-        if (location.hash !== `#${h}`) window.history.replaceState(null, "", `#${h}`);
+        if (location.hash !== `#${h}`)
+          window.history.replaceState(null, "", `#${h}`);
       }
 
       function resolveTheme(seed, sel, themeTables) {
@@ -3720,17 +5160,26 @@
         _crossHoverBound = true;
 
         const clearHot = () => {
-          document.querySelectorAll(".is-hot").forEach((el) => el.classList.remove("is-hot"));
+          document
+            .querySelectorAll(".is-hot")
+            .forEach((el) => el.classList.remove("is-hot"));
         };
 
         const markCell = (cell) => {
           clearHot();
           if (!cell) return;
 
-          const esc = window.CSS && CSS.escape ? CSS.escape(cell) : cell.replace(/"/g, '\\"');
+          const esc =
+            window.CSS && CSS.escape
+              ? CSS.escape(cell)
+              : cell.replace(/"/g, '\\"');
 
-          mapEl.querySelectorAll(`span[data-cell="${esc}"]`).forEach((el) => el.classList.add("is-hot"));
-          out.querySelectorAll(`.xref[data-cell="${esc}"]`).forEach((el) => el.classList.add("is-hot"));
+          mapEl
+            .querySelectorAll(`span[data-cell="${esc}"]`)
+            .forEach((el) => el.classList.add("is-hot"));
+          out
+            .querySelectorAll(`.xref[data-cell="${esc}"]`)
+            .forEach((el) => el.classList.add("is-hot"));
         };
 
         out.addEventListener("pointerover", (e) => {
@@ -3764,8 +5213,15 @@
 
       function generate() {
         if (!current) return;
-        const themeUsed = resolveTheme(current, themeSel.value, worldBuilder.themes);
-        const { html, mapGrid, mapFlags } = worldBuilder.buildSlice(current, themeUsed);
+        const themeUsed = resolveTheme(
+          current,
+          themeSel.value,
+          worldBuilder.themes,
+        );
+        const { html, mapGrid, mapFlags } = worldBuilder.buildSlice(
+          current,
+          themeUsed,
+        );
         out.innerHTML = html;
         mapEl.innerHTML = mapGrid;
         mapEl.dataset.deadTrees = mapFlags?.deadTrees ? "1" : "";
@@ -3788,7 +5244,9 @@
       // Copy Seed copies current seed.
       // Deterministic spot checks:
       // - Theme "rnd" resolves via Object.keys(themes)[rngUtil.h32(seed) % keys.length].
-      // - Example seeds: "atlas", "ember", "cobalt" (verify themeUsed matches hash/keys).
+      // - Example seeds: "atlas",
+      // "ember",
+      // "cobalt" (verify themeUsed matches hash/keys).
       // - Explicit theme selection uses the selected theme directly.
 
       /* ====================== Events + Init ====================== */
