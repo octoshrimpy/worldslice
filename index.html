@@ -589,11 +589,9 @@
 
     <script>
       /** 
-       * TODO: map size next to seed pill, for small/med/large
        * TODO: wrap NPC names in span, color them --sw12
-       * TODO: sometimes two locations are setup for a NPC task: `Khalem: repairing a broken bridge, lift, or passageway at Rail cathedral at Riros out in the wilds`, at rail cathedral but also at wilds. if this happens, the wilds needs to be within 3 tiles of the original mentioned spot. also make sure both spots are `is-hot` highlighted respectively.
        * TODO: hook grammar makes no sense when it combines multiple modifiers, e.g. "a relic goes missing near the rootbound enclave during light wind conditions". maybe only allow one modifier per hook?
-
+       * 
       **/
 
       /* ====================== Tables (themes) ====================== */
@@ -601,7 +599,6 @@
         "river-water",
         "river-lava",
         "mountain",
-        "lake", // not implemented yet
         "beaches",
         "dunes",
         "oasis",
@@ -750,6 +747,71 @@
                 "dead trees": 0.3,
               },
             },
+            {
+              name: "crystal barrens",
+              features: {
+                "river-water": 0.15,
+                "river-lava": 0.2,
+                dunes: 0.35,
+                ridge: 0.45,
+                ruins: 0.3,
+                "dead trees": 0.25,
+              },
+            },
+            {
+              name: "fungal expanse",
+              features: {
+                mycelium: 0.8,
+                lake: 0.25,
+                "river-water": 0.35,
+                ruins: 0.2,
+                "dead trees": 0.3,
+              },
+            },
+            {
+              name: "ashen plains",
+              features: {
+                "river-lava": 0.5,
+                dunes: 0.25,
+                ridge: 0.4,
+                mountain: 0.3,
+                ruins: 0.25,
+                "dead trees": 0.45,
+              },
+            },
+            {
+              name: "shattered coast",
+              features: {
+                beaches: 0.6,
+                reef: 0.55,
+                lake: 0.25,
+                "river-water": 0.3,
+                ruins: 0.2,
+                dunes: 0.15,
+              },
+            },
+            {
+              name: "hollow grove",
+              features: {
+                mycelium: 0.45,
+                "dead trees": 0.65,
+                "river-water": 0.25,
+                lake: 0.2,
+                ruins: 0.35,
+                ridge: 0.25,
+              },
+            },
+            {
+              name: "obsidian high desert",
+              features: {
+                dunes: 0.55,
+                oasis: 0.2,
+                "river-lava": 0.35,
+                ridge: 0.4,
+                mountain: 0.25,
+                ruins: 0.3,
+              },
+            }
           ],
           temp: {
             1: "gelid",
@@ -1070,7 +1132,7 @@
             {
               name: "fungal mats",
               features: {
-                mycelium: 0.8,
+                mycelium: 0.9,
                 lake: 0.25,
                 "river-water": 0.35,
                 ruins: 0.2,
@@ -1103,7 +1165,7 @@
                 lake: 0.4,
                 lagoon: 0.25,
                 ruins: 0.2,
-                mycelium: 0.3,
+                mycelium: 0.7,
               },
             },
             {
@@ -1608,7 +1670,6 @@
           ],
         },
       };
-
       const fieldMotiveVerbs = [
         "guarding",
         "defending",
@@ -1633,7 +1694,6 @@
         "surveying",
         "patrolling",
       ];
-
       const npcTasks = {
         faction: [
           "recruiting new members for a difficult assignment",
@@ -1676,7 +1736,7 @@
           "investigating a sabotage incident in the faction's stores",
           "retrieving a message that must not be read by outsiders",
           "{binding|sealing|securing} a dangerous discovery at <poi>",
-          "monitoring a repeating signal/omen tied to <poi>",
+          "monitoring a repeating {signal|omen} tied to <poi>",
           "setting a trap for a rival team operating near <poi>",
           "running security for a clandestine meeting during <weather>",
           "conducting a census of members and dependents",
@@ -1689,7 +1749,7 @@
         settlement: [
           "repairing the waterworks after <weather>",
           "patching leaks and reinforcing cisterns ahead of <weather>",
-          "restoring power/heat/light to a key block of homes",
+          "restoring {power|heat|light} to a key block of homes",
           "fixing a jammed {gate|lift|lock|access mechanism} at <poi>",
           "tracking a series of thefts that target essentials",
           "investigating a break-in at a storeroom near <poi>",
@@ -1698,19 +1758,19 @@
           "hosting a tense council meeting about <poi>",
           "mediating a feud that threatens to split the community",
           "surveying new housing sites away from known hazards",
-          "mapping structural risks in older tunnels/buildings",
+          "mapping structural risks in older {tunnels|buildings}",
           "investigating a strange illness spreading after <weather>",
           "quarantining a block and tracing the source to <poi>",
           "clearing rubble to reopen a route to <poi>",
           "reinforcing defenses after a warning sign at <poi>",
           "training volunteers for watch duty and emergency response",
           "rescuing trapped workers during <weather>",
-          "finding a replacement part/resource the settlement can't do without",
+          "finding a replacement {part|resource} the settlement can't do without",
           "recovering a lost tool kit critical to maintenance",
           "auditing stores because supplies don't match the ledgers",
-          "running a controlled burn / purge / cleanup of a contaminated zone",
+          "running a controlled {burn|purge|cleanup} of a contaminated zone",
           "investigating a suspicious fire that started too cleanly",
-          "negotiating a marriage pact / adoption / sponsorship to secure alliances",
+          "negotiating a marriage {pact|adoption|sponsorship} to secure alliances",
           "settling a land claim dispute over the edge of the biome",
           "evacuating families after a new hazard appears near <poi>",
           "escorting a visiting envoy through nervous streets",
@@ -1723,18 +1783,18 @@
           "investigating counterfeit {tokens|ration chits|permits} circulating locally",
           "hunting down a black-market supplier poisoning the town",
           "organizing a salvage lottery that's turning violent",
-          "recovering a child/elder who wandered toward <poi>",
-          "escorting healers/engineers to a worksite near <poi>",
+          "recovering a {child|elder} who wandered toward <poi>",
+          "escorting {healers|engineers} to a worksite near <poi>",
           "replacing leadership after a sudden resignation",
           "investigating a ghost story that's driving people away from <poi>",
           "securing a festival with rising tensions and hidden weapons",
           "disarming a booby trap found in a common thoroughfare",
-          "patching a collapsed tunnel/bridge caused by <weather>",
-          "moving the seed stores / archives / reliquary to a safer vault",
+          "patching a collapsed {tunnel|bridge} caused by <weather>",
+          "moving the seed {stores|archives|reliquary} to a safer vault",
           "interviewing newcomers whose story doesn't add up",
           "negotiating protection payments under threat",
           "tracking a predator that hunts livestock near <poi>",
-          "testing a new well/route that may be cursed/unsafe/unstable",
+          "testing a new {well|route} that may be {cursed|unsafe|unstable}",
           "restoring the local map after someone altered it",
         ],
 
@@ -1766,7 +1826,7 @@
           "tracking a {poacher|scavenger crew} operating near <poi>",
           "negotiating {passage|terms} with a territorial group beyond the border",
           "discovering why local the {wildlife|fauna|tribe} avoids <poi>",
-          "finding the source of strange lights/sounds near <poi>",
+          "finding the source of strange {lights|sounds} near <poi>",
           "recovering supplies dropped during a retreat",
           "investigating an abandoned camp where everything was left behind",
           "locating a hidden {cache|<item>} mapped only in partial coordinates",
@@ -1791,9 +1851,10 @@
         ],
       };
 
-      /* ====================== Tileset (no colors here; CSS drives colors) ====================== */
+      /* ====================== Tileset ========================================== */
       const tileset = {
-        water: { depthGlyphs: { 1: ["~", "∾", "˜", "∿"], 2: "≈", 3: "≋" } },
+        // TODO: refactor tileset to not have a "tile" prop. it can just be like `grass: ["f","d","e"]`. depth and named variants can stay. "variants" obj key makes no sense. 
+        water: { depthGlyphs: { 1: ["~", "∾", "˜", "∿", "˷"], 2: "≈", 3: "≋" } },
         lava: { depthGlyphs: { 1: ["~", "∾", "˜", "∿"], 2: "≈", 3: "≋" } },
         plains: { tile: "·", variants: ["‧", "∙"] },
         beach: { tile: "·", variants: ["‧", "∙"] },
@@ -1820,10 +1881,38 @@
         },
         ruins: {
           tile: "⌂",
+          // tODO: use linear B block to add more ruined buildings and not have crossover with settlement variants: https://unicodeplus.com/block/10000
           variants: ["⌂", "𐘮", "𐙁", "𐛅", "𐛘", "𐝡", "𐀁", "𐁍", "𐂧", "𐃀"],
         },
-        camp: { tile: "ᗑ" },
-        religious: { death: "⚱", monastery: "⛨" },
+        camp: { tile: [
+          // TODO: use linear B block to add better tents and camps: https://unicodeplus.com/block/10000
+          "ᗑ",
+          "ᐰ",
+          "ᐄ"
+        ] },
+        religious: { death: [
+          "⚱",
+          "⚱️",
+          "⚰",
+          "🏺",
+          // "✝",
+          // "✞",
+          // "✟",
+        ], monastery: [
+          "⛨",
+          "⛧",
+          "☪",
+          "⚚",
+          "⚕️",
+          "🍵",
+          "🕯️",
+          // "✠",
+          // "☯",
+        ] },
+        crystal: [
+          "ж",
+          "⩕",
+        ]
       };
 
       const TILE_SET = new Set(Object.keys(tileset));
@@ -1909,8 +1998,9 @@
         "sta",
         "dra",
         "pha",
+        "dul",
+        "uth"
       ];
-
       const namePostfixes = [
         " Hold",
         " Castle",
@@ -1943,7 +2033,6 @@
         " Maw",
         " Province",
       ];
-
       const factionNameTemplates = [
         {
           name: "Title+Lineage",
@@ -2574,7 +2663,7 @@
         return out;
       }
 
-      /* ====================== RNG modules (single-file) ====================== */
+      /* ====================== RNG modules ====================== */
       function h32(s) {
         let h = 5381 >>> 0;
         const str = String(s ?? "");
@@ -2666,11 +2755,17 @@
           this.postfixes = postfixes;
         }
 
-        baseName({ allowExtraSyllable = true } = {}) {
+        baseName({ allowExtraSyllable = true, apostropheChance = 0.1 } = {}) {
           const n = 2 + (allowExtraSyllable && this.r() > 0.7);
           let s = "";
-          for (let i = 0; i < n; i++)
-            s += this.syllables[(this.r() * this.syllables.length) | 0];
+          for (let i = 0; i < n; i++) {
+            let syl = this.syllables[(this.r() * this.syllables.length) | 0];
+            s += syl;
+            
+            if (i < n - 1 && maybe(this.r, apostropheChance)) {
+              s += "'";
+            }
+          }
           return s.charAt(0).toUpperCase() + s.slice(1);
         }
 
@@ -3711,8 +3806,8 @@
           });
 
           applyFeature("mycelium", 0.05, (rarity) => {
-            inc("forest", 1 + rarity * 0.2);
-            inc("grass", 1 + rarity * 0.1);
+            inc("forest", 1 + rarity * 0.5);
+            inc("grass", 1 + rarity * 0.4);
           });
 
           applyFeature("dead trees", 0.05, (rarity) => {
@@ -4499,6 +4594,7 @@
         return next;
       }
 
+      // TODO: chance for bigger oasis to spawn
       function applyOasisPatches(seedU32, tileKeyGrid, N, rarity) {
         const oasisVeg = new Set();
         if (rarity <= 0) return { grid: tileKeyGrid, oasisVeg };
@@ -4547,6 +4643,7 @@
         return { grid: next, oasisVeg };
       }
 
+      // TODO: if higher rarity (eg fungal mats) then also do bigger patches. 
       function applyMyceliumPatches(seedU32, tileKeyGrid, N, rarity) {
         if (rarity <= 0) return tileKeyGrid;
         const next = tileKeyGrid.map((row) => row.slice());
@@ -4565,6 +4662,7 @@
           [-1, -1],
         ];
 
+        // TODO: do not be blocked by ruins or settlements. instead, convert them to fungal ruins and fungal settlement, same tileset as ruins/settlement but fungal color. 
         const isBlocked = (k) =>
           k === "water" ||
           k === "lava" ||
@@ -4893,6 +4991,7 @@
         pickVariant,
       ) {
         const ann = worldMeta?.annotations || new Map();
+        const rpick = rngUtil.xs32((seedU32 ^ 0x5a5a5a5a) >>> 0);
 
         let s = "";
         for (let y = 0; y < N; y++) {
@@ -4941,7 +5040,7 @@
               row += `<span data-cell="${x},${y}" data-tile="settlement" data-poi="structure" title="${title}">${ch}</span>`;
             } else if (a?.fieldCamp) {
               const ch =
-                tileset.camp?.tile ||
+                rngUtil.oneOf(rpick, tileset.camp?.tile) ||
                 tileset.settlement?.tile ||
                 tileset.plains?.tile;
               row += `<span data-cell="${x},${y}" data-tile="camp" title="${title}">${ch}</span>`;
@@ -4953,7 +5052,7 @@
                 tileset.settlement?.tile ||
                 tileset.plains?.tile;
               const ch =
-                rel.glyph || tileset.religious?.[rel.kind] || fallbackRel;
+                rngUtil.oneOf(rpick, rel.glyph) || rngUtil.oneOf(rpick, tileset.religious?.[rel.kind]) || fallbackRel;
               row += `<span data-cell="${x},${y}" data-tile="religious" data-religious="${escAttr(rel.kind)}" title="${title}">${ch}</span>`;
             } else if (tileKey === "water" || tileKey === "lava") {
               const d = clamp(depthGrid[y][x] || 1, 1, 3);
@@ -5017,11 +5116,26 @@
       }
 
       const $ = (sel) => document.querySelector(sel);
-      const out = $("#out"),
+      const 
+        out = $("#out"),
         mapEl = $("#map"),
         seedIn = $("#seed"),
         seedShow = $("#seedShow"),
-        themeSel = $("#theme");
+        themeSel = $("#theme"),
+        btnGen = $("#gen"),
+        btnPrev = $("#prev"),
+        btnNext = $("#next"),
+        btnCopySeed = $("#copySeed"),
+        histList = $("#hist"),
+        favList = $("#favs"),
+        btnClrFav = $("#clrFav"),
+        // btnSave = $("#save"),
+        // btnCopyOut = $("#copyOut"),
+        // btnShare = $("#share"),
+
+        LS_H = "sow_history_v2",
+        LS_F = "sow_faves_v2",
+        MAXH = 99;
 
       const ui = new UIController(
         document,
@@ -5029,23 +5143,6 @@
         worldBuilder,
         mapGenerator,
       );
-
-      const btnGen = $("#gen"),
-        // btnSave = $("#save"),
-        btnPrev = $("#prev"),
-        btnNext = $("#next");
-
-      const btnCopySeed = $("#copySeed");
-      // btnCopyOut = $("#copyOut"),
-      // btnShare = $("#share");
-
-      const histList = $("#hist"),
-        favList = $("#favs"),
-        btnClrFav = $("#clrFav");
-
-      const LS_H = "sow_history_v2",
-        LS_F = "sow_faves_v2",
-        MAXH = 5;
 
       let histArr = [],
         faves = [],
@@ -5234,21 +5331,6 @@
         updateHash();
       }
 
-      /* ====================== Manual verification (DEBUG=false) ====================== */
-      // Generate produces output.
-      // Enter in seed box generates.
-      // Prev/Next navigates history.
-      // Theme changes regenerate and update hash.
-      // Reload with #s=...&t=... restores.
-      // Cross-hover highlights map + text.
-      // Copy Seed copies current seed.
-      // Deterministic spot checks:
-      // - Theme "rnd" resolves via Object.keys(themes)[rngUtil.h32(seed) % keys.length].
-      // - Example seeds: "atlas",
-      // "ember",
-      // "cobalt" (verify themeUsed matches hash/keys).
-      // - Explicit theme selection uses the selected theme directly.
-
       /* ====================== Events + Init ====================== */
       btnGen.onclick = doGenerate;
       seedIn.addEventListener("keydown", (e) => {
@@ -5272,15 +5354,15 @@
 
       // btnShare.onclick = () => shareURL();
 
-      if (btnClrFav) {
-        btnClrFav.onclick = () => {
-          if (!faves.length) return;
-          if (!confirm("Clear all favorites?")) return;
-          faves = [];
-          ui.save();
-          ui.renderLists();
-        };
-      }
+      // if (btnClrFav) {
+      //   btnClrFav.onclick = () => {
+      //     if (!faves.length) return;
+      //     if (!confirm("Clear all favorites?")) return;
+      //     faves = [];
+      //     ui.save();
+      //     ui.renderLists();
+      //   };
+      // }
 
       themeSel.onchange = () => {
         ui.generate();
