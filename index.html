@@ -682,6 +682,16 @@
         "crystals",
         "dead trees",
       ];
+      const moistureLevels = [
+        "arid",
+        "dry winds",
+        "breezy",
+        "humid",
+        "mist-laden",
+        "rainy",
+        "soaking",
+        "saturated",
+      ];
 
       const DEBUG = false;
       const FEATURE_SET = new Set([...geoFeatures, "lagoon", "watering hole"]);
@@ -901,16 +911,6 @@
             7: "sultry",
             8: "searing",
           },
-          rain: [
-            "parched",
-            "dry",
-            "breezy",
-            "misty",
-            "drizzled",
-            "rain-washed",
-            "monsoonal",
-            "storm-lashed",
-          ],
           climateAdj: [
             "rocky",
             "dusty",
@@ -1286,16 +1286,6 @@
             7: "equatorial",
             8: "thermic",
           },
-          rain: [
-            "arid",
-            "dry winds",
-            "breezy",
-            "humid",
-            "mist-laden",
-            "rainy",
-            "storm-charged",
-            "ion-saturated",
-          ],
           climateAdj: [
             "rocky",
             "dusty",
@@ -1594,16 +1584,6 @@
             7: "blistering",
             8: "oven-hot",
           },
-          rain: [
-            "powder-dry",
-            "dry gusts",
-            "dusty",
-            "clammy",
-            "drizzle",
-            "rain-battered",
-            "monsoon-bent",
-            "electric storms",
-          ],
           climateAdj: [
             "rocky",
             "dusty",
@@ -2062,13 +2042,18 @@
       // #endregion Tileset + Glyphs
       // #region Lexicon Data
       const syllablePool = [
-        "zek",
-        "ath",
         "aer",
         "al",
+        "an",
+        "ath",
         "bah",
         "bel",
         "bit",
+        "bat",
+        "bra",
+        "brie",
+        "bur",
+        "by",
         "cal",
         "col",
         "da",
@@ -2081,32 +2066,64 @@
         "fun",
         "fus",
         "gal",
+        "gol",
         "grah",
         "gre",
         "grie",
+        "hak",
+        "hal",
+        "hel",
+        "hur",
+        "ian",
+        "il",
         "ins",
         "ion",
         "ios",
+        "ir",
+        "is",
+        "ith",
+        "jan",
         "jha",
+        "jor",
         "ka",
+        "kra",
         "kar",
+        "kel",
         "kha",
+        "kor",
         "lai",
+        "lan",
         "lem",
+        "len",
         "lha",
         "lon",
+        "lor",
+        "mal",
         "mar",
         "mel",
         "mes",
         "mor",
+        "mor",
+        "mun",
+        "myr",
+        "nal",
         "nel",
         "nera",
         "nir",
         "nor",
         "oa",
+        "oar",
+        "or",
         "ora",
+        "os",
         "oth",
         "pha",
+        "pil",
+        "pis",
+        "pol",
+        "pra",
+        "pul",
+        "pyr",
         "qar",
         "qua",
         "rah",
@@ -2114,26 +2131,37 @@
         "ri",
         "ros",
         "ryn",
+        "sat",
         "ser",
         "set",
         "sha",
         "sta",
+        "tai",
         "ter",
         "thal",
+        "thar",
         "ti",
+        "tie",
         "to",
+        "tor",
+        "tra",
+        "tua",
+        "tur",
+        "toa",
         "ume",
         "una",
         "ur",
+        "uth",
         "vak",
         "vek",
         "vor",
         "yal",
         "zal",
         "zan",
+        "zek",
         "zir",
         "zul",
-        "uth"
+        "zuth",
       ];
       const namePostfixes = [
         " Hold",
@@ -3077,14 +3105,10 @@
           return { tier: 4, label: String(label) };
         }
 
-        pickRainIndex(r, tt) {
-          const rain = tt?.rain;
-          if (Array.isArray(rain) && rain.length) {
-            const idx = (r() * rain.length) | 0;
-            return { idx, label: String(rain[idx]) };
-          }
-          const label = rngUtil.oneOf(r, rain) ?? "dry";
-          return { idx: 1, label: String(label) };
+        pickRainIndex(r) {
+          const rain = moistureLevels;
+          const idx = (r() * rain.length) | 0;
+          return { idx, label: String(rain[idx] || "arid") };
         }
 
         coord(r) {
@@ -3912,6 +3936,17 @@
           };
           const inc = (k, f) =>
             (baseWeights[k] = Math.max(0.01, baseWeights[k] * f));
+          if (
+            String(biome || "")
+              .toLowerCase()
+              .includes("desert")
+          ) {
+            inc("forest", 0.45);
+            inc("grass", 0.6);
+            inc("plains", 1.35);
+            inc("water", 0.85);
+            inc("mountain", 1.05);
+          }
           const { features } = this.normalizeBiome(biome);
           const applyFeature = (id, minRarity, fn) => {
             const rarity = features?.[id];
@@ -4072,13 +4107,14 @@
             ridgeRarity,
             pickByWeights,
           );
-          tileKeyGrid = applyDesertAll(seedU32, tileKeyGrid, biome, N);
           tileKeyGrid = applyDunePatches(
             seedU32,
             tileKeyGrid,
             N,
             biomeFeatureRarity(biome, "dunes"),
           );
+          const desertAll = desertAllEnabled(seedU32, biome);
+          tileKeyGrid = applyDesertAll(tileKeyGrid, N, desertAll);
           const oasisResult = applyOasisPatches(
             seedU32,
             tileKeyGrid,
@@ -4087,6 +4123,14 @@
           );
           tileKeyGrid = oasisResult.grid;
           const oasisVeg = oasisResult.oasisVeg;
+          tileKeyGrid = thinDesertForests(
+            seedU32,
+            tileKeyGrid,
+            N,
+            biome,
+            climate,
+            oasisVeg,
+          );
           tileKeyGrid = applyMyceliumPatches(
             seedU32,
             tileKeyGrid,
@@ -5262,19 +5306,51 @@
         return next;
       }
 
-      function applyDesertAll(seedU32, tileKeyGrid, biome, N) {
+      function desertAllEnabled(seedU32, biome) {
+        if (
+          !String(biome || "")
+            .toLowerCase()
+            .includes("desert")
+        )
+          return false;
+        return rngUtil.n2(seedU32, 4242, 31337) < 0.5;
+      }
+
+      function applyDesertAll(tileKeyGrid, N, desertAll) {
+        if (!desertAll) return tileKeyGrid;
+        const next = tileKeyGrid.map((row) => row.slice());
+        for (let y = 0; y < N; y++) {
+          for (let x = 0; x < N; x++) {
+            if (next[y][x] === "plains") next[y][x] = "desert";
+          }
+        }
+        return next;
+      }
+
+      function thinDesertForests(
+        seedU32,
+        tileKeyGrid,
+        N,
+        biome,
+        climate,
+        oasisVeg = null,
+      ) {
         if (
           !String(biome || "")
             .toLowerCase()
             .includes("desert")
         )
           return tileKeyGrid;
-        const desertAll = rngUtil.n2(seedU32, 4242, 31337) < 0.5;
-        if (!desertAll) return tileKeyGrid;
+        const rainIdx = clamp(climate?.rainIdx ?? 3, 0, 7);
+        const isArid = rainIdx <= 1;
+        const thinChance = isArid ? 0.75 : 0.55;
         const next = tileKeyGrid.map((row) => row.slice());
         for (let y = 0; y < N; y++) {
           for (let x = 0; x < N; x++) {
-            if (next[y][x] === "plains") next[y][x] = "desert";
+            if (tileKeyGrid[y][x] !== "forest") continue;
+            if (oasisVeg?.has(`${x},${y}`)) continue;
+            const roll = rngUtil.n2(seedU32, 75000 + x, 76000 + y);
+            if (roll < thinChance) next[y][x] = "desert";
           }
         }
         return next;
