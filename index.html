@@ -82,9 +82,14 @@
         --tile-settlement: var(--sw2);
         --tile-camp: var(--sw3);
         --tile-ruins: var(--sw14);
+        --tile-overgrown-ruins: color-mix(
+          in srgb,
+          var(--tile-ruins) 50%,
+          var(--sw5)
+        );
         --tile-fungal-settlement: color-mix(
           in srgb,
-          var(--tile-mycelium) 65%,
+          var(--tile-mycelium) 45%,
           var(--tile-settlement)
         );
         --tile-fungal-ruins: color-mix(
@@ -388,6 +393,9 @@
       }
       #map span[data-tile="ruins"] {
         color: var(--tile-ruins);
+      }
+      #map span[data-tile="overgrown-ruins"] {
+        color: var(--tile-overgrown-ruins);
       }
       #map span[data-tile="fungal-settlement"] {
         color: var(--tile-fungal-settlement);
@@ -849,6 +857,7 @@
                 "river-water": 0.3,
                 ruins: 0.2,
                 dunes: 0.15,
+                crystals: 0.2,
               },
             },
             {
@@ -1553,6 +1562,7 @@
                 ruins: 0.25,
                 lake: 0.15,
                 "dead trees": 0.25,
+                crystals: 0.3,
               },
             },
             {
@@ -1991,6 +2001,7 @@
 
       tileset["fungal-settlement"] = baseGlyphs(tileset.settlement);
       tileset["fungal-ruins"] = baseGlyphs(tileset.ruins);
+      tileset["overgrown-ruins"] = baseGlyphs(tileset.ruins);
 
       const TILE_SET = new Set(Object.keys(tileset));
 
@@ -4037,6 +4048,12 @@
             ruinCenters,
             biomeFeatureRarity(biome, "ruins"),
           );
+          tileKeyGrid = applyOvergrownRuins(
+            seedU32,
+            tileKeyGrid,
+            N,
+            climate,
+          );
           tileKeyGrid = applyLavaEdge(tileKeyGrid, N);
           tileKeyGrid = cleanupIsolatedWater(
             seedU32,
@@ -4818,7 +4835,7 @@
         const fungalVariant = (k) => {
           if (k === "settlement")
             return rand() < 1 / 3 ? "fungal-settlement" : null;
-          if (k === "ruins") return rand() < 1 / 2 ? "fungal-ruins" : null;
+          if (k === "ruins") return rand() < 0.6 ? "fungal-ruins" : null;
           if (k === "fungal-settlement" || k === "fungal-ruins") return k;
           return null;
         };
@@ -4999,6 +5016,14 @@
           return tileKeyGrid;
         const next = tileKeyGrid.map((row) => row.slice());
 
+        const rand = rngUtil.xs32(seedU32 ^ 0x33b5c5a9);
+        const hasMyceliumNeighbor = (x, y) => {
+          for (const [nx, ny] of neighbors4(N, x, y)) {
+            if (next[ny][nx] === "mycelium") return true;
+          }
+          return false;
+        };
+
         for (const center of ruinCenters) {
           const parts = String(center?.cell || "").split(",");
           const cx = Number(parts[0]);
@@ -5014,7 +5039,27 @@
             k === "fungal-ruins"
           )
             continue;
-          next[cy][cx] = "ruins";
+          const nearMycelium =
+            k === "mycelium" || hasMyceliumNeighbor(cx, cy);
+          next[cy][cx] = nearMycelium && rand() < 0.6 ? "fungal-ruins" : "ruins";
+        }
+
+        return next;
+      }
+
+      function applyOvergrownRuins(seedU32, tileKeyGrid, N, climate) {
+        const rainIdx = clamp((climate?.rainIdx ?? 3) + 1, 1, 8);
+        if (rainIdx < 6) return tileKeyGrid;
+        const next = tileKeyGrid.map((row) => row.slice());
+        const rand = rngUtil.xs32(seedU32 ^ 0x6fbd1d97);
+        const chance = 0.75;
+
+        for (let y = 0; y < N; y++) {
+          for (let x = 0; x < N; x++) {
+            if (next[y][x] === "ruins" && rand() < chance) {
+              next[y][x] = "overgrown-ruins";
+            }
+          }
         }
 
         return next;
@@ -5658,6 +5703,13 @@
 
         const gRuins = addGroup("ruins");
         addList(gRuins, "ruins", tileset.ruins);
+
+        const gOvergrownRuins = addGroup("overgrown-ruins");
+        addList(
+          gOvergrownRuins,
+          "overgrown-ruins",
+          tileset["overgrown-ruins"],
+        );
 
         const gFungalSettlement = addGroup("fungal-settlement");
         addList(gFungalSettlement, "fungal-settlement", tileset["fungal-settlement"]);
