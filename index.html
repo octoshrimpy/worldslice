@@ -100,6 +100,7 @@
         );
         --tile-plains: color-mix(in srgb, var(--sw5) 50%, var(--sw0));
         --tile-settlement: var(--sw2);
+        --tile-poi: var(--tile-settlement);
         --tile-camp: var(--sw3);
         --tile-ruins: var(--sw14);
         --tile-overgrown-ruins: color-mix(
@@ -389,6 +390,9 @@
       }
       #map span[data-tile="settlement"] {
         color: var(--tile-settlement);
+      }
+      #map span[data-tile="poi"] {
+        color: var(--tile-poi);
       }
       #map span[data-tile="ruins"] {
         color: var(--tile-ruins);
@@ -1098,7 +1102,6 @@
           ],
           pois: [
             "relic line",
-            "forgotten cairn",
             "leyline path",
             "star-iron vein",
             "storm cycle",
@@ -1108,15 +1111,12 @@
             "hearthhold",
             "shattered runestone",
             "cursed grove",
-            "ancestral cairn",
             "rootbound enclave",
             "dormant sentinel",
-            "echoing tomb",
             "emberfield",
             "sealed vault",
             "moonshade beast",
             "sky-bridge",
-            "sunken sanctuary",
           ],
           weather: [
             "light wind",
@@ -1706,7 +1706,6 @@
             "signal tower",
             "mall",
             "canal gate",
-            "rail cathedral",
             "salt pit",
             "water plant",
           ],
@@ -1939,9 +1938,9 @@
         grass: ["ᵞ", "˯", "ˬ", "ˇ", "…", "ⵈ", '"', "'"],
         forest: {
           base: ["⯭", "𐙘", "↑", "⏃", "𐌒", "Ọ", "𐙢", "𐊾", "↟"],
-          coniferous: ["⏃", "𐙢", "𐊾"],
+          coniferous: ["⏃", "𐙢", "𐊾","𐙢"],
           dead: ["𐙘", "↑", "↟"],
-          deciduous: ["𐌒", "Ọ"],
+          deciduous: ["𐌒", "Ọ", "𐙱", "𐙲"],
         },
         desert: ["≈"],
         mycelium: ["ᵠ", "ⵈ", "·", "‧", "∙"],
@@ -1949,7 +1948,7 @@
           base: ["^"],
           height: { 1: "꘍", 2: "ᨈ", 3: "ᴧ", 4: "Λ", 5: "Δ" },
         },
-        settlement: ["⛩", "⌂", "𐘮", "𐙁", "𐛅", "𐛘", "𐝡", "𐀁", "𐁍", "𐂧", "𐃀"],
+        settlement: ["⛩", "⌂", "𐘮", "𐙁", "𐛅", "𐛘", "𐝡", "𐀁", "𐁍", "𐂧", "𐃀", "𐜣"],
         ruins: [
           "⌂",
           // TODO: use linear B block to add more ruined buildings and not have crossover with settlement variants: https://unicodeplus.com/block/10000
@@ -1969,11 +1968,17 @@
           "ᐰ",
           "ᐄ",
         ],
+        poi: ["𐀀", "𐀇", "𐀒", "𐀚", "𐀛", "𐀣", "𐀵", "𐘄", "𐘇", "𐘙", "𐘝", "𐘤", "𐝏", "𐝕"],
         religious: {
           death: [
             "⚱",
             "⚱️",
             "⚰",
+            "𐚬",
+            "𐚭",
+            "🪦",
+            "𐚮",
+            "𐚯",
             "🏺",
             // "✝",
             // "✞",
@@ -1984,6 +1989,7 @@
             "⛧",
             "☪",
             "⚚",
+            "𐜨",
             "⚕️",
             "🍵",
             "🕯️",
@@ -3218,6 +3224,7 @@
 
           const settlements = [];
           const land = [];
+          const ruinsCells = [];
 
           for (let y = 0; y < N; y++) {
             for (let x = 0; x < N; x++) {
@@ -3226,6 +3233,12 @@
               if (k !== "water" && k !== "lava") land.push(key);
               if (k === "settlement" || k === "fungal-settlement")
                 settlements.push(key);
+              if (
+                k === "ruins" ||
+                k === "overgrown-ruins" ||
+                k === "fungal-ruins"
+              )
+                ruinsCells.push(key);
             }
           }
 
@@ -3271,18 +3284,32 @@
 
           if (ruinCount > 0) {
             let rIdx = 0;
+            const ruinOrder = rngUtil.shuffleDet(r, ruinsCells);
+            let ruinIdx = 0;
             for (let i = 0; i < ruinCount; i++) {
+              let cell = null;
               while (
-                rIdx < landOrder.length &&
-                (settlementNameByCell.has(landOrder[rIdx]) ||
-                  poiPlacements.some((p) => p.cell === landOrder[rIdx]))
+                ruinIdx < ruinOrder.length &&
+                (settlementNameByCell.has(ruinOrder[ruinIdx]) ||
+                  poiPlacements.some((p) => p.cell === ruinOrder[ruinIdx]))
               ) {
-                rIdx++;
+                ruinIdx++;
               }
-              const cell =
-                landOrder[rIdx++] ||
-                landOrder[0] ||
-                `${(seedU32 % N) | 0},${((seedU32 >>> 8) % N) | 0}`;
+              if (ruinIdx < ruinOrder.length) {
+                cell = ruinOrder[ruinIdx++];
+              } else {
+                while (
+                  rIdx < landOrder.length &&
+                  (settlementNameByCell.has(landOrder[rIdx]) ||
+                    poiPlacements.some((p) => p.cell === landOrder[rIdx]))
+                ) {
+                  rIdx++;
+                }
+                cell =
+                  landOrder[rIdx++] ||
+                  landOrder[0] ||
+                  `${(seedU32 % N) | 0},${((seedU32 >>> 8) % N) | 0}`;
+              }
               const poiType = "ruins";
               const poiName = namedPOI(nameGen, poiType);
               poiPlacements.push({ poiType, poiName, cell });
@@ -5903,12 +5930,27 @@
               !a?.fieldCamp &&
               !a?.religious &&
               tileKey !== "water";
+            const showPoi =
+              a?.poi?.length &&
+              !showStructure &&
+              !a?.fieldCamp &&
+              !a?.religious &&
+              tileKey !== "settlement" &&
+              tileKey !== "fungal-settlement" &&
+              tileKey !== "ruins" &&
+              tileKey !== "overgrown-ruins" &&
+              tileKey !== "fungal-ruins" &&
+              tileKey !== "water";
             const allowRoadGlyph = hasRoad;
 
             if (showStructure) {
               const variantSeed = rngUtil.n2(seedU32, x + 999, y + 999);
               const ch = pickVariant("settlement", tileset, variantSeed);
               row += `<span data-cell="${x},${y}" data-tile="settlement"${roadAttr} data-poi="structure" title="${title}">${ch}</span>`;
+            } else if (showPoi) {
+              const variantSeed = rngUtil.n2(seedU32, x + 999, y + 999);
+              const ch = pickVariant("poi", tileset, variantSeed);
+              row += `<span data-cell="${x},${y}" data-tile="poi"${roadAttr} data-poi="marker" title="${title}">${ch}</span>`;
             } else if (a?.fieldCamp) {
               const ch =
                 rngUtil.oneOf(rpick, baseGlyphs(tileset.camp)) ||
@@ -6295,6 +6337,9 @@
 
         const gCamp = addGroup("camp");
         addList(gCamp, "camp", tileset.camp);
+
+        const gPoi = addGroup("poi");
+        addList(gPoi, "poi", tileset.poi);
 
         const gRel = addGroup("religious");
         const rel = tileset.religious || {};
