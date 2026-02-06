@@ -292,6 +292,11 @@
         flex-direction: column;
         align-items: flex-end;
       }
+      .map-tip {
+        margin-top: 6px;
+        min-height: 1.2em;
+        color: var(--mut);
+      }
 
       /* Larger, square-cell minimap */
       #map {
@@ -316,11 +321,13 @@
         font-weight: 700;
         letter-spacing: 0.02em;
       }
-      #map span:hover {
-        transform: scale(1.3);
-      }
-      #map span.map-label:hover {
-        transform: none;
+      @media (hover: hover) and (pointer: fine) {
+        #map span:hover {
+          transform: scale(1.3);
+        }
+        #map span.map-label:hover {
+          transform: none;
+        }
       }
 
       /* ========= Tile coloring (NO magic colors) ========= */
@@ -480,8 +487,10 @@
         border-radius: 6px;
         cursor: pointer;
       }
-      ul.list li:hover {
-        border-color: var(--acc);
+      @media (hover: hover) and (pointer: fine) {
+        ul.list li:hover {
+          border-color: var(--acc);
+        }
       }
 
       .head {
@@ -577,8 +586,10 @@
         font-weight: bold;
         transition: all ease-in-out 0.15s;
       }
-      button.primary:hover {
-        background: color-mix(in srgb, var(--acc) 80%, var(--btn));
+      @media (hover: hover) and (pointer: fine) {
+        button.primary:hover {
+          background: color-mix(in srgb, var(--acc) 80%, var(--btn));
+        }
       }
 
       /* ===== cross-hover linking ===== */
@@ -652,6 +663,7 @@
         <pre id="out"></pre>
         <span class="mapwrap">
           <pre id="map"></pre>
+          <div id="mapTip" class="map-tip small" aria-live="polite"></div>
           <span class="pill seedpill small">
             Seed:
             <strong id="seedShow">—</strong>
@@ -6381,6 +6393,10 @@
       function bindCrossHover() {
         if (_crossHoverBound) return;
         _crossHoverBound = true;
+        let locked = false;
+        const mapTipEl = document.getElementById("mapTip");
+        const canShowTip =
+          window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
 
         const clearHot = () => {
           document
@@ -6396,6 +6412,21 @@
               if (orig !== undefined) el.textContent = orig;
               el.classList.remove("is-ferry-path");
             });
+        };
+
+        const setMapTip = (text) => {
+          if (!mapTipEl || !canShowTip) return;
+          mapTipEl.textContent = text || "";
+        };
+
+        const getTitleForCell = (cell) => {
+          if (!cell) return "";
+          const esc =
+            window.CSS && CSS.escape
+              ? CSS.escape(cell)
+              : cell.replace(/"/g, '\\"');
+          const el = mapEl.querySelector(`span[data-cell="${esc}"]`);
+          return el?.getAttribute("title") || "";
         };
 
         const showFerryPreview = (ferryId) => {
@@ -6449,12 +6480,16 @@
         };
 
         out.addEventListener("pointerover", (e) => {
+          if (locked) return;
+          if (e.pointerType && e.pointerType !== "mouse") return;
           const t = e.target.closest?.(".xref[data-cell]");
           if (!t) return;
           markCell(t.dataset.cell, t.dataset.ferryId || null);
         });
 
         out.addEventListener("pointerout", (e) => {
+          if (locked) return;
+          if (e.pointerType && e.pointerType !== "mouse") return;
           const t = e.target.closest?.(".xref[data-cell]");
           if (!t) return;
           const rt = e.relatedTarget;
@@ -6464,12 +6499,16 @@
         });
 
         mapEl.addEventListener("pointerover", (e) => {
+          if (locked) return;
+          if (e.pointerType && e.pointerType !== "mouse") return;
           const t = e.target.closest?.("span[data-cell]");
           if (!t) return;
           markCell(t.dataset.cell, t.dataset.ferryId || null);
         });
 
         mapEl.addEventListener("pointerout", (e) => {
+          if (locked) return;
+          if (e.pointerType && e.pointerType !== "mouse") return;
           const t = e.target.closest?.("span[data-cell]");
           if (!t) return;
           const rt = e.relatedTarget;
@@ -6477,6 +6516,56 @@
           clearHot();
           clearFerryPreview();
         });
+
+        const lockFromTarget = (target) => {
+          const t =
+            target?.closest?.(".xref[data-cell]") ||
+            target?.closest?.("span[data-cell]");
+          if (!t) return false;
+          locked = true;
+          markCell(t.dataset.cell, t.dataset.ferryId || null);
+          setMapTip(getTitleForCell(t.dataset.cell));
+          return true;
+        };
+
+        let touchStart = null;
+        const startTouch = (e) => {
+          if (e.pointerType === "mouse") return;
+          touchStart = {
+            id: e.pointerId,
+            x: e.clientX,
+            y: e.clientY,
+            target: e.target,
+            moved: false,
+          };
+        };
+        const moveTouch = (e) => {
+          if (!touchStart || e.pointerId !== touchStart.id) return;
+          const dx = Math.abs(e.clientX - touchStart.x);
+          const dy = Math.abs(e.clientY - touchStart.y);
+          if (dx > 8 || dy > 8) touchStart.moved = true;
+        };
+        const endTouch = (e) => {
+          if (!touchStart || e.pointerId !== touchStart.id) return;
+          const { moved, target } = touchStart;
+          touchStart = null;
+          if (moved) return;
+          if (lockFromTarget(target)) return;
+          if (!locked) return;
+          locked = false;
+          clearHot();
+          clearFerryPreview();
+          setMapTip("");
+        };
+        const cancelTouch = (e) => {
+          if (touchStart && e.pointerId === touchStart.id) touchStart = null;
+        };
+
+        out.addEventListener("pointerdown", startTouch);
+        mapEl.addEventListener("pointerdown", startTouch);
+        document.addEventListener("pointermove", moveTouch);
+        document.addEventListener("pointerup", endTouch);
+        document.addEventListener("pointercancel", cancelTouch);
       }
 
       function generate() {
