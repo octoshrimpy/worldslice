@@ -2299,28 +2299,75 @@
         " Maw",
         " Province",
       ];
-      const settlementTypes = [
-        "hamlet",
-        "village",
-        "farmstead",
-        "settlement",
-        "fort",
-        "crossroads",
-        "borough",
-        "town",
-        "city",
-        "capital",
-        "trade hub",
-        "stronghold",
-        "citadel",
-        "bastion",
-        "garrison",
-        "enclave",
-        "outpost",
-        "fortress",
-        "metropolis",
-        "megacity",
-      ];
+      const settlementTypes = {
+        base: [
+          "hamlet",
+          "village",
+          "farmstead",
+          "ranch",
+          "outpost",
+          "fortified village",
+          "manor",
+          "keep",
+          "stronghold",
+          "castle",
+          "city-state",
+          "military base",
+          "lodge",
+          "suburbs",
+          "campus",
+          "complex",
+          "farm",
+          "settlement",
+          "fort",
+          "borough",
+          "town",
+          "city",
+          "capital",
+          "stronghold",
+          "citadel",
+          "bastion",
+          "garrison",
+          "enclave",
+          "outpost",
+          "fortress",
+          "metropolis",
+          "megacity",
+        ],
+        nearWater: [
+          "port",
+          "harbor",
+          "docktown",
+          "fishing village",
+          "river town",
+          "canal city",
+          "delta town",
+          "lakeside town",
+          "wharf",
+        ],
+        nearMountain: [
+          "mining town",
+          "mountain hold",
+          "cliffside village",
+          "ridgefort",
+          "highpass outpost",
+          "quarry town",
+          "peakstead",
+        ],
+        nearPaths: [
+          "waystation",
+          "roadhouse",
+          "trade hub",
+          "trading post",
+          "exchange",
+          "merchant quarter",
+          "market town",
+          "trading post",
+          "trade hub",
+          "rest stop",
+          "crossroads",
+        ],
+      };
       const factionNameTemplates = [
         {
           name: "Title+Lineage",
@@ -3336,9 +3383,22 @@
               settlementNames[i % settlementNames.length],
             ),
           );
-          settlements.forEach((cell) =>
-            settlementTypeByCell.set(cell, rngUtil.oneOf(r, settlementTypes)),
-          );
+          settlements.forEach((cell) => {
+            const [xStr, yStr] = cell.split(",");
+            const x = Number(xStr);
+            const y = Number(yStr);
+            const nearMountain =
+              countNeighbors8Of(tileKeyGrid, N, x, y, "mountain") > 0;
+
+            let type = rngUtil.oneOf(r, settlementTypes.base);
+            const contextual = [];
+            if (nearMountain)
+              contextual.push(...ensure(settlementTypes.nearMountain, []));
+            if (contextual.length && rngUtil.maybe(r, 0.6))
+              type = rngUtil.oneOf(r, contextual);
+
+            settlementTypeByCell.set(cell, type);
+          });
 
           const poiPlacements = [];
           const poiTypesExpanded = poiTypes.slice();
@@ -4321,7 +4381,62 @@
             N,
             riverType || "water",
           );
+          if (worldMeta?.settlementTypeByCell) {
+            for (const cell of worldMeta.settlementTypeByCell.keys()) {
+              const [xStr, yStr] = cell.split(",");
+              const x = Number(xStr);
+              const y = Number(yStr);
+              if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+
+              let nearWater = false;
+              for (const [nx, ny] of neighbors4(N, x, y)) {
+                if (tileKeyGrid[ny][nx] === "water") {
+                  nearWater = true;
+                  break;
+                }
+              }
+
+              if (!nearWater) {
+                for (let dy = -3; dy <= 3 && !nearWater; dy++) {
+                  for (let dx = -3; dx <= 3; dx++) {
+                    if (Math.max(Math.abs(dx), Math.abs(dy)) > 3) continue;
+                    const nx = x + dx;
+                    const ny = y + dy;
+                    if (nx < 0 || ny < 0 || nx >= N || ny >= N) continue;
+                    if (
+                      tileKeyGrid[ny][nx] === "water" &&
+                      depthGrid[ny][nx] >= 2
+                    ) {
+                      nearWater = true;
+                      break;
+                    }
+                  }
+                }
+              }
+
+              if (!nearWater) continue;
+              const roll = rngUtil.n2(seedU32, 92000 + x, 92100 + y);
+              if (roll < 0.8) {
+                const list = ensure(settlementTypes.nearWater, []);
+                if (list.length) {
+                  const cellSeed =
+                    seedU32 ^ ((x * 374761393) | 0) ^ ((y * 668265263) | 0);
+                  const rPick = rngUtil.xs32(cellSeed ^ 0x4f1a2b3c);
+                  worldMeta.settlementTypeByCell.set(
+                    cell,
+                    rngUtil.oneOf(rPick, list),
+                  );
+                }
+              }
+            }
+          }
           tileKeyGrid = applyBeachPatches(seedU32, tileKeyGrid, depthGrid, N);
+          tileKeyGrid = applyStoneNearRivers(
+            seedU32,
+            tileKeyGrid,
+            river,
+            N,
+          );
           let heightGrid = buildHeightGrid(tileKeyGrid, N);
           heightGrid = boostMountainHeights(
             heightGrid,
@@ -4346,6 +4461,40 @@
             worldMeta,
             N,
           );
+          if (worldMeta?.settlementTypeByCell && roadInfo?.cells) {
+            for (const cell of worldMeta.settlementTypeByCell.keys()) {
+              const [xStr, yStr] = cell.split(",");
+              const x = Number(xStr);
+              const y = Number(yStr);
+              if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+
+              let roadNeighbors = 0;
+              for (const [nx, ny] of neighbors4(N, x, y)) {
+                if (roadInfo.cells.has(`${nx},${ny}`)) roadNeighbors++;
+              }
+              if (roadNeighbors < 2) continue;
+
+              const roll = rngUtil.n2(seedU32, 93000 + x, 93100 + y);
+              if (roll < 0.65) {
+                const list = ensure(settlementTypes.nearPaths, []);
+                if (list.length) {
+                  const cellSeed =
+                    seedU32 ^ ((x * 374761393) | 0) ^ ((y * 668265263) | 0);
+                  const rPick = rngUtil.xs32(cellSeed ^ 0x9a1b2c3d);
+                  worldMeta.settlementTypeByCell.set(
+                    cell,
+                    rngUtil.oneOf(rPick, list),
+                  );
+                }
+              }
+            }
+          }
+          if (worldMeta?.annotations && worldMeta?.settlementTypeByCell) {
+            for (const [cell, type] of worldMeta.settlementTypeByCell.entries()) {
+              const a = worldMeta.annotations.get(cell);
+              if (a) a.settlementType = type;
+            }
+          }
           const html = renderMapHtml(
             seedU32,
             tileKeyGrid,
@@ -4921,6 +5070,59 @@
             if (tileKeyGrid[y][x] !== "plains") continue;
             if (isAdjacentTo(tileKeyGrid, N, x, y, "lava")) {
               next[y][x] = "stone";
+            }
+          }
+        }
+        return next;
+      }
+
+      function applyStoneNearRivers(seedU32, tileKeyGrid, river, N) {
+        if (!river || !river.size) return tileKeyGrid;
+        const next = tileKeyGrid.map((row) => row.slice());
+        const chance = 0.12;
+        const allowed = new Set(["plains", "grass"]);
+        const blocked = new Set([
+          "settlement",
+          "fungal-settlement",
+          "camp",
+          "ruins",
+          "overgrown-ruins",
+          "fungal-ruins",
+          "religious",
+          "lava",
+        ]);
+        const dirs = [
+          [1, 0],
+          [-1, 0],
+          [0, 1],
+          [0, -1],
+        ];
+
+        for (let y = 0; y < N; y++) {
+          for (let x = 0; x < N; x++) {
+            const k = tileKeyGrid[y][x];
+            if (!allowed.has(k)) continue;
+            let nearRiver = false;
+            for (const [nx, ny] of neighbors4(N, x, y)) {
+              if (river.has(`${nx},${ny}`)) {
+                nearRiver = true;
+                break;
+              }
+            }
+            if (!nearRiver) continue;
+            const roll = rngUtil.n2(seedU32, 84500 + x, 84600 + y);
+            if (roll < chance) {
+              const clumpSize = 2 + ((rngUtil.n2(seedU32, 84700 + x, 84800 + y) * 3) | 0);
+              let cx = x;
+              let cy = y;
+              for (let i = 0; i < clumpSize; i++) {
+                if (cx < 0 || cy < 0 || cx >= N || cy >= N) break;
+                const ck = next[cy][cx];
+                if (!blocked.has(ck)) next[cy][cx] = "stone";
+                const d = dirs[(rngUtil.n2(seedU32, 84900 + x + i, 85000 + y + i) * dirs.length) | 0];
+                cx = clamp(cx + d[0], 0, N - 1);
+                cy = clamp(cy + d[1], 0, N - 1);
+              }
             }
           }
         }
