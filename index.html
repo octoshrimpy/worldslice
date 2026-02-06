@@ -4461,6 +4461,28 @@
             worldMeta,
             N,
           );
+          tileKeyGrid = applyVolcanicPeakFlow(
+            seedU32,
+            tileKeyGrid,
+            heightGrid,
+            depthGrid,
+            N,
+            biome,
+            biomeAllowsFeature,
+            worldMeta,
+            roadInfo?.cells,
+          );
+          tileKeyGrid = applyVolcanicPeakPool(
+            seedU32,
+            tileKeyGrid,
+            heightGrid,
+            depthGrid,
+            N,
+            biome,
+            biomeAllowsFeature,
+            worldMeta,
+            roadInfo?.cells,
+          );
           if (worldMeta?.settlementTypeByCell && roadInfo?.cells) {
             for (const cell of worldMeta.settlementTypeByCell.keys()) {
               const [xStr, yStr] = cell.split(",");
@@ -5126,6 +5148,344 @@
             }
           }
         }
+        return next;
+      }
+
+      function isMountainousBiome(biome, biomeAllowsFeature) {
+        if (biomeAllowsFeature?.(biome, "mountain", 0.35)) return true;
+        if (biomeAllowsFeature?.(biome, "ridge", 0.45)) return true;
+        const name = String(biome?.name ?? biome).toLowerCase();
+        return name.includes("mountain") || name.includes("highland");
+      }
+
+      function applyVolcanicPeakFlow(
+        seedU32,
+        tileKeyGrid,
+        heightGrid,
+        depthGrid,
+        N,
+        biome,
+        biomeAllowsFeature,
+        worldMeta,
+        roadCells,
+      ) {
+        if (!isMountainousBiome(biome, biomeAllowsFeature)) return tileKeyGrid;
+        const next = tileKeyGrid.map((row) => row.slice());
+        const protectedCells = new Set();
+        if (worldMeta?.annotations) {
+          for (const cell of worldMeta.annotations.keys())
+            protectedCells.add(cell);
+        }
+
+        let maxH = 0;
+        const candidates = [];
+        for (let y = 0; y < N; y++) {
+          for (let x = 0; x < N; x++) {
+            if (tileKeyGrid[y][x] !== "mountain") continue;
+            const cell = `${x},${y}`;
+            if (protectedCells.has(cell)) continue;
+            const h = heightGrid[y][x] || 0;
+            if (h > maxH) {
+              maxH = h;
+              candidates.length = 0;
+              candidates.push({ x, y });
+            } else if (h === maxH) {
+              candidates.push({ x, y });
+            }
+          }
+        }
+        if (maxH < 4 || !candidates.length) return tileKeyGrid;
+
+        const pick =
+          candidates[
+            Math.floor(
+              rngUtil.n2(seedU32, 86200, 86300) * candidates.length,
+            )
+          ];
+        if (!pick) return tileKeyGrid;
+
+        const dirs = [
+          [1, 0],
+          [-1, 0],
+          [0, 1],
+          [0, -1],
+        ];
+        const maxLen =
+          10 + ((rngUtil.n2(seedU32, 86400, 86500) * 10) | 0);
+        const startWidth =
+          1 + ((rngUtil.n2(seedU32, 86450, 86550) * 3) | 0);
+        let cx = pick.x;
+        let cy = pick.y;
+        let onLandSteps = 0;
+        const flowSteps = [];
+        const placementDepth = new Map();
+
+        const seedStep = () => {
+          const curH = heightGrid[cy][cx] || 0;
+          let bestH = Infinity;
+          const best = [];
+          for (const [dx, dy] of dirs) {
+            const nx = cx + dx;
+            const ny = cy + dy;
+            if (nx < 0 || ny < 0 || nx >= N || ny >= N) continue;
+            const cell = `${nx},${ny}`;
+            if (protectedCells.has(cell)) continue;
+            if (roadCells?.has(cell)) continue;
+            const nk = tileKeyGrid[ny][nx];
+            if (nk === "water") continue;
+            const nh = nk === "mountain" ? heightGrid[ny][nx] || 0 : 0;
+            if (nh > curH) continue;
+            if (nh < bestH) {
+              bestH = nh;
+              best.length = 0;
+              best.push({ x: nx, y: ny, k: nk, h: nh });
+            } else if (nh === bestH) {
+              best.push({ x: nx, y: ny, k: nk, h: nh });
+            }
+          }
+          if (!best.length) return false;
+          const pickIdx = Math.floor(
+            rngUtil.n2(seedU32, 86520, 86580) * best.length,
+          );
+          const step = best[pickIdx] || best[0];
+          cx = step.x;
+          cy = step.y;
+          return true;
+        };
+        if (!seedStep()) return tileKeyGrid;
+        const mouthCell = `${cx},${cy}`;
+
+        for (let i = 0; i < maxLen; i++) {
+          const curCell = `${cx},${cy}`;
+          if (protectedCells.has(curCell)) break;
+          if (roadCells?.has(curCell)) break;
+          const width = clamp(
+            Math.round(startWidth * (1 - (i / Math.max(1, maxLen - 1)) * 0.7)),
+            1,
+            startWidth,
+          );
+          flowSteps.push({ x: cx, y: cy, width });
+          if (width > 1) {
+            const orth = [
+              [0, -1],
+              [1, 0],
+              [0, 1],
+              [-1, 0],
+            ];
+            for (let w = 1; w <= width - 1; w++) {
+              const [ox, oy] = orth[w % orth.length];
+              const sx = cx + ox;
+              const sy = cy + oy;
+              if (sx < 0 || sy < 0 || sx >= N || sy >= N) continue;
+              const scell = `${sx},${sy}`;
+              if (protectedCells.has(scell)) continue;
+              if (roadCells?.has(scell)) continue;
+              if (tileKeyGrid[sy][sx] === "water") continue;
+              placementDepth.set(scell, placementDepth.get(scell) || 0);
+            }
+          }
+
+          const curH =
+            tileKeyGrid[cy][cx] === "mountain" ? heightGrid[cy][cx] || 0 : 0;
+          let bestH = Infinity;
+          const best = [];
+          for (const [dx, dy] of dirs) {
+            const nx = cx + dx;
+            const ny = cy + dy;
+            if (nx < 0 || ny < 0 || nx >= N || ny >= N) continue;
+            const cell = `${nx},${ny}`;
+            if (protectedCells.has(cell)) continue;
+            if (roadCells?.has(cell)) continue;
+            const nk = tileKeyGrid[ny][nx];
+            if (nk === "water") continue;
+            const nh = nk === "mountain" ? heightGrid[ny][nx] || 0 : 0;
+            if (nh < bestH) {
+              bestH = nh;
+              best.length = 0;
+              best.push({ x: nx, y: ny, k: nk, h: nh });
+            } else if (nh === bestH) {
+              best.push({ x: nx, y: ny, k: nk, h: nh });
+            }
+          }
+          if (!best.length) break;
+
+          const pickIdx = Math.floor(
+            rngUtil.n2(seedU32, 86600 + i, 86700 + i) * best.length,
+          );
+          const step = best[pickIdx] || best[0];
+          if (!step) break;
+          cx = step.x;
+          cy = step.y;
+
+          if (step.k !== "mountain") onLandSteps++;
+          if (onLandSteps >= 4) break;
+          if (step.k !== "mountain" && step.h <= curH) {
+            const tailKey = `${cx},${cy}`;
+            placementDepth.set(tailKey, Math.max(placementDepth.get(tailKey) || 0, 1));
+          }
+          if (step.h > curH && curH > 0) break;
+        }
+
+        if (flowSteps.length) {
+          const stepCount = flowSteps.length;
+          const bandDepth = (idx) => {
+            if (stepCount === 1) return 3;
+            const t = idx / (stepCount - 1);
+            if (t < 1 / 3) return 3;
+            if (t < 2 / 3) return 2;
+            return 1;
+          };
+          for (let i = 0; i < flowSteps.length; i++) {
+            const step = flowSteps[i];
+            const centerKey = `${step.x},${step.y}`;
+            const depth = bandDepth(i);
+            placementDepth.set(
+              centerKey,
+              Math.max(placementDepth.get(centerKey) || 0, depth),
+            );
+            if (step.width > 1) {
+              for (const [dx, dy] of [
+                [0, -1],
+                [1, 0],
+                [0, 1],
+                [-1, 0],
+              ]) {
+                const sx = step.x + dx;
+                const sy = step.y + dy;
+                if (sx < 0 || sy < 0 || sx >= N || sy >= N) continue;
+                const scell = `${sx},${sy}`;
+                if (!placementDepth.has(scell)) continue;
+                placementDepth.set(
+                  scell,
+                  Math.max(
+                    placementDepth.get(scell) || 0,
+                    Math.max(1, depth - 1),
+                  ),
+                );
+              }
+            }
+          }
+          for (const [cell, d] of placementDepth.entries()) {
+            const p = parseCell(cell);
+            if (!p) continue;
+            next[p.y][p.x] = "lava";
+            if (depthGrid?.[p.y]) depthGrid[p.y][p.x] = clamp(d, 1, 3);
+          }
+        }
+
+        if (worldMeta?.annotations) {
+          let a = worldMeta.annotations.get(mouthCell);
+          if (!a) {
+            a = { poi: [], factions: [] };
+            worldMeta.annotations.set(mouthCell, a);
+          }
+          a.poi.push({ name: "Volcano", type: "volcano" });
+          if (worldMeta.poiPlacements) {
+            const already =
+              worldMeta.poiPlacements.some(
+                (p) => p.poiType === "volcano" && p.cell === mouthCell,
+              ) || false;
+            if (!already)
+              worldMeta.poiPlacements.push({
+                poiType: "volcano",
+                poiName: "Volcano",
+                cell: mouthCell,
+              });
+          }
+        }
+
+        return next;
+      }
+
+      function applyVolcanicPeakPool(
+        seedU32,
+        tileKeyGrid,
+        heightGrid,
+        depthGrid,
+        N,
+        biome,
+        biomeAllowsFeature,
+        worldMeta,
+        roadCells,
+      ) {
+        if (!isMountainousBiome(biome, biomeAllowsFeature)) return tileKeyGrid;
+        const next = tileKeyGrid.map((row) => row.slice());
+        const protectedCells = new Set();
+        if (worldMeta?.annotations) {
+          for (const cell of worldMeta.annotations.keys())
+            protectedCells.add(cell);
+        }
+
+        let maxH = 0;
+        const candidates = [];
+        for (let y = 0; y < N; y++) {
+          for (let x = 0; x < N; x++) {
+            if (tileKeyGrid[y][x] !== "mountain") continue;
+            const cell = `${x},${y}`;
+            if (protectedCells.has(cell)) continue;
+            if (roadCells?.has(cell)) continue;
+            const h = heightGrid[y][x] || 0;
+            if (h < 4) continue;
+            let surrounded = true;
+            for (let dy = -3; dy <= 3 && surrounded; dy++) {
+              for (let dx = -3; dx <= 3; dx++) {
+                const dist = Math.abs(dx) + Math.abs(dy);
+                if (dist !== 3) continue;
+                const nx = x + dx;
+                const ny = y + dy;
+                if (nx < 0 || ny < 0 || nx >= N || ny >= N) {
+                  surrounded = false;
+                  break;
+                }
+                if (tileKeyGrid[ny][nx] !== "mountain") {
+                  surrounded = false;
+                  break;
+                }
+                const nh = heightGrid[ny][nx] || 0;
+                if (nh < h - 1 || nh > h) {
+                  surrounded = false;
+                  break;
+                }
+              }
+            }
+            if (!surrounded) continue;
+            if (h > maxH) {
+              maxH = h;
+              candidates.length = 0;
+              candidates.push({ x, y });
+            } else if (h === maxH) {
+              candidates.push({ x, y });
+            }
+          }
+        }
+        if (maxH < 4 || !candidates.length) return tileKeyGrid;
+
+        const pick =
+          candidates[
+            Math.floor(
+              rngUtil.n2(seedU32, 87200, 87300) * candidates.length,
+            )
+          ];
+        if (!pick) return tileKeyGrid;
+
+        const radius = 2;
+        for (let dy = -radius; dy <= radius; dy++) {
+          for (let dx = -radius; dx <= radius; dx++) {
+            const nx = pick.x + dx;
+            const ny = pick.y + dy;
+            if (nx < 0 || ny < 0 || nx >= N || ny >= N) continue;
+            const cell = `${nx},${ny}`;
+            if (protectedCells.has(cell)) continue;
+            if (roadCells?.has(cell)) continue;
+            const dist = Math.abs(dx) + Math.abs(dy);
+            if (dist > radius) continue;
+            next[ny][nx] = "lava";
+            if (depthGrid?.[ny]) {
+              depthGrid[ny][nx] = dist <= 1 ? 3 : 2;
+            }
+          }
+        }
+
         return next;
       }
 
@@ -6365,7 +6725,7 @@
                 `height: ${clamp(heightGrid[y][x] || 1, 1, 5)}`,
               );
             if (hasRoad) {
-              const label = "Road (primary)";
+              const label = "Road";
               contentParts.push(
                 isMountainPass(tileKeyGrid, heightGrid, x, y)
                   ? `${label} — pass`
@@ -6415,6 +6775,8 @@
               !a?.fieldCamp &&
               !a?.religious &&
               tileKey !== "water";
+            const hasVolcanoPoi =
+              a?.poi?.some((p) => p.type === "volcano") || false;
             const showPoi =
               a?.poi?.length &&
               !showStructure &&
@@ -6425,7 +6787,8 @@
               tileKey !== "ruins" &&
               tileKey !== "overgrown-ruins" &&
               tileKey !== "fungal-ruins" &&
-              tileKey !== "water";
+              tileKey !== "water" &&
+              !(tileKey === "lava" && hasVolcanoPoi);
             const allowRoadGlyph = hasRoad;
 
             if (showStructure) {
