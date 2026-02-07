@@ -3301,7 +3301,7 @@
 
         buildNicknames(r) {
           return CoreUtils.cartesian(nicknameColors, nicknameThings).map(
-            ([c, t]) => `${c} ${t}${rngUtil.RNGUtil.maybe(r, 0.5) ? "s" : ""}`,
+            ([c, t]) => `${c} ${t}${rngUtil.maybe(r, 0.5) ? "s" : ""}`,
           );
         }
 
@@ -3315,7 +3315,7 @@
           const nicknames = this.buildNicknames(r);
 
           const sites = siteBases.map((s) =>
-            rngUtil.RNGUtil.maybe(r, 0.5) ? `the ${s}` : s,
+            rngUtil.maybe(r, 0.5) ? `the ${s}` : s,
           );
 
           return {
@@ -3479,11 +3479,11 @@
         composeHook(r, tt, ctx = {}) {
           const trigger = rngUtil.oneOf(r, tt.hooks);
           const mod =
-            tt.hookMods && rngUtil.RNGUtil.maybe(r, 0.6)
+            tt.hookMods && rngUtil.maybe(r, 0.6)
               ? this.resolvePlaceholders(rngUtil.oneOf(r, tt.hookMods), ctx, r)
               : null;
           const consequence =
-            tt.hookConsequences && rngUtil.RNGUtil.maybe(r, 0.3)
+            tt.hookConsequences && rngUtil.maybe(r, 0.3)
               ? this.resolvePlaceholders(
                   rngUtil.oneOf(r, tt.hookConsequences),
                   ctx,
@@ -3504,7 +3504,7 @@
         ) {
           const motive = rngUtil.oneOf(r, fieldMotiveVerbs.concat(tt.motives));
           const glue = rngUtil.oneOf(r, tt.motiveGlue);
-          const includeAdj = forceAdj || rngUtil.RNGUtil.maybe(r, adjChance);
+          const includeAdj = forceAdj || rngUtil.maybe(r, adjChance);
           const adj = includeAdj ? rngUtil.oneOf(r, tt.relicAdjectives) : null;
           const noun = rngUtil.oneOf(r, tt.relicNouns);
 
@@ -3576,7 +3576,7 @@
             const contextual = [];
             if (nearMountain)
               contextual.push(...CoreUtils.ensure(settlementTypes.nearMountain, []));
-            if (contextual.length && rngUtil.RNGUtil.maybe(r, 0.6))
+            if (contextual.length && rngUtil.maybe(r, 0.6))
               type = rngUtil.oneOf(r, contextual);
 
             settlementTypeByCell.set(cell, type);
