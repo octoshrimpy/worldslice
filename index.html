@@ -6480,12 +6480,11 @@
           addEdge(poi, best);
         }
 
-        const stampRoad = (path) => {
-          if (!path || !path.length) return;
-          for (const cell of path) {
-            roadCells.add(cell);
-            roadKindByCell.set(cell, "primary");
-          }
+        const markRoadCell = (cell, kind) => {
+          const existing = roadKindByCell.get(cell);
+          if (existing === "primary" && kind === "secondary") return;
+          roadCells.add(cell);
+          roadKindByCell.set(cell, kind);
         };
 
         const ferrySet = new Set();
@@ -6512,6 +6511,7 @@
           if (!path || path.length < 3) return null;
           let lastLand = null;
           let i = 0;
+          const waterRuns = [];
 
           while (i < path.length) {
             const cell = path[i];
@@ -6528,6 +6528,7 @@
             }
 
             const startLand = lastLand;
+            const runStart = i;
             let deepSeen = false;
             while (i < path.length) {
               const wCell = path[i];
@@ -6542,14 +6543,21 @@
               if (d >= 2) deepSeen = true;
               i++;
             }
-
+            const runEnd = i - 1;
             const endCell = path[i];
-            if (deepSeen && startLand && endCell) {
-              return { start: startLand, end: endCell };
-            }
+            waterRuns.push({ startLand, endCell, deepSeen, runStart, runEnd });
           }
 
-          return null;
+          if (waterRuns.length !== 1) return null;
+          const run = waterRuns[0];
+          if (!run.startLand || !run.endCell || !run.deepSeen) return null;
+          if (run.runStart <= 0 || run.runEnd >= path.length - 1) return null;
+          const startP = parseCell(path[run.runStart - 1]);
+          const endP = parseCell(path[run.runEnd + 1]);
+          if (!startP || !endP) return null;
+          if (tileKeyGrid[startP.y][startP.x] === "water") return null;
+          if (tileKeyGrid[endP.y][endP.x] === "water") return null;
+          return { start: run.startLand, end: run.endCell };
         };
 
         const ferryLabels = (aCell, bCell) => {
@@ -6564,15 +6572,14 @@
           return dy >= 0 ? ["north", "south"] : ["south", "north"];
         };
 
-        const stampRoadLandOnly = (path) => {
+        const stampRoadLandOnly = (path, kind = "primary") => {
           if (!path || !path.length) return;
           for (const cell of path) {
             const p = parseCell(cell);
             if (!p) continue;
             const k = tileKeyGrid[p.y][p.x];
             if (k === "water" || k === "lava") continue;
-            roadCells.add(cell);
-            roadKindByCell.set(cell, "primary");
+            markRoadCell(cell, kind);
           }
         };
 
@@ -6606,7 +6613,67 @@
           );
           if (!path || !path.length) continue;
           const ferry = ferryFromPath(path);
-          if (!ferry) continue;
+          if (!ferry) {
+            const aLand = findNearestPassable(a);
+            const bLand = findNearestPassable(b);
+            if (aLand && bLand && aLand !== bLand) {
+              const secondaryPath = aStarPath(
+                aLand,
+                bLand,
+                N,
+                tileKeyGrid,
+                heightGrid,
+                depthGrid,
+                roadCells,
+                { allowWater: true },
+              );
+              const secondaryFerry = ferryFromPath(secondaryPath);
+              if (secondaryFerry) {
+                const key =
+                  secondaryFerry.start < secondaryFerry.end
+                    ? `${secondaryFerry.start}|${secondaryFerry.end}`
+                    : `${secondaryFerry.end}|${secondaryFerry.start}`;
+                if (!ferrySet.has(key)) {
+                  ferrySet.add(key);
+                  const ferrySeed = rngUtil.h32(
+                    `${seedU32}|${secondaryFerry.start}|${secondaryFerry.end}|ferry`,
+                  );
+                  const ferryNameGen = new NameGenerator(rngUtil.xs32(ferrySeed));
+                  const ferryBase = namedPOI(ferryNameGen, "ferry crossing");
+                  const [aLabel, bLabel] = ferryLabels(
+                    secondaryFerry.start,
+                    secondaryFerry.end,
+                  );
+                  const ferryId = `ferry-${ferrySet.size}`;
+                  addFerryPoi(`${ferryBase} (${aLabel})`, secondaryFerry.start, ferryId);
+                  addFerryPoi(`${ferryBase} (${bLabel})`, secondaryFerry.end, ferryId);
+                  ferries.push({
+                    id: ferryId,
+                    start: secondaryFerry.start,
+                    end: secondaryFerry.end,
+                    path: secondaryPath,
+                  });
+                }
+                stampRoadLandOnly(secondaryPath, "secondary");
+                continue;
+              }
+
+              const landPath = aStarPath(
+                aLand,
+                bLand,
+                N,
+                tileKeyGrid,
+                heightGrid,
+                depthGrid,
+                roadCells,
+                { allowWater: false },
+              );
+              if (landPath && landPath.length) {
+                stampRoadLandOnly(landPath);
+              }
+            }
+            continue;
+          }
 
           const key =
             ferry.start < ferry.end
