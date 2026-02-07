@@ -6545,7 +6545,7 @@
         if (k === "water") {
           if (!allowWater) return Infinity;
           const d = GridMath.clamp(depthGrid?.[y]?.[x] || 1, 1, 3);
-          cost = d === 1 ? 6 : d === 2 ? 14 : 22;
+          cost = d === 1 ? 4.2 : d === 2 ? 0.7 : 0.5;
         } else if (k === "mountain") {
           const h = GridMath.clamp(heightGrid[y][x] || 1, 1, 5);
           cost = h <= 2 ? 4 : h === 3 ? 12 : 30;
@@ -6862,15 +6862,28 @@
             waterRuns.push({ startLand, endCell, deepSeen, runStart, runEnd });
           }
 
-          if (waterRuns.length !== 1) return null;
-          const run = waterRuns[0];
-          if (!run.startLand || !run.endCell || !run.deepSeen) return null;
-          if (run.runStart <= 0 || run.runEnd >= path.length - 1) return null;
-          const startP = parseCell(path[run.runStart - 1]);
-          const endP = parseCell(path[run.runEnd + 1]);
-          if (!startP || !endP) return null;
-          if (tileKeyGrid[startP.y][startP.x] === "water") return null;
-          if (tileKeyGrid[endP.y][endP.x] === "water") return null;
+          if (!waterRuns.length) return null;
+
+          const eligibleRuns = [];
+          for (const run of waterRuns) {
+            if (!run.startLand || !run.endCell || !run.deepSeen) continue;
+            if (run.runStart <= 0 || run.runEnd >= path.length - 1) continue;
+            const startP = parseCell(path[run.runStart - 1]);
+            const endP = parseCell(path[run.runEnd + 1]);
+            if (!startP || !endP) continue;
+            if (tileKeyGrid[startP.y][startP.x] === "water") continue;
+            if (tileKeyGrid[endP.y][endP.x] === "water") continue;
+            eligibleRuns.push(run);
+          }
+
+          if (!eligibleRuns.length) return null;
+
+          // Prefer the longest crossing when a path includes multiple water runs.
+          const run = eligibleRuns.reduce((best, cur) => {
+            const bestLen = best.runEnd - best.runStart;
+            const curLen = cur.runEnd - cur.runStart;
+            return curLen > bestLen ? cur : best;
+          });
           return { start: run.startLand, end: run.endCell };
         };
 
