@@ -7290,14 +7290,16 @@
       }
 
       function parseHash() {
-        const h = location.hash.replace(/^#/, "");
-        const params = new URLSearchParams(h.includes("=") ? h : "");
-        const s = params.get("s"),
-          t = params.get("t");
-        return {
-          s: s ? decodeURIComponent(s) : null,
-          t: t ? decodeURIComponent(t) : null,
-        };
+        try {
+          const h = location.hash.replace(/^#/, "");
+          const params = new URLSearchParams(h.includes("=") ? h : "");
+          return {
+            s: params.get("s"),
+            t: params.get("t"),
+          };
+        } catch (_err) {
+          return { s: null, t: null };
+        }
       }
 
       function updateHash() {
