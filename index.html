@@ -1,36 +1,45 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <title>Slice-of-World Generator</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Noto+Sans+Symbols&family=Noto+Sans+Symbols+2&family=Noto+Sans+Linear+A&family=Noto+Sans+Linear+B&family=Noto+Emoji&display=swap">
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Noto+Sans+Symbols&family=Noto+Sans+Symbols+2&family=Noto+Sans+Linear+A&family=Noto+Sans+Linear+B&family=Noto+Emoji&display=swap"
+    />
     <style>
-  @font-face {
-  font-family: 'UnifontExMono';
-  src: url('https://stgiga.github.io/UnifontEX/UnifontExMono.eot'); /* IE9 Compat Modes */
-  src: url('https://stgiga.github.io/UnifontEX/UnifontExMono.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-       url('https://stgiga.github.io/UnifontEX/UnifontExMono.woff') format('woff'), /* Pretty Modern Browsers */
-       url('https://stgiga.github.io/UnifontEX/UnifontExMono.ttf')  format('truetype'), /* Safari, Android, iOS */
-       url('https://stgiga.github.io/UnifontEX/UnifontExMono.woff2') format('woff2'), /* Super Modern Browsers */
-       url('https://stgiga.github.io/UnifontEX/UnifontExMono.svg#UnifontExMono') format('svg'); /* Legacy iOS */
-}
-
-            
-      /* Use UnifontEX first, then Noto fallbacks */
-      :root{
-        --app-font:
-          "UnifontExMono",
-          "Noto Sans",
-          "Noto Sans Linear A",
-          "Noto Sans Linear B",
-          "Noto Sans Symbols 2",
-          "Noto Sans Symbols",
-          "Noto Emoji",
-          monospace;
+      @font-face {
+        font-family: "UnifontExMono";
+        src: url("https://stgiga.github.io/UnifontEX/UnifontExMono.eot"); /* IE9 Compat Modes */
+        src:
+          url("https://stgiga.github.io/UnifontEX/UnifontExMono.eot?#iefix")
+            format("embedded-opentype"),
+          /* IE6-IE8 */
+            url("https://stgiga.github.io/UnifontEX/UnifontExMono.woff")
+            format("woff"),
+          /* Pretty Modern Browsers */
+            url("https://stgiga.github.io/UnifontEX/UnifontExMono.ttf")
+            format("truetype"),
+          /* Safari, Android, iOS */
+            url("https://stgiga.github.io/UnifontEX/UnifontExMono.woff2")
+            format("woff2"),
+          /* Super Modern Browsers */
+            url("https://stgiga.github.io/UnifontEX/UnifontExMono.svg#UnifontExMono")
+            format("svg"); /* Legacy iOS */
       }
 
-      html, body, * {
+      /* Use UnifontEX first, then Noto fallbacks */
+      :root {
+        --app-font:
+          "UnifontExMono", "Noto Sans", "Noto Sans Linear A",
+          "Noto Sans Linear B", "Noto Sans Symbols 2", "Noto Sans Symbols",
+          "Noto Emoji", monospace;
+      }
+
+      html,
+      body,
+      * {
         font-family: var(--app-font);
       }
 
@@ -466,11 +475,9 @@
         /* box-shadow: inset 0 0 0.2rem color-mix(in srgb, var(--tile-road-secondary) 60%, transparent); */
       }
       #map {
-
       }
       #map span[data-road] .road-glyph,
       #map span.is-ferry-path {
-
         display: inline-flex;
         transform: scaleX(2);
         transform-origin: center;
@@ -708,7 +715,12 @@
               Seed:
               <strong id="seedShow">—</strong>
             </span>
-            <button id="showAll" class="pill small" type="button" aria-pressed="false">
+            <button
+              id="showAll"
+              class="pill small"
+              type="button"
+              aria-pressed="false"
+            >
               Show All
             </button>
           </span>
@@ -737,11 +749,11 @@
     </div>
 
     <script>
-      /** 
+      /**
        * TODO: wrap NPC names in span, color them --sw12
        * TODO: hook grammar makes no sense when it combines multiple modifiers, e.g. "a relic goes missing near the rootbound enclave during light wind conditions". maybe only allow one modifier per hook?
-       * 
-      **/
+       *
+       **/
 
       // #region App Script Overview
       // Sections: Constants, Theme Tables, Tileset, Lexicon Data, RNG Utilities,
@@ -1180,7 +1192,7 @@
                 mountain: 0.25,
                 ruins: 0.3,
               },
-            }
+            },
           ],
           factionsN1: [
             "Order",
@@ -2114,7 +2126,9 @@
       // #region Tileset + Glyphs
       /* ====================== Tileset ========================================== */
       const tileset = {
-        water: { depthGlyphs: { 1: ["~", "∾", "˜", "∿", "˷"], 2: "≈", 3: "≋" } },
+        water: {
+          depthGlyphs: { 1: ["~", "∾", "˜", "∿", "˷"], 2: "≈", 3: "≋" },
+        },
         lava: { depthGlyphs: { 1: ["~", "∾", "˜", "∿"], 2: "≈", 3: "≋" } },
         plains: ["·", "‧", "∙"],
         stone: ["·", "‧", "∙"],
@@ -2122,7 +2136,7 @@
         grass: ["ᵞ", "˯", "ˬ", "ˇ", "…", "ⵈ", '"', "'"],
         forest: {
           base: ["⯭", "𐙘", "↑", "⏃", "𐌒", "Ọ", "𐙢", "𐊾", "↟"],
-          coniferous: ["⏃", "𐙢", "𐊾","𐙢"],
+          coniferous: ["⏃", "𐙢", "𐊾", "𐙢"],
           dead: ["𐙘", "↑", "↟"],
           deciduous: ["𐌒", "Ọ", "𐙱", "𐙲"],
         },
@@ -2132,7 +2146,20 @@
           base: ["^"],
           height: { 1: "꘍", 2: "ᨈ", 3: "ᴧ", 4: "Λ", 5: "Δ" },
         },
-        settlement: ["⛩", "⌂", "𐘮", "𐙁", "𐛅", "𐛘", "𐝡", "𐀁", "𐁍", "𐂧", "𐃀", "𐜣"],
+        settlement: [
+          "⛩",
+          "⌂",
+          "𐘮",
+          "𐙁",
+          "𐛅",
+          "𐛘",
+          "𐝡",
+          "𐀁",
+          "𐁍",
+          "𐂧",
+          "𐃀",
+          "𐜣",
+        ],
         ruins: [
           "⌂",
           // TODO: use linear B block to add more ruined buildings and not have crossover with settlement variants: https://unicodeplus.com/block/10000
@@ -2152,7 +2179,22 @@
           "ᐰ",
           "ᐄ",
         ],
-        poi: ["𐀀", "𐀇", "𐀒", "𐀚", "𐀛", "𐀣", "𐀵", "𐘄", "𐘇", "𐘙", "𐘝", "𐘤", "𐝏", "𐝕"],
+        poi: [
+          "𐀀",
+          "𐀇",
+          "𐀒",
+          "𐀚",
+          "𐀛",
+          "𐀣",
+          "𐀵",
+          "𐘄",
+          "𐘇",
+          "𐘙",
+          "𐘝",
+          "𐘤",
+          "𐝏",
+          "𐝕",
+        ],
         religious: {
           death: [
             "⚱",
@@ -2260,8 +2302,7 @@
             continue;
           }
           if (key === "road") {
-            if (!def.glyphs)
-              debugWarn(`Tileset "road" missing glyphs`);
+            if (!def.glyphs) debugWarn(`Tileset "road" missing glyphs`);
             continue;
           }
           if (!baseGlyphs(def)?.length)
@@ -3159,8 +3200,7 @@
         }
 
         static n2(seed, x, y) {
-          let v =
-            (seed ^ ((x * 374761393) | 0) ^ ((y * 668265263) | 0)) >>> 0;
+          let v = (seed ^ ((x * 374761393) | 0) ^ ((y * 668265263) | 0)) >>> 0;
           v ^= v >>> 13;
           v = Math.imul(v, 1274126177) >>> 0;
           v ^= v >>> 16;
@@ -3240,7 +3280,7 @@
           for (let i = 0; i < n; i++) {
             let syl = this.syllables[(this.r() * this.syllables.length) | 0];
             s += syl;
-            
+
             if (i < n - 1 && RNGUtil.maybe(this.r, apostropheChance)) {
               s += "'";
             }
@@ -3307,7 +3347,10 @@
 
         buildLexicon(tt, r) {
           const roles = CoreUtils.ensure(tt.roles, defaultRoles);
-          const collectives = CoreUtils.ensure(tt.factionsN1, defaultCollectives);
+          const collectives = CoreUtils.ensure(
+            tt.factionsN1,
+            defaultCollectives,
+          );
 
           const lineages = this.buildLineages(r, 12);
           const toponyms = this.buildToponyms(r, 20);
@@ -3575,7 +3618,9 @@
             let type = rngUtil.oneOf(r, settlementTypes.base);
             const contextual = [];
             if (nearMountain)
-              contextual.push(...CoreUtils.ensure(settlementTypes.nearMountain, []));
+              contextual.push(
+                ...CoreUtils.ensure(settlementTypes.nearMountain, []),
+              );
             if (contextual.length && rngUtil.maybe(r, 0.6))
               type = rngUtil.oneOf(r, contextual);
 
@@ -4145,7 +4190,10 @@
           let hookHtml = CoreUtils.escHtml(hook);
           if (hookPick && hookPOIName) {
             const re = new RegExp(CoreUtils.escRe(hookPOIName), "g");
-            hookHtml = hookHtml.replace(re, CoreUtils.xref(hookPOICell, hookPOIName));
+            hookHtml = hookHtml.replace(
+              re,
+              CoreUtils.xref(hookPOICell, hookPOIName),
+            );
           }
 
           let html = "";
@@ -4541,12 +4589,7 @@
             ruinCenters,
             biomeFeatureRarity(biome, "ruins"),
           );
-          tileKeyGrid = applyOvergrownRuins(
-            seedU32,
-            tileKeyGrid,
-            N,
-            climate,
-          );
+          tileKeyGrid = applyOvergrownRuins(seedU32, tileKeyGrid, N, climate);
           tileKeyGrid = TerrainOps.applyLavaEdge(tileKeyGrid, N, worldMeta);
           tileKeyGrid = TerrainOps.applyStoneNearLava(tileKeyGrid, N);
           tileKeyGrid = TerrainOps.cleanupIsolatedWater(
@@ -4703,7 +4746,10 @@
             }
           }
           if (worldMeta?.annotations && worldMeta?.settlementTypeByCell) {
-            for (const [cell, type] of worldMeta.settlementTypeByCell.entries()) {
+            for (const [
+              cell,
+              type,
+            ] of worldMeta.settlementTypeByCell.entries()) {
               const a = worldMeta.annotations.get(cell);
               if (a) a.settlementType = type;
             }
@@ -4917,12 +4963,23 @@
       }
 
       class TerrainOps {
-        static cleanupIsolatedWater(seedU32, tileKeyGrid, weights, N, pickByWeights) {
+        static cleanupIsolatedWater(
+          seedU32,
+          tileKeyGrid,
+          weights,
+          N,
+          pickByWeights,
+        ) {
           const next = tileKeyGrid.map((row) => row.slice());
           for (let y = 0; y < N; y++) {
             for (let x = 0; x < N; x++) {
               if (tileKeyGrid[y][x] !== "water") continue;
-              const waterN4 = GridMath.countWaterNeighbors4(tileKeyGrid, N, x, y);
+              const waterN4 = GridMath.countWaterNeighbors4(
+                tileKeyGrid,
+                N,
+                x,
+                y,
+              );
               if (waterN4 >= 2) continue;
 
               const cand = new Map();
@@ -4962,7 +5019,14 @@
           return next;
         }
 
-        static smoothMountains(seedU32, tileKeyGrid, weights, N, rounds = 2, pickByWeights) {
+        static smoothMountains(
+          seedU32,
+          tileKeyGrid,
+          weights,
+          N,
+          rounds = 2,
+          pickByWeights,
+        ) {
           let cur = tileKeyGrid.map((row) => row.slice());
 
           for (let round = 0; round < rounds; round++) {
@@ -5013,11 +5077,27 @@
           return cur;
         }
 
-        static thinRidges(seedU32, tileKeyGrid, weights, N, ridgeRarity, pickByWeights) {
-          if (!Number.isFinite(ridgeRarity) || ridgeRarity <= 0) return tileKeyGrid;
+        static thinRidges(
+          seedU32,
+          tileKeyGrid,
+          weights,
+          N,
+          ridgeRarity,
+          pickByWeights,
+        ) {
+          if (!Number.isFinite(ridgeRarity) || ridgeRarity <= 0)
+            return tileKeyGrid;
           let cur = tileKeyGrid.map((row) => row.slice());
-          const erosionChance = GridMath.clamp(0.35 + ridgeRarity * 0.35, 0.35, 0.75);
-          const growthChance = GridMath.clamp(0.1 + ridgeRarity * 0.2, 0.1, 0.35);
+          const erosionChance = GridMath.clamp(
+            0.35 + ridgeRarity * 0.35,
+            0.35,
+            0.75,
+          );
+          const growthChance = GridMath.clamp(
+            0.1 + ridgeRarity * 0.2,
+            0.1,
+            0.35,
+          );
 
           const isMountain = (x, y, grid) =>
             x >= 0 && y >= 0 && x < N && y < N && grid[y][x] === "mountain";
@@ -5127,7 +5207,13 @@
           return dist;
         }
 
-        static smoothDepthsTodo2(seedU32, tileKeyGrid, depthGrid, N, liquidKey) {
+        static smoothDepthsTodo2(
+          seedU32,
+          tileKeyGrid,
+          depthGrid,
+          N,
+          liquidKey,
+        ) {
           const next = depthGrid.map((row) => row.slice());
 
           for (let y = 0; y < N; y++) {
@@ -5182,7 +5268,10 @@
               if (d >= 3) continue;
               let sameOrHigher = true;
               for (const [nx, ny] of GridMath.neighbors4(N, x, y)) {
-                if (tileKeyGrid[ny][nx] !== liquidKey || depthGrid[ny][nx] < d) {
+                if (
+                  tileKeyGrid[ny][nx] !== liquidKey ||
+                  depthGrid[ny][nx] < d
+                ) {
                   sameOrHigher = false;
                   break;
                 }
@@ -5193,7 +5282,13 @@
           return next;
         }
 
-        static buildDepthGrid(seedU32, tileKeyGrid, river, N, liquidKey = "water") {
+        static buildDepthGrid(
+          seedU32,
+          tileKeyGrid,
+          river,
+          N,
+          liquidKey = "water",
+        ) {
           const dist = TerrainOps.distToNonLiquid(tileKeyGrid, N, liquidKey);
 
           const depthGrid = Array.from({ length: N }, () => Array(N).fill(0));
@@ -5213,7 +5308,12 @@
             N,
             liquidKey,
           );
-          return TerrainOps.bumpDepthCenters(tileKeyGrid, smoothed, N, liquidKey);
+          return TerrainOps.bumpDepthCenters(
+            tileKeyGrid,
+            smoothed,
+            N,
+            liquidKey,
+          );
         }
 
         static applyLavaEdge(tileKeyGrid, N, worldMeta) {
@@ -5310,14 +5410,20 @@
               if (!nearRiver) continue;
               const roll = rngUtil.n2(seedU32, 84500 + x, 84600 + y);
               if (roll < chance) {
-                const clumpSize = 2 + ((rngUtil.n2(seedU32, 84700 + x, 84800 + y) * 3) | 0);
+                const clumpSize =
+                  2 + ((rngUtil.n2(seedU32, 84700 + x, 84800 + y) * 3) | 0);
                 let cx = x;
                 let cy = y;
                 for (let i = 0; i < clumpSize; i++) {
                   if (cx < 0 || cy < 0 || cx >= N || cy >= N) break;
                   const ck = next[cy][cx];
                   if (!blocked.has(ck)) next[cy][cx] = "stone";
-                  const d = dirs[(rngUtil.n2(seedU32, 84900 + x + i, 85000 + y + i) * dirs.length) | 0];
+                  const d =
+                    dirs[
+                      (rngUtil.n2(seedU32, 84900 + x + i, 85000 + y + i) *
+                        dirs.length) |
+                        0
+                    ];
                   cx = GridMath.clamp(cx + d[0], 0, N - 1);
                   cy = GridMath.clamp(cy + d[1], 0, N - 1);
                 }
@@ -5375,9 +5481,7 @@
 
         const pick =
           candidates[
-            Math.floor(
-              rngUtil.n2(seedU32, 86200, 86300) * candidates.length,
-            )
+            Math.floor(rngUtil.n2(seedU32, 86200, 86300) * candidates.length)
           ];
         if (!pick) return tileKeyGrid;
 
@@ -5387,10 +5491,8 @@
           [0, 1],
           [0, -1],
         ];
-        const maxLen =
-          10 + ((rngUtil.n2(seedU32, 86400, 86500) * 10) | 0);
-        const startWidth =
-          1 + ((rngUtil.n2(seedU32, 86450, 86550) * 3) | 0);
+        const maxLen = 10 + ((rngUtil.n2(seedU32, 86400, 86500) * 10) | 0);
+        const startWidth = 1 + ((rngUtil.n2(seedU32, 86450, 86550) * 3) | 0);
         let cx = pick.x;
         let cy = pick.y;
         let onLandSteps = 0;
@@ -5498,7 +5600,10 @@
           if (onLandSteps >= 4) break;
           if (step.k !== "mountain" && step.h <= curH) {
             const tailKey = `${cx},${cy}`;
-            placementDepth.set(tailKey, Math.max(placementDepth.get(tailKey) || 0, 1));
+            placementDepth.set(
+              tailKey,
+              Math.max(placementDepth.get(tailKey) || 0, 1),
+            );
           }
           if (step.h > curH && curH > 0) break;
         }
@@ -5639,9 +5744,7 @@
 
         const pick =
           candidates[
-            Math.floor(
-              rngUtil.n2(seedU32, 87200, 87300) * candidates.length,
-            )
+            Math.floor(rngUtil.n2(seedU32, 87200, 87300) * candidates.length)
           ];
         if (!pick) return tileKeyGrid;
 
@@ -5762,8 +5865,16 @@
               next[y][x] = "desert";
             const d = dirs[(rand() * dirs.length) | 0];
             if (rand() < 0.2) {
-              x = GridMath.clamp(x + d[0] + (rand() < 0.5 ? d[0] : 0), 0, N - 1);
-              y = GridMath.clamp(y + d[1] + (rand() < 0.5 ? d[1] : 0), 0, N - 1);
+              x = GridMath.clamp(
+                x + d[0] + (rand() < 0.5 ? d[0] : 0),
+                0,
+                N - 1,
+              );
+              y = GridMath.clamp(
+                y + d[1] + (rand() < 0.5 ? d[1] : 0),
+                0,
+                N - 1,
+              );
             } else {
               x = GridMath.clamp(x + d[0], 0, N - 1);
               y = GridMath.clamp(y + d[1], 0, N - 1);
@@ -5848,10 +5959,7 @@
         ];
 
         const isBlocked = (k) =>
-          k === "water" ||
-          k === "lava" ||
-          k === "mountain" ||
-          k === "desert";
+          k === "water" || k === "lava" || k === "mountain" || k === "desert";
         const fungalVariant = (k) => {
           if (k === "settlement")
             return rand() < 1 / 3 ? "fungal-settlement" : null;
@@ -5892,8 +6000,16 @@
             }
             const d = dirs[(rand() * dirs.length) | 0];
             if (rand() < 0.25) {
-              x = GridMath.clamp(x + d[0] + (rand() < 0.5 ? d[0] : 0), 0, N - 1);
-              y = GridMath.clamp(y + d[1] + (rand() < 0.5 ? d[1] : 0), 0, N - 1);
+              x = GridMath.clamp(
+                x + d[0] + (rand() < 0.5 ? d[0] : 0),
+                0,
+                N - 1,
+              );
+              y = GridMath.clamp(
+                y + d[1] + (rand() < 0.5 ? d[1] : 0),
+                0,
+                N - 1,
+              );
             } else {
               x = GridMath.clamp(x + d[0], 0, N - 1);
               y = GridMath.clamp(y + d[1], 0, N - 1);
@@ -5959,8 +6075,16 @@
             }
             const d = dirs[(rand() * dirs.length) | 0];
             if (rand() < 0.25) {
-              x = GridMath.clamp(x + d[0] + (rand() < 0.5 ? d[0] : 0), 0, N - 1);
-              y = GridMath.clamp(y + d[1] + (rand() < 0.5 ? d[1] : 0), 0, N - 1);
+              x = GridMath.clamp(
+                x + d[0] + (rand() < 0.5 ? d[0] : 0),
+                0,
+                N - 1,
+              );
+              y = GridMath.clamp(
+                y + d[1] + (rand() < 0.5 ? d[1] : 0),
+                0,
+                N - 1,
+              );
             } else {
               x = GridMath.clamp(x + d[0], 0, N - 1);
               y = GridMath.clamp(y + d[1], 0, N - 1);
@@ -6059,9 +6183,9 @@
             k === "fungal-ruins"
           )
             continue;
-          const nearMycelium =
-            k === "mycelium" || hasMyceliumNeighbor(cx, cy);
-          next[cy][cx] = nearMycelium && rand() < 0.6 ? "fungal-ruins" : "ruins";
+          const nearMycelium = k === "mycelium" || hasMyceliumNeighbor(cx, cy);
+          next[cy][cx] =
+            nearMycelium && rand() < 0.6 ? "fungal-ruins" : "ruins";
         }
 
         return next;
@@ -6279,7 +6403,11 @@
         for (let y = 0; y < N; y++) {
           for (let x = 0; x < N; x++) {
             if (tileKeyGrid[y][x] !== "mountain") continue;
-            next[y][x] = GridMath.clamp(Math.round(next[y][x] * heightBoost), 1, 5);
+            next[y][x] = GridMath.clamp(
+              Math.round(next[y][x] * heightBoost),
+              1,
+              5,
+            );
           }
         }
         return next;
@@ -6485,8 +6613,7 @@
         const fScore = new Array(N * N).fill(Infinity);
         const cameFrom = new Array(N * N).fill(-1);
 
-        const heuristic = (x, y) =>
-          Math.abs(x - goal.x) + Math.abs(y - goal.y);
+        const heuristic = (x, y) => Math.abs(x - goal.x) + Math.abs(y - goal.y);
 
         gScore[startIdx] = 0;
         fScore[startIdx] = heuristic(start.x, start.y);
@@ -6825,15 +6952,25 @@
                   const ferrySeed = rngUtil.h32(
                     `${seedU32}|${secondaryFerry.start}|${secondaryFerry.end}|ferry`,
                   );
-                  const ferryNameGen = new NameGenerator(rngUtil.xs32(ferrySeed));
+                  const ferryNameGen = new NameGenerator(
+                    rngUtil.xs32(ferrySeed),
+                  );
                   const ferryBase = namedPOI(ferryNameGen, "ferry crossing");
                   const [aLabel, bLabel] = ferryLabels(
                     secondaryFerry.start,
                     secondaryFerry.end,
                   );
                   const ferryId = `ferry-${ferrySet.size}`;
-                  addFerryPoi(`${ferryBase} (${aLabel})`, secondaryFerry.start, ferryId);
-                  addFerryPoi(`${ferryBase} (${bLabel})`, secondaryFerry.end, ferryId);
+                  addFerryPoi(
+                    `${ferryBase} (${aLabel})`,
+                    secondaryFerry.start,
+                    ferryId,
+                  );
+                  addFerryPoi(
+                    `${ferryBase} (${bLabel})`,
+                    secondaryFerry.end,
+                    ferryId,
+                  );
                   ferries.push({
                     id: ferryId,
                     start: secondaryFerry.start,
@@ -6877,7 +7014,12 @@
             const ferryId = `ferry-${ferrySet.size}`;
             addFerryPoi(`${ferryBase} (${aLabel})`, ferry.start, ferryId);
             addFerryPoi(`${ferryBase} (${bLabel})`, ferry.end, ferryId);
-            ferries.push({ id: ferryId, start: ferry.start, end: ferry.end, path });
+            ferries.push({
+              id: ferryId,
+              start: ferry.start,
+              end: ferry.end,
+              path,
+            });
           }
           stampRoadLandOnly(path);
         }
@@ -7062,11 +7204,20 @@
                 firstBaseGlyph(tileset.settlement) ||
                 firstBaseGlyph(tileset.plains, "?");
               const ch =
-                rngUtil.oneOf(rpick, rel.glyph) || rngUtil.oneOf(rpick, tileset.religious?.[rel.kind]) || fallbackRel;
+                rngUtil.oneOf(rpick, rel.glyph) ||
+                rngUtil.oneOf(rpick, tileset.religious?.[rel.kind]) ||
+                fallbackRel;
               row += `<span data-cell="${x},${y}" data-tile="religious"${roadAttr}${ferryAttr} data-religious="${CoreUtils.escAttr(rel.kind)}" title="${title}">${ch}</span>`;
             } else if (tileKey === "water" || tileKey === "lava") {
               const d = GridMath.clamp(depthGrid[y][x] || 1, 1, 3);
-              const ch = TerrainOps.liquidGlyph(tileKey, d, tileset, seedU32, x, y);
+              const ch = TerrainOps.liquidGlyph(
+                tileKey,
+                d,
+                tileset,
+                seedU32,
+                x,
+                y,
+              );
               row += `<span data-cell="${x},${y}" data-tile="${tileKey}"${roadAttr}${ferryAttr}${ferryPathAttr} data-depth="${d}" title="${title}">${ch}</span>`;
             } else if (tileKey === "mountain") {
               const h = GridMath.clamp(heightGrid[y][x] || 1, 1, 5);
@@ -7220,10 +7371,7 @@
               colorIndex += 1;
             }
             el.classList.add("is-hot");
-            el.style.setProperty(
-              "--hot-color",
-              colorByCell.get(cell),
-            );
+            el.style.setProperty("--hot-color", colorByCell.get(cell));
           });
           mapCells.forEach((el) => {
             const cell = el.dataset.cell || "";
@@ -7400,13 +7548,11 @@
 
         const clearFerryPreview = () => {
           if (showAllMode) return;
-          mapEl
-            .querySelectorAll("span.is-ferry-path")
-            .forEach((el) => {
-              const orig = el.dataset.ferryOrig;
-              if (orig !== undefined) el.textContent = orig;
-              el.classList.remove("is-ferry-path");
-            });
+          mapEl.querySelectorAll("span.is-ferry-path").forEach((el) => {
+            const orig = el.dataset.ferryOrig;
+            if (orig !== undefined) el.textContent = orig;
+            el.classList.remove("is-ferry-path");
+          });
         };
 
         const setMapTip = (text) => {
@@ -7704,14 +7850,14 @@
         addList(gRuins, "ruins", tileset.ruins);
 
         const gOvergrownRuins = addGroup("overgrown-ruins");
-        addList(
-          gOvergrownRuins,
-          "overgrown-ruins",
-          tileset["overgrown-ruins"],
-        );
+        addList(gOvergrownRuins, "overgrown-ruins", tileset["overgrown-ruins"]);
 
         const gFungalSettlement = addGroup("fungal-settlement");
-        addList(gFungalSettlement, "fungal-settlement", tileset["fungal-settlement"]);
+        addList(
+          gFungalSettlement,
+          "fungal-settlement",
+          tileset["fungal-settlement"],
+        );
 
         const gFungalRuins = addGroup("fungal-ruins");
         addList(gFungalRuins, "fungal-ruins", tileset["fungal-ruins"]);
@@ -7752,16 +7898,17 @@
             const { tileKey, glyph, attrs } = group.entries[i];
             const cell = `${col},${row}`;
 
-            const dataParts = [
-              `data-cell="${cell}"`,
-              `data-tile="${tileKey}"`,
-            ];
+            const dataParts = [`data-cell="${cell}"`, `data-tile="${tileKey}"`];
             if (attrs.depth) dataParts.push(`data-depth="${attrs.depth}"`);
             if (attrs.height) dataParts.push(`data-height="${attrs.height}"`);
             if (attrs.forest)
-              dataParts.push(`data-forest="${CoreUtils.escAttr(attrs.forest)}"`);
+              dataParts.push(
+                `data-forest="${CoreUtils.escAttr(attrs.forest)}"`,
+              );
             if (attrs.religious)
-              dataParts.push(`data-religious="${CoreUtils.escAttr(attrs.religious)}"`);
+              dataParts.push(
+                `data-religious="${CoreUtils.escAttr(attrs.religious)}"`,
+              );
 
             const titleParts = [tileKey, cell];
             if (attrs.depth) titleParts.push(`depth: ${attrs.depth}`);
