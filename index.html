@@ -758,14 +758,179 @@
         "dead trees",
       ];
       const moistureLevels = [
-        "arid",
-        "dry winds",
-        "breezy",
-        "humid",
+        ["arid", "bone-dry", "dusty"],
+        ["dry-wind", "parched", "desiccating"],
+        ["breezy", "lightly-damp", "fresh"],
+        ["humid", "muggy", "damp"],
+        ["mist-laden", "foggy", "drizzly"],
+        ["rainy", "steady-rain", "overcast"],
+        ["soaking", "waterlogged", "downpouring"],
+        ["saturated", "flooded", "rain-soaked"],
+      ];
+      const tempLevels = [
+        ["frost-bit", "glacial", "ice-cold"],
+        ["cold", "chilled", "wintry"],
+        ["cool", "crisp", "brisk"],
+        ["mild", "temperate", "balmy"],
+        ["warm", "sun-warmed", "pleasant"],
+        ["hot", "sweltering", "baking"],
+        ["blistering", "scorching", "searing"],
+        ["oven-hot", "infernal", "white-hot"],
+      ];
+      const climateAdjLevels = [
+        "rocky",
+        "stone-littered",
+        "gravelly",
+        "dusty",
+        "powdery",
+        "silted",
+        "foggy",
         "mist-laden",
-        "rainy",
-        "soaking",
-        "saturated",
+        "haze-dimmed",
+        "smoky",
+        "ash-hung",
+        "soot-touched",
+        "cracked",
+        "fissured",
+        "split",
+        "scarred",
+        "worn",
+        "gouged",
+        "shadowed",
+        "shade-wreathed",
+        "dim",
+        "glowing",
+        "ember-lit",
+        "aura-lit",
+        "pitted",
+        "pockmarked",
+        "hole-riddled",
+        "overgrown",
+        "wild",
+        "tangle-thick",
+        "mossy",
+        "lichened",
+        "verdant",
+        "fungal",
+        "spore-rich",
+        "mycelial",
+        "boggy",
+        "sodden",
+        "peaty",
+        "marshy",
+        "reed-choked",
+        "fen-like",
+        "rooted",
+        "root-bound",
+        "tangled",
+        "thorny",
+        "spined",
+        "barbed",
+        "brambly",
+        "briar-choked",
+        "thicketed",
+        "ancient",
+        "timeworn",
+        "age-sunk",
+        "veined",
+        "striated",
+        "threaded",
+        "twilight",
+        "dusk-lit",
+        "gloaming",
+        "starlit",
+        "star-washed",
+        "star-sprinkled",
+        "moonlit",
+        "moon-washed",
+        "lunar-lit",
+        "buried",
+        "entombed",
+        "submerged",
+        "forgotten",
+        "lost",
+        "forsaken",
+        "synthetic",
+        "fabricated",
+        "engineered",
+        "alien",
+        "xeno",
+        "offworld",
+        "metallic",
+        "steel-bright",
+        "iron-hard",
+        "magnetic",
+        "magnetized",
+        "polarity-charged",
+        "gravitic",
+        "gravity-warped",
+        "mass-bent",
+        "orbital",
+        "high-orbit",
+        "station-side",
+        "stellar",
+        "star-born",
+        "heliac",
+        "lunar",
+        "moonward",
+        "tidal",
+        "current-tossed",
+        "pull-swept",
+        "crystalline",
+        "crystal-lined",
+        "prismatic",
+        "coralline",
+        "reef-bound",
+        "coral-spired",
+        "glassy",
+        "vitrified",
+        "mirror-bright",
+        "mutant",
+        "altered",
+        "twisted",
+        "viral",
+        "pathogen-laced",
+        "contagious",
+        "sentient",
+        "aware",
+        "cognizant",
+        "abandoned",
+        "derelict",
+        "empty",
+        "encrypted",
+        "cipher-locked",
+        "encoded",
+        "rifted",
+        "split-reality",
+        "fractured",
+        "plasmatic",
+        "ionized",
+        "charged",
+        "sooty",
+        "blackened",
+        "char-streaked",
+        "ashen",
+        "cinder-gray",
+        "ash-dulled",
+        "shattered",
+        "splintered",
+        "broken",
+        "rusted",
+        "corroded",
+        "oxidized",
+        "sealed",
+        "locked-down",
+        "quarantined",
+        "slimed",
+        "slick",
+        "ooze-coated",
+        "collapsed",
+        "ruined",
+        "ravaged",
+        "wasted",
+        "hollow",
+        "caverned",
+        "voided",
       ];
 
       const DEBUG = false;
@@ -790,6 +955,8 @@
           biome: [
             {
               name: "tundra",
+              moistureRange: [1, 3],
+              tempRange: [1, 2],
               features: {
                 "river-water": 0.3,
                 lake: 0.25,
@@ -800,6 +967,8 @@
             },
             {
               name: "taiga",
+              moistureRange: [3, 6],
+              tempRange: [2, 3],
               features: {
                 "river-water": 0.45,
                 lake: 0.35,
@@ -811,6 +980,8 @@
             },
             {
               name: "temperate forest",
+              moistureRange: [4, 7],
+              tempRange: [3, 5],
               features: {
                 "river-water": 0.5,
                 lake: 0.35,
@@ -821,6 +992,8 @@
             },
             {
               name: "steppe",
+              moistureRange: [2, 4],
+              tempRange: [3, 5],
               features: {
                 "river-water": 0.25,
                 lake: 0.15,
@@ -832,6 +1005,8 @@
             },
             {
               name: "savanna",
+              moistureRange: [3, 6],
+              tempRange: [5, 7],
               features: {
                 "river-water": 0.35,
                 lake: 0.2,
@@ -843,6 +1018,8 @@
             },
             {
               name: "desert",
+              moistureRange: [1, 2],
+              tempRange: [7, 8],
               features: {
                 "river-water": 0.1,
                 lake: 0.05,
@@ -856,6 +1033,8 @@
             },
             {
               name: "jungle",
+              moistureRange: [6, 8],
+              tempRange: [6, 8],
               features: {
                 "river-water": 0.6,
                 lake: 0.35,
@@ -866,6 +1045,8 @@
             },
             {
               name: "wetlands",
+              moistureRange: [7, 8],
+              tempRange: [4, 6],
               features: {
                 "river-water": 0.7,
                 lake: 0.45,
@@ -876,6 +1057,8 @@
             },
             {
               name: "highlands",
+              moistureRange: [3, 5],
+              tempRange: [2, 4],
               features: {
                 "river-water": 0.3,
                 mountain: 0.7,
@@ -887,6 +1070,8 @@
             },
             {
               name: "islands",
+              moistureRange: [5, 7],
+              tempRange: [4, 6],
               features: {
                 "river-water": 0.25,
                 lake: 0.2,
@@ -898,6 +1083,8 @@
             },
             {
               name: "badlands",
+              moistureRange: [1, 3],
+              tempRange: [5, 7],
               features: {
                 "river-water": 0.15,
                 mountain: 0.4,
@@ -910,6 +1097,8 @@
             },
             {
               name: "crystal barrens",
+              moistureRange: [1, 3],
+              tempRange: [5, 7],
               features: {
                 "river-water": 0.15,
                 "river-lava": 0.2,
@@ -922,6 +1111,8 @@
             },
             {
               name: "fungal expanse",
+              moistureRange: [6, 8],
+              tempRange: [4, 6],
               features: {
                 mycelium: 0.8,
                 lake: 0.25,
@@ -932,6 +1123,8 @@
             },
             {
               name: "ashen plains",
+              moistureRange: [1, 3],
+              tempRange: [6, 8],
               features: {
                 "river-lava": 0.5,
                 dunes: 0.25,
@@ -943,6 +1136,8 @@
             },
             {
               name: "shattered coast",
+              moistureRange: [5, 7],
+              tempRange: [4, 6],
               features: {
                 beaches: 0.6,
                 reef: 0.55,
@@ -955,6 +1150,8 @@
             },
             {
               name: "hollow grove",
+              moistureRange: [5, 7],
+              tempRange: [3, 5],
               features: {
                 mycelium: 0.45,
                 "dead trees": 0.65,
@@ -966,6 +1163,8 @@
             },
             {
               name: "obsidian high desert",
+              moistureRange: [1, 2],
+              tempRange: [7, 8],
               features: {
                 dunes: 0.55,
                 oasis: 0.2,
@@ -975,42 +1174,6 @@
                 ruins: 0.3,
               },
             }
-          ],
-          temp: {
-            1: "gelid",
-            2: "frigid",
-            3: "chill",
-            4: "mild",
-            5: "warm",
-            6: "balmy",
-            7: "sultry",
-            8: "searing",
-          },
-          climateAdj: [
-            "rocky",
-            "dusty",
-            "foggy",
-            "smoky",
-            "cracked",
-            "scarred",
-            "shadowed",
-            "glowing",
-            "pitted",
-            "overgrown",
-            "mossy",
-            "fungal",
-            "boggy",
-            "marshy",
-            "rooted",
-            "thorny",
-            "brambly",
-            "ancient",
-            "veined",
-            "twilight",
-            "starlit",
-            "moonlit",
-            "buried",
-            "forgotten",
           ],
           factionsN1: [
             "Order",
@@ -1241,6 +1404,8 @@
           biome: [
             {
               name: "oceanic world",
+              moistureRange: [6, 8],
+              tempRange: [4, 6],
               features: {
                 reef: 0.8,
                 lagoon: 0.7,
@@ -1251,6 +1416,8 @@
             },
             {
               name: "barren craters",
+              moistureRange: [1, 3],
+              tempRange: [2, 5],
               features: {
                 ridge: 0.6,
                 mountain: 0.4,
@@ -1261,6 +1428,8 @@
             },
             {
               name: "lava fields",
+              moistureRange: [1, 3],
+              tempRange: [7, 8],
               features: {
                 "river-lava": 0.8,
                 mountain: 0.5,
@@ -1270,6 +1439,8 @@
             },
             {
               name: "arboreal belts",
+              moistureRange: [4, 7],
+              tempRange: [4, 6],
               features: {
                 "river-water": 0.5,
                 lake: 0.3,
@@ -1279,6 +1450,8 @@
             },
             {
               name: "fungal mats",
+              moistureRange: [6, 8],
+              tempRange: [4, 6],
               features: {
                 mycelium: 0.9,
                 lake: 0.25,
@@ -1288,6 +1461,8 @@
             },
             {
               name: "erg desert",
+              moistureRange: [1, 2],
+              tempRange: [7, 8],
               features: {
                 dunes: 0.8,
                 oasis: 0.35,
@@ -1298,6 +1473,8 @@
             },
             {
               name: "ice shelf",
+              moistureRange: [2, 4],
+              tempRange: [1, 2],
               features: {
                 lake: 0.3,
                 "river-water": 0.2,
@@ -1308,6 +1485,8 @@
             },
             {
               name: "toxic bogs",
+              moistureRange: [7, 8],
+              tempRange: [4, 6],
               features: {
                 "river-water": 0.5,
                 lake: 0.4,
@@ -1318,6 +1497,8 @@
             },
             {
               name: "megacity sector",
+              moistureRange: [3, 6],
+              tempRange: [4, 6],
               features: {
                 ruins: 0.6,
                 ridge: 0.3,
@@ -1327,6 +1508,8 @@
             },
             {
               name: "ring habitat",
+              moistureRange: [4, 7],
+              tempRange: [4, 6],
               features: {
                 "river-water": 0.35,
                 lake: 0.25,
@@ -1337,6 +1520,8 @@
             },
             {
               name: "tidal wetlands",
+              moistureRange: [7, 8],
+              tempRange: [4, 6],
               features: {
                 "river-water": 0.6,
                 lagoon: 0.6,
@@ -1345,47 +1530,6 @@
                 mycelium: 0.2,
               },
             },
-          ],
-          temp: {
-            1: "cryonic",
-            2: "subzero",
-            3: "brisk",
-            4: "temperate",
-            5: "warm",
-            6: "tropic",
-            7: "equatorial",
-            8: "thermic",
-          },
-          climateAdj: [
-            "rocky",
-            "dusty",
-            "foggy",
-            "smoky",
-            "cracked",
-            "scarred",
-            "shadowed",
-            "glowing",
-            "pitted",
-            "overgrown",
-            "synthetic",
-            "alien",
-            "metallic",
-            "magnetic",
-            "gravitic",
-            "orbital",
-            "stellar",
-            "lunar",
-            "tidal",
-            "crystalline",
-            "coralline",
-            "glassy",
-            "mutant",
-            "viral",
-            "sentient",
-            "abandoned",
-            "encrypted",
-            "rifted",
-            "plasmatic",
           ],
           factionsN1: [
             "Consortium",
@@ -1524,6 +1668,8 @@
           biome: [
             {
               name: "ruined city",
+              moistureRange: [3, 6],
+              tempRange: [4, 6],
               features: {
                 ruins: 0.9,
                 "river-water": 0.25,
@@ -1534,6 +1680,8 @@
             },
             {
               name: "wasteland",
+              moistureRange: [1, 3],
+              tempRange: [6, 8],
               features: {
                 ruins: 0.4,
                 ridge: 0.4,
@@ -1546,6 +1694,8 @@
             },
             {
               name: "overgrowth",
+              moistureRange: [6, 8],
+              tempRange: [4, 6],
               features: {
                 "river-water": 0.5,
                 lake: 0.3,
@@ -1556,6 +1706,8 @@
             },
             {
               name: "floodplain",
+              moistureRange: [6, 8],
+              tempRange: [4, 6],
               features: {
                 "river-water": 0.75,
                 lake: 0.5,
@@ -1566,6 +1718,8 @@
             },
             {
               name: "ash desert",
+              moistureRange: [1, 2],
+              tempRange: [7, 8],
               features: {
                 dunes: 0.7,
                 "river-lava": 0.35,
@@ -1578,6 +1732,8 @@
             },
             {
               name: "irradiated zone",
+              moistureRange: [2, 5],
+              tempRange: [5, 7],
               features: {
                 ruins: 0.4,
                 ridge: 0.3,
@@ -1588,6 +1744,8 @@
             },
             {
               name: "salt flats",
+              moistureRange: [1, 2],
+              tempRange: [6, 8],
               features: {
                 lake: 0.25,
                 dunes: 0.4,
@@ -1599,6 +1757,8 @@
             },
             {
               name: "scrapyard dunes",
+              moistureRange: [1, 2],
+              tempRange: [7, 8],
               features: {
                 dunes: 0.8,
                 ruins: 0.5,
@@ -1610,6 +1770,8 @@
             },
             {
               name: "bunker valley",
+              moistureRange: [3, 5],
+              tempRange: [3, 5],
               features: {
                 mountain: 0.4,
                 ridge: 0.5,
@@ -1620,6 +1782,8 @@
             },
             {
               name: "shattered highlands",
+              moistureRange: [2, 5],
+              tempRange: [3, 6],
               features: {
                 mountain: 0.7,
                 ridge: 0.7,
@@ -1632,6 +1796,8 @@
             },
             {
               name: "canal maze",
+              moistureRange: [7, 8],
+              tempRange: [4, 6],
               features: {
                 "river-water": 0.8,
                 lagoon: 0.6,
@@ -1640,42 +1806,6 @@
                 reef: 0.1,
               },
             },
-          ],
-          temp: {
-            1: "frost-bit",
-            2: "cold",
-            3: "cool",
-            4: "mild",
-            5: "warm",
-            6: "hot",
-            7: "blistering",
-            8: "oven-hot",
-          },
-          climateAdj: [
-            "rocky",
-            "dusty",
-            "foggy",
-            "smoky",
-            "cracked",
-            "scarred",
-            "shadowed",
-            "glowing",
-            "pitted",
-            "overgrown",
-            "sooty",
-            "ashen",
-            "shattered",
-            "rusted",
-            "abandoned",
-            "buried",
-            "sealed",
-            "forgotten",
-            "viral",
-            "mutant",
-            "slimed",
-            "broken",
-            "ruined",
-            "hollow",
           ],
           factionsN1: [
             "Remnants",
@@ -2991,6 +3121,12 @@
         return out;
       }
 
+      function pickFromOptions(r, list, fallback) {
+        const pick = rngUtil.oneOf(r, list);
+        if (Array.isArray(pick)) return rngUtil.oneOf(r, pick) ?? fallback;
+        return pick ?? fallback;
+      }
+
       /* ====================== RNG Utilities ====================== */
       // #endregion Lexicon Data
       // #region RNG Utilities
@@ -3233,8 +3369,45 @@
           this.themes = themeTables;
         }
 
-        pickTempTier(r, tt) {
-          const temp = tt?.temp;
+        pickTempTier(r, tempTable, biome) {
+          const temp = tempTable;
+          const range = biome?.tempRange;
+          let tierFromRange = null;
+          if (Array.isArray(range) && range.length >= 2) {
+            const lo = Number(range[0]);
+            const hi = Number(range[1]);
+            if (Number.isFinite(lo) && Number.isFinite(hi)) {
+              const min = clamp(Math.min(lo, hi), 1, 8);
+              const max = clamp(Math.max(lo, hi), 1, 8);
+              tierFromRange = min + Math.floor(r() * (max - min + 1));
+            }
+          } else if (range && typeof range === "object") {
+            const lo = Number(range.min);
+            const hi = Number(range.max);
+            if (Number.isFinite(lo) && Number.isFinite(hi)) {
+              const min = clamp(Math.min(lo, hi), 1, 8);
+              const max = clamp(Math.max(lo, hi), 1, 8);
+              tierFromRange = min + Math.floor(r() * (max - min + 1));
+            }
+          }
+          if (Number.isFinite(tierFromRange)) {
+            const tier = clamp(tierFromRange, 1, 8);
+            if (temp && typeof temp === "object" && !Array.isArray(temp)) {
+              if (Object.prototype.hasOwnProperty.call(temp, tier))
+                return { tier, label: String(temp[tier]) };
+            }
+            if (Array.isArray(temp) && temp.length) {
+              const idx = clamp(tier - 1, 0, temp.length - 1);
+              const pick = temp[idx];
+              const label =
+                Array.isArray(pick) && pick.length
+                  ? rngUtil.oneOf(r, pick)
+                  : pick;
+              return { tier, label: String(label ?? "mild") };
+            }
+            const label = pickFromOptions(r, temp, "mild");
+            return { tier, label: String(label) };
+          }
           if (temp && typeof temp === "object" && !Array.isArray(temp)) {
             const keys = Object.keys(temp)
               .map((k) => Number(k))
@@ -3245,14 +3418,38 @@
               return { tier, label: String(temp[tier]) };
             }
           }
-          const label = rngUtil.oneOf(r, temp) ?? "mild";
+          const label = pickFromOptions(r, temp, "mild");
           return { tier: 4, label: String(label) };
         }
 
-        pickRainIndex(r) {
+        pickRainIndex(r, biome) {
           const rain = moistureLevels;
-          const idx = (r() * rain.length) | 0;
-          return { idx, label: String(rain[idx] || "arid") };
+          const range = biome?.moistureRange;
+          let idx = null;
+          if (Array.isArray(range) && range.length >= 2) {
+            const lo = Number(range[0]);
+            const hi = Number(range[1]);
+            if (Number.isFinite(lo) && Number.isFinite(hi)) {
+              const min = clamp(Math.min(lo, hi), 1, 8);
+              const max = clamp(Math.max(lo, hi), 1, 8);
+              const tier = min + Math.floor(r() * (max - min + 1));
+              idx = clamp(tier - 1, 0, rain.length - 1);
+            }
+          } else if (range && typeof range === "object") {
+            const lo = Number(range.min);
+            const hi = Number(range.max);
+            if (Number.isFinite(lo) && Number.isFinite(hi)) {
+              const min = clamp(Math.min(lo, hi), 1, 8);
+              const max = clamp(Math.max(lo, hi), 1, 8);
+              const tier = min + Math.floor(r() * (max - min + 1));
+              idx = clamp(tier - 1, 0, rain.length - 1);
+            }
+          }
+          if (!Number.isFinite(idx)) idx = (r() * rain.length) | 0;
+          const pick = rain[idx];
+          const label =
+            Array.isArray(pick) && pick.length ? rngUtil.oneOf(r, pick) : pick;
+          return { idx, label: String(label || "arid") };
         }
 
         coord(r) {
@@ -3586,9 +3783,9 @@
 
           const biome = this.mapGen.normalizeBiome(rngUtil.oneOf(r, tt.biome));
           const biomeName = biome.name;
-          const tempPick = this.pickTempTier(r, tt);
-          const rainPick = this.pickRainIndex(r, tt);
-          const climA = rngUtil.oneOf(r, tt.climateAdj);
+          const tempPick = this.pickTempTier(r, tempLevels, biome);
+          const rainPick = this.pickRainIndex(r, biome);
+          const climA = pickFromOptions(r, climateAdjLevels, "mild");
           const coords = this.coord(r);
 
           const climate = {
