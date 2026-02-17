@@ -89,6 +89,7 @@
         --tile-lava-1: var(--sw2);
         --tile-lava-2: var(--sw3);
         --tile-lava-3: var(--sw4);
+        --tile-volcano: var(--tile-lava-3);
 
         --tile-mountain-1: var(--sw14);
         --tile-mountain-2: var(--sw13);
@@ -363,6 +364,9 @@
       }
       #map span[data-tile="lava"][data-depth="3"] {
         color: var(--tile-lava-3);
+      }
+      #map span[data-tile="volcano"] {
+        color: var(--tile-volcano);
       }
 
       #map span[data-tile="mountain"][data-height="1"] {
@@ -769,7 +773,7 @@
         "beaches",
         "dunes",
         "oasis",
-        "ruins",
+        // "ruins",
         "ridge",
         "reef", // not implemented yet
         "mycelium",
@@ -2243,6 +2247,7 @@
           },
         },
         crystal: ["ж", "⩕", "꘍", "X"],
+        volcano:["Ṽ","ṽ", "⊽"]
       };
 
       function baseGlyphs(def) {
@@ -7176,8 +7181,27 @@
               tileKey !== "water";
             const hasVolcanoPoi =
               a?.poi?.some((p) => p.type === "volcano") || false;
+            const hasRuinsPoi =
+              a?.poi?.some((p) => p.type === "ruins") || false;
+            const showVolcano =
+              hasVolcanoPoi &&
+              !showStructure &&
+              !a?.fieldCamp &&
+              !a?.religious &&
+              tileKey !== "water";
+            const showRuinsPoi =
+              hasRuinsPoi &&
+              !showStructure &&
+              !a?.fieldCamp &&
+              !a?.religious &&
+              tileKey !== "water" &&
+              tileKey !== "lava" &&
+              tileKey !== "ruins" &&
+              tileKey !== "overgrown-ruins" &&
+              tileKey !== "fungal-ruins";
             const showPoi =
               a?.poi?.length &&
+              !hasRuinsPoi &&
               !showStructure &&
               !a?.fieldCamp &&
               !a?.religious &&
@@ -7194,6 +7218,14 @@
               const variantSeed = rngUtil.n2(seedU32, x + 999, y + 999);
               const ch = pickVariant("settlement", tileset, variantSeed);
               row += `<span data-cell="${x},${y}" data-tile="settlement"${roadAttr}${ferryAttr} data-poi="structure" title="${title}">${ch}</span>`;
+            } else if (showVolcano) {
+              const variantSeed = rngUtil.n2(seedU32, x + 555, y + 555);
+              const ch = pickVariant("volcano", tileset, variantSeed);
+              row += `<span data-cell="${x},${y}" data-tile="volcano"${roadAttr}${ferryAttr} data-poi="volcano" title="${title}">${ch}</span>`;
+            } else if (showRuinsPoi) {
+              const variantSeed = rngUtil.n2(seedU32, x + 444, y + 444);
+              const ch = pickVariant("ruins", tileset, variantSeed);
+              row += `<span data-cell="${x},${y}" data-tile="ruins"${roadAttr}${ferryAttr} data-poi="ruins" title="${title}">${ch}</span>`;
             } else if (showPoi) {
               const ferryRef = a?.poi?.find((p) => p.type === "ferry");
               const ferryPickSeed = ferryRef?.ferryId
@@ -7880,6 +7912,9 @@
 
         const gPoi = addGroup("poi");
         addList(gPoi, "poi", tileset.poi);
+
+        const gVolcano = addGroup("volcano");
+        addList(gVolcano, "volcano", tileset.volcano);
 
         const gRel = addGroup("religious");
         const rel = tileset.religious || {};
