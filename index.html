@@ -4779,6 +4779,55 @@
             };
           };
 
+          const pickFieldCampCellNear = (targetCell, avoidCell, maxDist = 4) => {
+            const near = pickCell({
+              rng: factionOpR,
+              cells: landCells,
+              filter: (cell) => {
+                if (cell === avoidCell) return false;
+                if (worldMeta.settlementNameByCell.has(cell)) return false;
+                return cellDist(cell, targetCell) <= maxDist;
+              },
+            });
+            if (near) return near;
+            const anyField = pickCell({
+              rng: factionOpR,
+              cells: landCells,
+              filter: (cell) => {
+                if (cell === avoidCell) return false;
+                return !worldMeta.settlementNameByCell.has(cell);
+              },
+            });
+            if (anyField) return anyField;
+            return avoidCell || pickLandCellForOps();
+          };
+
+          const relocateFieldCampBase = (fp, newCell) => {
+            if (!newCell || fp.cell === newCell) return;
+            const oldCell = fp.cell;
+            const oldAnn = worldMeta.annotations.get(oldCell);
+            if (oldAnn?.factions?.length) {
+              oldAnn.factions = oldAnn.factions.filter(
+                (f) => f.name !== fp.factionName,
+              );
+            }
+            if (!worldMeta.settlementNameByCell.has(oldCell)) {
+              if (oldAnn?.factions?.length) oldAnn.fieldCamp = true;
+              else if (oldAnn) delete oldAnn.fieldCamp;
+            }
+            let newAnn = worldMeta.annotations.get(newCell);
+            if (!newAnn) {
+              newAnn = { poi: [], factions: [] };
+              worldMeta.annotations.set(newCell, newAnn);
+            }
+            if (!newAnn.factions) newAnn.factions = [];
+            if (!newAnn.factions.some((f) => f.name === fp.factionName)) {
+              newAnn.factions.push({ name: fp.factionName });
+            }
+            newAnn.fieldCamp = true;
+            fp.cell = newCell;
+          };
+
           const motiveVerb = (motive) =>
             String(motive || "")
               .trim()
@@ -4896,6 +4945,32 @@
             if (!loc) return null;
             return { verb, ...loc };
           });
+
+          factionOps.forEach((op, i) => {
+            if (!op) return;
+            const fp = worldMeta.factionPlacements[i];
+            if (!fp) return;
+            const hasFieldCamp = Boolean(
+              worldMeta.annotations.get(fp.cell)?.fieldCamp,
+            );
+            if (!hasFieldCamp) return;
+            const newCampCell = pickFieldCampCellNear(op.cell, fp.cell, 4);
+            relocateFieldCampBase(fp, newCampCell);
+          });
+
+          const factionCellByName = new Map(
+            worldMeta.factionPlacements.map((fp) => [fp.factionName, fp.cell]),
+          );
+          for (const npc of npcs) {
+            const withFactionCell = factionCellByName.get(npc.label);
+            if (npc.prep === "with" && withFactionCell) npc.cell = withFactionCell;
+            const forFactionCell = npc.affiliation
+              ? factionCellByName.get(npc.affiliation.label)
+              : null;
+            if (npc.affiliation?.prep === "for" && forFactionCell) {
+              npc.affiliation.cell = forFactionCell;
+            }
+          }
 
           factionOps.forEach((op, i) => {
             if (!op) return;
