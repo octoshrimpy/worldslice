@@ -2411,6 +2411,7 @@
         "ros",
         "ryn",
         "sat",
+        "sah",
         "ser",
         "sus",
         "set",
@@ -3077,6 +3078,319 @@
         "vault",
         "wayhouse",
       ];
+      const naturalPlaceTypes = [
+        "archipelago",
+        "arena",
+        "atoll",
+        "badlands",
+        "bay",
+        "bluff",
+        "bog",
+        "butte",
+        "caldera",
+        "canyon",
+        "cape",
+        "cascade",
+        "cave",
+        "channel",
+        "chasm",
+        "cliff",
+        "cove",
+        "crater",
+        "crossing",
+        "delta",
+        "dune",
+        "estuary",
+        "fen",
+        "fjord",
+        "ford",
+        "forest",
+        "forge",
+        "geyser",
+        "glacier",
+        "glade",
+        "gorge",
+        "grove",
+        "headland",
+        "hot spring",
+        "icefield",
+        "island",
+        "islet",
+        "isthmus",
+        "lagoon",
+        "lake",
+        "marsh",
+        "meadow",
+        "mesa",
+        "mountain peak",
+        "oasis",
+        "pass",
+        "peninsula",
+        "plateau",
+        "pond",
+        "prairie",
+        "ravine",
+        "reef",
+        "saddle",
+        "salt flat",
+        "shoal",
+        "sinkhole",
+        "spring",
+        "steppe",
+        "strait",
+        "swamp",
+        "thicket",
+        "tundra",
+        "valley",
+        "volcano",
+        "waterfall",
+      ];
+      const manmadePlaceTypes = [
+        "bridge",
+        "camp",
+        "causeway",
+        "cemetery",
+        "dock",
+        "ferry",
+        "fort",
+        "gate",
+        "harbor",
+        "library",
+        "lighthouse",
+        "market",
+        "mine",
+        "monolith",
+        "obelisk",
+        "observatory",
+        "outpost",
+        "quarry",
+        "ridge",
+        "river",
+        "road",
+        "ruins",
+        "sanctum",
+        "shrine",
+        "statue",
+        "stone circle",
+        "tomb",
+        "trail",
+        "vault",
+        "watchtower",
+      ];
+      const PLACE_TYPE_ARCHETYPE = {
+        archipelago: "island_chain",
+        arena: "upland",
+        atoll: "island_chain",
+        badlands: "arid",
+        bay: "coastal",
+        bluff: "upland",
+        bog: "wetland",
+        butte: "upland",
+        caldera: "volcanic",
+        canyon: "upland",
+        cape: "coastal",
+        cascade: "riverine",
+        cave: "upland",
+        channel: "open_water",
+        chasm: "upland",
+        cliff: "upland",
+        cove: "coastal",
+        crater: "upland",
+        crossing: "riverine",
+        delta: "riverine",
+        dune: "arid",
+        estuary: "coastal",
+        fen: "wetland",
+        fjord: "coastal",
+        ford: "riverine",
+        forest: "vegetated",
+        forge: "upland",
+        geyser: "special_geo",
+        glacier: "cold",
+        glade: "vegetated",
+        gorge: "upland",
+        grove: "vegetated",
+        headland: "coastal",
+        "hot spring": "special_geo",
+        icefield: "cold",
+        island: "island_chain",
+        islet: "island_chain",
+        isthmus: "coastal",
+        lagoon: "coastal",
+        lake: "open_water",
+        marsh: "wetland",
+        meadow: "vegetated",
+        mesa: "upland",
+        "mountain peak": "upland",
+        oasis: "arid",
+        pass: "upland",
+        peninsula: "coastal",
+        plateau: "upland",
+        pond: "wetland",
+        prairie: "arid",
+        ravine: "upland",
+        reef: "coastal",
+        saddle: "upland",
+        "salt flat": "arid",
+        shoal: "coastal",
+        sinkhole: "special_geo",
+        spring: "wetland",
+        steppe: "arid",
+        strait: "open_water",
+        swamp: "wetland",
+        thicket: "vegetated",
+        tundra: "cold",
+        valley: "upland",
+        volcano: "volcanic",
+        waterfall: "riverine",
+        bridge: "riverine",
+        camp: "manmade_landmark",
+        causeway: "riverine",
+        cemetery: "manmade_landmark",
+        dock: "coastal",
+        ferry: "riverine",
+        fort: "manmade_landmark",
+        gate: "manmade_landmark",
+        harbor: "coastal",
+        library: "manmade_landmark",
+        lighthouse: "coastal",
+        market: "manmade_landmark",
+        mine: "upland",
+        monolith: "manmade_landmark",
+        obelisk: "manmade_landmark",
+        observatory: "upland",
+        outpost: "manmade_landmark",
+        quarry: "upland",
+        ridge: "upland",
+        river: "riverine",
+        road: "manmade_landmark",
+        ruins: "manmade_landmark",
+        sanctum: "manmade_landmark",
+        shrine: "manmade_landmark",
+        statue: "manmade_landmark",
+        "stone circle": "manmade_landmark",
+        tomb: "manmade_landmark",
+        trail: "manmade_landmark",
+        vault: "manmade_landmark",
+        watchtower: "manmade_landmark",
+      };
+      const PLACE_TYPE_SET = new Set(
+        naturalPlaceTypes.concat(manmadePlaceTypes),
+      );
+      const MANMADE_PLACE_TYPE_SET = new Set(manmadePlaceTypes);
+      const MOUNTAIN_PLACE_NOUNS = ["ascent", "summit", "crown"];
+      const DEFAULT_PLACE_NOUNS = [
+        "bargain",
+        "bend",
+        "blessing",
+        "bloom",
+        "blossom",
+        "breach",
+        "bridge",
+        "burden",
+        "calm",
+        "claim",
+        "curse",
+        "divide",
+        "drift",
+        "ember",
+        "fall",
+        "fallow",
+        "feast",
+        "fire",
+        "fold",
+        "folly",
+        "gift",
+        "grace",
+        "grave",
+        "harrow",
+        "haven",
+        "hollow",
+        "hope",
+        "knot",
+        "lament",
+        "leap",
+        "light",
+        "mercy",
+        "mourning",
+        "oath",
+        "peace",
+        "pilgrimage",
+        "pledge",
+        "price",
+        "promise",
+        "reckoning",
+        "refuge",
+        "return",
+        "rise",
+        "sacrifice",
+        "sanctum",
+        "scar",
+        "seal",
+        "shadow",
+        "silence",
+        "spark",
+        "stride",
+        "sunder",
+        "thaw",
+        "trace",
+        "trial",
+        "veil",
+        "vigil",
+        "wake",
+        "watch",
+        "wound",
+      ];
+      const RELIGIOUS_NAME_TYPES = new Set([
+        "sanctum",
+        "shrine",
+        "tomb",
+        "cemetery",
+        "stone circle",
+        "obelisk",
+        "monolith",
+        "library",
+        "vault",
+      ]);
+      const HARSH_NAME_TYPES = new Set([
+        "badlands",
+        "ruins",
+        "ravine",
+        "chasm",
+        "crater",
+        "sinkhole",
+        "volcano",
+      ]);
+      const DEDICATION_NAME_TYPES = new Set([
+        "badlands",
+        "ravine",
+        "chasm",
+        "crater",
+        "sinkhole",
+        "volcano",
+        "mountain peak",
+      ]);
+      const RELIGIOUS_BIAS_NOUNS = ["oath", "vigil", "mercy", "sacrifice", "seal"];
+      const HARSH_BIAS_NOUNS = ["reckoning", "wound", "scar", "mourning", "curse"];
+
+      function titleCaseWords(s) {
+        return String(s || "")
+          .split(" ")
+          .map((w) =>
+            w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : w,
+          )
+          .join(" ");
+      }
+
+      function choosePoiNoun(r, poiType, ctx = {}) {
+        const type = String(poiType || "").toLowerCase();
+        const isMountainous = !!ctx.isMountainous;
+        const useMountainPool = isMountainous && r() < 0.7;
+        let pool = useMountainPool ? MOUNTAIN_PLACE_NOUNS : DEFAULT_PLACE_NOUNS;
+        if (RELIGIOUS_NAME_TYPES.has(type) && r() < 0.65) pool = RELIGIOUS_BIAS_NOUNS;
+        if (HARSH_NAME_TYPES.has(type) && r() < 0.65) pool = HARSH_BIAS_NOUNS;
+        return rngUtil.oneOf(r, pool) || "watch";
+      }
 
       const biomeFeaturesByName = (() => {
         const out = {};
@@ -3391,15 +3705,36 @@
         return template.build(r, L);
       }
 
-      function namedPOI(nameGen, poiType) {
+      function namedPOI(nameGen, poiType, namingContext = null) {
         const r = nameGen.r;
-        const style = (r() * 4) | 0;
+        const style = (r() * 5) | 0;
         const base = nameGen.placeName();
-        if (style === 0) return `${base} ${poiType}`;
-        if (style === 1) return `The ${poiType} of ${base}`;
+        const rawType = String(poiType || "").trim();
+        const typeLabel = titleCaseWords(rawType || "Place");
+        const lowerType = rawType.toLowerCase();
+        const noun = choosePoiNoun(r, poiType, namingContext || {});
+        const pickDedicationName = () => {
+          const usePersonName = r() < 0.5;
+          if (usePersonName) return nameGen.npcName();
+          const nearby = String(namingContext?.nearbyLocationName || "").trim();
+          if (nearby && r() < 0.65) return nearby;
+          return nameGen.placeName();
+        };
+        const dedicationStyle =
+          lowerType.includes("ruins") || DEDICATION_NAME_TYPES.has(lowerType);
+        if (dedicationStyle) {
+          const dedication = pickDedicationName();
+          if (style <= 2)
+            return `The ${noun.charAt(0).toUpperCase() + noun.slice(1)} of ${dedication}`;
+          if (style === 3) return `${dedication}'s ${noun}`;
+          return `${noun.charAt(0).toUpperCase() + noun.slice(1)} of ${dedication}`;
+        }
+        if (style === 0) return `${base} ${typeLabel}`;
+        if (style === 1) return `The ${typeLabel} of ${base}`;
         if (style === 2)
-          return `${poiType.charAt(0).toUpperCase() + poiType.slice(1)} at ${base}`;
-        return `${base}'s ${poiType}`;
+          return `${noun.charAt(0).toUpperCase() + noun.slice(1)} of ${base}`;
+        if (style === 3) return `${base}'s ${noun}`;
+        return `The ${noun} ${typeLabel}`;
       }
 
       function poiIsStructure(poiType) {
@@ -3574,17 +3909,25 @@
           factions,
           rText,
           biome,
+          placementContext = {},
         ) {
           const r = rngUtil.xs32(seedU32 ^ 0xa53c9e17);
+          const depthGrid = placementContext.depthGrid || null;
+          const heightGrid = placementContext.heightGrid || null;
+          const roadCells = placementContext.roadCells || new Set();
+          const riverCellsSet = placementContext.river || new Set();
+          const climate = placementContext.climate || null;
 
           const settlements = [];
           const land = [];
           const ruinsCells = [];
+          const allCells = [];
 
           for (let y = 0; y < N; y++) {
             for (let x = 0; x < N; x++) {
               const k = tileKeyGrid[y][x];
               const key = `${x},${y}`;
+              allCells.push(key);
               if (k !== "water" && k !== "lava") land.push(key);
               if (k === "settlement" || k === "fungal-settlement")
                 settlements.push(key);
@@ -3599,6 +3942,9 @@
 
           const settlementOrder = rngUtil.shuffleDet(r, settlements);
           const landOrder = rngUtil.shuffleDet(r, land);
+          const allOrder = rngUtil.shuffleDet(r, allCells);
+          const settlementSet = new Set(settlements);
+          const ruinsSet = new Set(ruinsCells);
 
           const nameGen = new NameGenerator(rText);
           const settlementNames = this.buildSettlementNames(
@@ -3641,14 +3987,231 @@
             if (r() < ruinsRarity * 0.6) ruinCount += 1;
           }
 
+          const parseXY = (cell) => {
+            const [sx, sy] = String(cell || "").split(",");
+            const x = Number(sx);
+            const y = Number(sy);
+            if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+            return { x, y };
+          };
+          const tileAt = (x, y) => {
+            if (x < 0 || y < 0 || x >= N || y >= N) return "";
+            return tileKeyGrid[y][x];
+          };
+          const neighbors = (x, y) => Array.from(GridMath.neighbors8(N, x, y));
+          const anyNeighbor = (x, y, pred) => {
+            for (const [nx, ny] of neighbors(x, y)) {
+              if (pred(nx, ny)) return true;
+            }
+            return false;
+          };
+          const isLiquid = (k) => k === "water" || k === "lava";
+          const cellTraits = (cell) => {
+            const p = parseXY(cell);
+            if (!p) return null;
+            const k = tileAt(p.x, p.y);
+            const d = GridMath.clamp(depthGrid?.[p.y]?.[p.x] || 1, 1, 3);
+            const h = GridMath.clamp(heightGrid?.[p.y]?.[p.x] || 1, 1, 5);
+            const nWater = anyNeighbor(p.x, p.y, (nx, ny) => tileAt(nx, ny) === "water");
+            const nRiver = riverCellsSet.has(cell) || anyNeighbor(p.x, p.y, (nx, ny) => riverCellsSet.has(`${nx},${ny}`));
+            const nMountain = anyNeighbor(p.x, p.y, (nx, ny) => tileAt(nx, ny) === "mountain");
+            const nForest = anyNeighbor(p.x, p.y, (nx, ny) => tileAt(nx, ny) === "forest");
+            const nRoad = roadCells.has(cell) || anyNeighbor(p.x, p.y, (nx, ny) => roadCells.has(`${nx},${ny}`));
+            const nSettlement =
+              settlementSet.has(cell) ||
+              anyNeighbor(p.x, p.y, (nx, ny) => settlementSet.has(`${nx},${ny}`));
+            const nRuins =
+              ruinsSet.has(cell) ||
+              anyNeighbor(p.x, p.y, (nx, ny) => {
+                const kk = tileAt(nx, ny);
+                return (
+                  kk === "ruins" ||
+                  kk === "overgrown-ruins" ||
+                  kk === "fungal-ruins"
+                );
+              });
+            return {
+              x: p.x,
+              y: p.y,
+              cell,
+              tileKey: k,
+              depth: d,
+              height: h,
+              nearWater: nWater,
+              nearRiver: nRiver,
+              nearMountain: nMountain,
+              nearForest: nForest,
+              nearRoad: nRoad,
+              nearSettlement: nSettlement,
+              nearRuins: nRuins,
+              cold: Number.isFinite(climate?.tempTier) && climate.tempTier <= 3,
+              wet: Number.isFinite(climate?.rainIdx) && climate.rainIdx >= 5,
+              arid: Number.isFinite(climate?.rainIdx) && climate.rainIdx <= 2,
+            };
+          };
+          const matchArchetype = (poiType, traits) => {
+            if (!traits) return false;
+            const type = String(poiType || "").toLowerCase();
+            const archetype = PLACE_TYPE_ARCHETYPE[type] || null;
+            if (!archetype) return !isLiquid(traits.tileKey);
+            const isLand = !isLiquid(traits.tileKey);
+            const isWater = traits.tileKey === "water";
+            const isCoast = isLand && traits.nearWater;
+            const isUpland =
+              traits.tileKey === "mountain" ||
+              traits.tileKey === "stone" ||
+              traits.height >= 3 ||
+              traits.nearMountain;
+            const isVegetated =
+              traits.tileKey === "forest" ||
+              traits.tileKey === "grass" ||
+              traits.tileKey === "mycelium";
+            const isWetland =
+              isLand &&
+              (traits.tileKey === "mycelium" ||
+                (traits.nearWater &&
+                  (traits.wet ||
+                    traits.tileKey === "grass" ||
+                    traits.tileKey === "forest" ||
+                    traits.tileKey === "plains")));
+            const isArid =
+              isLand &&
+              (traits.tileKey === "desert" ||
+                traits.tileKey === "beach" ||
+                traits.tileKey === "stone" ||
+                traits.arid);
+            switch (archetype) {
+              case "open_water":
+                return isWater && traits.depth >= 2;
+              case "coastal":
+                return isCoast || (isWater && traits.depth === 1);
+              case "island_chain":
+                return (
+                  (isLand && traits.nearWater && !traits.nearMountain) ||
+                  (isWater && traits.depth === 1)
+                );
+              case "riverine":
+                if (type === "ferry")
+                  return (
+                    (isLand && traits.nearWater) || (isWater && traits.depth <= 2)
+                  );
+                return traits.nearRiver || (isWater && traits.depth <= 2);
+              case "wetland":
+                return isWetland;
+              case "arid":
+                return isArid;
+              case "upland":
+                return isUpland && isLand;
+              case "cold":
+                return traits.cold && isLand;
+              case "vegetated":
+                if (type === "grove")
+                  return (
+                    isLand &&
+                    (traits.tileKey === "forest" || traits.nearForest)
+                  );
+                return isVegetated && isLand;
+              case "volcanic":
+                return (
+                  traits.tileKey === "lava" ||
+                  (traits.tileKey === "mountain" && traits.height >= 4)
+                );
+              case "special_geo":
+                return (
+                  (isUpland && traits.nearWater) ||
+                  (isLand && traits.nearWater && traits.nearMountain)
+                );
+              case "manmade_landmark":
+                return (
+                  isLand &&
+                  (traits.nearRoad || traits.nearSettlement || traits.nearRuins)
+                );
+              default:
+                return isLand;
+            }
+          };
+          const pickFallbackPoiCell = (index, usedCells) =>
+            settlementOrder[index] ||
+            landOrder[index] ||
+            allOrder.find((c) => !usedCells.has(c)) ||
+            `${(seedU32 % N) | 0},${((seedU32 >>> 8) % N) | 0}`;
+          const pickPoiCellForType = (poiType, index, usedCells) => {
+            const type = String(poiType || "").toLowerCase();
+            if (!PLACE_TYPE_SET.has(type)) return pickFallbackPoiCell(index, usedCells);
+            const manmade = MANMADE_PLACE_TYPE_SET.has(type);
+            const best = [];
+            const okay = [];
+            for (const cell of allOrder) {
+              if (usedCells.has(cell)) continue;
+              const traits = cellTraits(cell);
+              if (!matchArchetype(type, traits)) continue;
+              if (manmade) {
+                if (traits?.nearRoad || traits?.nearSettlement) best.push(cell);
+                else okay.push(cell);
+              } else {
+                if (traits?.nearSettlement && r() < 0.6) continue;
+                best.push(cell);
+              }
+            }
+            return (
+              best[0] ||
+              okay[0] ||
+              pickFallbackPoiCell(index, usedCells)
+            );
+          };
+          const namingContextFor = (poiType, cell) => {
+            const traits = cellTraits(cell);
+            const type = String(poiType || "").toLowerCase();
+            const origin = parseXY(cell);
+            const nearestName = (entries, maxDist = 8) => {
+              if (!origin) return null;
+              let bestName = null;
+              let bestDist = Infinity;
+              for (const [locCell, label] of entries) {
+                const lp = parseXY(locCell);
+                if (!lp) continue;
+                const d = Math.abs(origin.x - lp.x) + Math.abs(origin.y - lp.y);
+                if (d < bestDist) {
+                  bestDist = d;
+                  bestName = label;
+                }
+              }
+              if (bestDist > maxDist) return null;
+              return bestName;
+            };
+            const nearbySettlementName = nearestName(
+              Array.from(settlementNameByCell.entries()),
+              8,
+            );
+            const nearbyPoiName = nearestName(
+              poiPlacements.map((p) => [p.cell, p.poiName]),
+              6,
+            );
+            return {
+              isMountainous:
+                !!traits &&
+                (traits.tileKey === "mountain" ||
+                  traits.height >= 4 ||
+                  traits.nearMountain ||
+                  type === "volcano" ||
+                  type === "mountain peak"),
+              isManmade: MANMADE_PLACE_TYPE_SET.has(type),
+              tileKey: traits?.tileKey,
+              depth: traits?.depth,
+              height: traits?.height,
+              nearbyLocationName: nearbySettlementName || nearbyPoiName || null,
+            };
+          };
+          const usedPoiCells = new Set();
           for (let i = 0; i < poiTypesExpanded.length; i++) {
             const poiType = poiTypesExpanded[i];
-            const poiName = namedPOI(nameGen, poiType);
-
-            const cell =
-              settlementOrder[i] ||
-              landOrder[i] ||
-              `${(seedU32 % N) | 0},${((seedU32 >>> 8) % N) | 0}`;
+            const cell = pickPoiCellForType(poiType, i, usedPoiCells);
+            usedPoiCells.add(cell);
+            const poiName = namedPOI(
+              nameGen,
+              poiType,
+              namingContextFor(poiType, cell),
+            );
             poiPlacements.push({ poiType, poiName, cell });
           }
 
@@ -3681,7 +4244,11 @@
                   `${(seedU32 % N) | 0},${((seedU32 >>> 8) % N) | 0}`;
               }
               const poiType = "ruins";
-              const poiName = namedPOI(nameGen, poiType);
+              const poiName = namedPOI(
+                nameGen,
+                poiType,
+                namingContextFor(poiType, cell),
+              );
               poiPlacements.push({ poiType, poiName, cell });
             }
           }
@@ -3859,10 +4426,6 @@
             factions.push({ name, motive });
           }
 
-          const poiTypes = [];
-          for (let i = 0; i < pCount; i++)
-            poiTypes.push(rngUtil.oneOf(r, tt.pois));
-
           const weatherNow = rngUtil.oneOf(r, tt.weather);
 
           const mapSeed = rngUtil.h32(seedStr + "|map|" + theme);
@@ -3873,6 +4436,75 @@
             null,
             climate,
           );
+          const biomeFeatures = biome?.features || {};
+          const biomeLowerName = String(biomeName || "").toLowerCase();
+          const hasFeature = (id, min = 0.2) =>
+            Number.isFinite(biomeFeatures?.[id]) && biomeFeatures[id] >= min;
+          const hasStrongWaterSignal =
+            hasFeature("river-water", 0.15) ||
+            hasFeature("lake", 0.15) ||
+            hasFeature("reef", 0.15) ||
+            hasFeature("lagoon", 0.15) ||
+            /\b(ocean|coast|island|tidal|flood|canal)\b/.test(biomeLowerName);
+          const hasStrongAridSignal =
+            hasFeature("dunes", 0.2) ||
+            hasFeature("oasis", 0.15) ||
+            /\b(desert|badlands|salt|ash)\b/.test(biomeLowerName);
+          const hasStrongUplandSignal =
+            hasFeature("mountain", 0.2) ||
+            hasFeature("ridge", 0.2) ||
+            hasFeature("river-lava", 0.15) ||
+            /\b(highland|crater|valley)\b/.test(biomeLowerName);
+          const placePool = Array.from(PLACE_TYPE_SET).filter((type) => {
+            const archetype = PLACE_TYPE_ARCHETYPE[type];
+            if (!archetype) return true;
+            if (type === "ferry") return hasStrongWaterSignal;
+            switch (archetype) {
+              case "open_water":
+              case "coastal":
+              case "island_chain":
+                return hasStrongWaterSignal;
+              case "riverine":
+                return hasFeature("river-water", 0.15) || hasFeature("river-lava", 0.15);
+              case "wetland":
+                return hasFeature("lagoon", 0.15) || hasFeature("lake", 0.2) || climate.rainIdx >= 4;
+              case "arid":
+                return hasStrongAridSignal || climate.rainIdx <= 3;
+              case "upland":
+              case "volcanic":
+                return hasStrongUplandSignal;
+              case "cold":
+                return climate.tempTier <= 3 || /\b(tundra|taiga|ice)\b/.test(biomeLowerName);
+              case "vegetated":
+                return climate.rainIdx >= 3 && !hasStrongAridSignal;
+              case "special_geo":
+                return hasStrongUplandSignal && hasStrongWaterSignal;
+              case "manmade_landmark":
+                return true;
+              default:
+                return true;
+            }
+          });
+          const shuffledPlacePool = rngUtil.shuffleDet(
+            r,
+            placePool.length ? placePool : Array.from(PLACE_TYPE_SET),
+          );
+          const legacyPois = CoreUtils.ensure(tt.pois, []);
+          const poiTypes = [];
+          let poolIdx = 0;
+          for (let i = 0; i < pCount; i++) {
+            const useLegacy = legacyPois.length && r() < 0.25;
+            if (useLegacy) {
+              poiTypes.push(rngUtil.oneOf(r, legacyPois));
+              continue;
+            }
+            if (!shuffledPlacePool.length) {
+              poiTypes.push(rngUtil.oneOf(r, legacyPois) || "outpost");
+              continue;
+            }
+            poiTypes.push(shuffledPlacePool[poolIdx % shuffledPlacePool.length]);
+            poolIdx++;
+          }
           const landCells = [];
           for (let y = 0; y < map0.N; y++) {
             for (let x = 0; x < map0.N; x++) {
@@ -3889,6 +4521,13 @@
             factions,
             r,
             biomeName,
+            {
+              depthGrid: map0.depthGrid,
+              heightGrid: map0.heightGrid,
+              roadCells: map0.roadCells,
+              river: map0.river,
+              climate,
+            },
           );
           const settlementEntries = Array.from(
             worldMeta.settlementNameByCell.entries(),
