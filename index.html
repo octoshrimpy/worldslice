@@ -3165,9 +3165,6 @@
         "outpost",
         "quarry",
         "ridge",
-        "river",
-        "road",
-        "ruins",
         "sanctum",
         "shrine",
         "statue",
@@ -3317,7 +3314,6 @@
         "peace",
         "pilgrimage",
         "pledge",
-        "price",
         "promise",
         "reckoning",
         "refuge",
@@ -3331,7 +3327,6 @@
         "silence",
         "spark",
         "stride",
-        "sunder",
         "thaw",
         "trace",
         "trial",
@@ -3711,30 +3706,82 @@
         const base = nameGen.placeName();
         const rawType = String(poiType || "").trim();
         const typeLabel = titleCaseWords(rawType || "Place");
+        const typeNoun = (rawType || "place").toLowerCase();
         const lowerType = rawType.toLowerCase();
         const noun = choosePoiNoun(r, poiType, namingContext || {});
+        const nounCap = noun.charAt(0).toUpperCase() + noun.slice(1);
+        const capFirst = (s) => {
+          const t = String(s || "").trim();
+          if (!t) return t;
+          return t.charAt(0).toUpperCase() + t.slice(1);
+        };
+        const possessiveOf = (s) => {
+          const n = String(s || "").trim();
+          if (!n) return "Unknown's";
+          return /s$/i.test(n) ? `${n}'` : `${n}'s`;
+        };
+        const sentenceCaseDedication = (s) => {
+          const n = String(s || "").trim();
+          if (!n) return n;
+          const parts = n.split(/\s+/);
+          if (parts.length >= 2) {
+            const tail2 = `${parts[parts.length - 2]} ${parts[parts.length - 1]}`.toLowerCase();
+            if (PLACE_TYPE_SET.has(tail2)) {
+              parts[parts.length - 2] = parts[parts.length - 2].toLowerCase();
+              parts[parts.length - 1] = parts[parts.length - 1].toLowerCase();
+              return parts.join(" ");
+            }
+          }
+          const tail1 = parts[parts.length - 1].toLowerCase();
+          if (PLACE_TYPE_SET.has(tail1)) {
+            parts[parts.length - 1] = parts[parts.length - 1].toLowerCase();
+          }
+          return parts.join(" ");
+        };
         const pickDedicationName = () => {
+          const mountainishLabel = (s) =>
+            /\b(mount|mountain|peak|peaks|ridge|summit|pass|range|cliff|cliffs|spire|crown)\b/i.test(
+              String(s || ""),
+            );
+          const allowsMountainLabel = !!namingContext?.isMountainous;
+          const allowed = (s) =>
+            !!String(s || "").trim() &&
+            (allowsMountainLabel || !mountainishLabel(s));
           const usePersonName = r() < 0.5;
           if (usePersonName) return nameGen.npcName();
           const nearby = String(namingContext?.nearbyLocationName || "").trim();
-          if (nearby && r() < 0.65) return nearby;
-          return nameGen.placeName();
+          if (nearby && r() < 0.65 && allowed(nearby)) return nearby;
+          for (let i = 0; i < 3; i++) {
+            const generated = nameGen.placeName();
+            if (allowed(generated)) return generated;
+          }
+          return nameGen.npcName();
         };
-        const dedicationStyle =
-          lowerType.includes("ruins") || DEDICATION_NAME_TYPES.has(lowerType);
-        if (dedicationStyle) {
-          const dedication = pickDedicationName();
-          if (style <= 2)
-            return `The ${noun.charAt(0).toUpperCase() + noun.slice(1)} of ${dedication}`;
-          if (style === 3) return `${dedication}'s ${noun}`;
-          return `${noun.charAt(0).toUpperCase() + noun.slice(1)} of ${dedication}`;
+        const ruinStyle = lowerType.includes("ruins");
+        if (ruinStyle) {
+          const dedication = sentenceCaseDedication(pickDedicationName());
+          const ruinWord = r() < 0.65 ? "ruins" : "ruin";
+          const ruinWordCap = ruinWord.charAt(0).toUpperCase() + ruinWord.slice(1);
+          if (style === 0) return capFirst(`${ruinWordCap} of ${dedication}`);
+          if (style === 1) return capFirst(`${possessiveOf(dedication)} ${ruinWordCap}`);
+          if (style === 2) return capFirst(`${ruinWordCap} at ${dedication}`);
+          if (style === 3) return capFirst(`${dedication} ${ruinWord}`);
+          return capFirst(`${nounCap} ${ruinWord} of ${dedication}`);
         }
-        if (style === 0) return `${base} ${typeLabel}`;
-        if (style === 1) return `The ${typeLabel} of ${base}`;
-        if (style === 2)
-          return `${noun.charAt(0).toUpperCase() + noun.slice(1)} of ${base}`;
-        if (style === 3) return `${base}'s ${noun}`;
-        return `The ${noun} ${typeLabel}`;
+        const dedicationStyle = DEDICATION_NAME_TYPES.has(lowerType);
+        if (dedicationStyle) {
+          const dedication = sentenceCaseDedication(pickDedicationName());
+          if (style === 0) return capFirst(`${possessiveOf(dedication)} ${nounCap}`);
+          if (style === 1) return capFirst(`${nounCap} at ${dedication}`);
+          if (style === 2) return capFirst(`${dedication} ${nounCap}`);
+          if (style === 3) return capFirst(`${nounCap} of ${dedication}`);
+          return capFirst(`${nounCap} near ${dedication}`);
+        }
+        if (style === 0) return capFirst(`${base} ${typeLabel}`);
+        if (style === 1) return capFirst(`${typeNoun} of ${base}`);
+        if (style === 2) return capFirst(`${nounCap} of ${base}`);
+        if (style === 3) return capFirst(`${base}'s ${noun}`);
+        return capFirst(`${nounCap} ${typeNoun}`);
       }
 
       function poiIsStructure(poiType) {
@@ -4379,6 +4426,49 @@
           placeReligious("death", deathCount);
           placeReligious("monastery", monasteryCount);
 
+          const uniqueHighestMountainCell = (() => {
+            let bestCell = null;
+            let bestHeight = -Infinity;
+            let bestCount = 0;
+            for (let y = 0; y < N; y++) {
+              for (let x = 0; x < N; x++) {
+                if (tileKeyGrid[y][x] !== "mountain") continue;
+                const h = GridMath.clamp(heightGrid?.[y]?.[x] || 1, 1, 5);
+                if (h > bestHeight) {
+                  bestHeight = h;
+                  bestCell = `${x},${y}`;
+                  bestCount = 1;
+                } else if (h === bestHeight) {
+                  bestCount++;
+                }
+              }
+            }
+            return bestCount === 1 ? bestCell : null;
+          })();
+          if (uniqueHighestMountainCell) {
+            const hasPeakPoi = poiPlacements.some(
+              (p) =>
+                p.cell === uniqueHighestMountainCell &&
+                String(p.poiType || "").toLowerCase() === "mountain peak",
+            );
+            if (!hasPeakPoi) {
+              const poiType = "mountain peak";
+              const poiName = namedPOI(
+                nameGen,
+                poiType,
+                namingContextFor(poiType, uniqueHighestMountainCell),
+              );
+              const o = ensureCell(uniqueHighestMountainCell);
+              o.poi.push({ name: poiName, type: poiType, hiddenOnMap: true });
+              poiPlacements.push({
+                poiType,
+                poiName,
+                cell: uniqueHighestMountainCell,
+                hiddenOnMap: true,
+              });
+            }
+          }
+
           return {
             annotations: ann,
             poiPlacements,
@@ -4654,24 +4744,34 @@
             };
           };
 
-          const pickFactionOpLocation = (avoidCell) => {
-            if (factionOpR() < 0.3) {
-              return {
-                prep: "out in",
-                label: "the wilds",
-                cell: pickLandCellNear(avoidCell, 10),
-              };
-            }
+          const pickFactionNamedLocation = (avoidCell, maxDist = 10) => {
             const pool = [];
             for (const [cell, name] of settlementEntries)
               pool.push({ prep: "in", label: name, cell });
             for (const p of worldMeta.poiPlacements)
               pool.push({ prep: "at", label: p.poiName, cell: p.cell });
             const filtered = pool.filter(
-              (p) => p.cell !== avoidCell && cellDist(p.cell, avoidCell) <= 10,
+              (p) => p.cell !== avoidCell && cellDist(p.cell, avoidCell) <= maxDist,
             );
             if (filtered.length)
               return filtered[(factionOpR() * filtered.length) | 0];
+            const nonBase = pool.filter((p) => p.cell !== avoidCell);
+            if (nonBase.length) return nonBase[(factionOpR() * nonBase.length) | 0];
+            return null;
+          };
+
+          const pickFactionOpLocation = (avoidCell, options = {}) => {
+            const allowWild = options.allowWild !== false;
+            if (allowWild && factionOpR() < 0.3) {
+              return {
+                prep: "out in",
+                label: "the wilds",
+                cell: pickLandCellNear(avoidCell, 10),
+              };
+            }
+            const named = pickFactionNamedLocation(avoidCell, 10);
+            if (named) return named;
+            if (!allowWild) return null;
             return {
               prep: "out in",
               label: "the wilds",
@@ -4768,9 +4868,19 @@
           const factionOps = worldMeta.factionPlacements.map((fp) => {
             const verb = motiveVerb(fp.motive);
             if (!fieldMotiveVerbSet.has(verb)) return null;
+            const hasFieldCamp = Boolean(
+              worldMeta.annotations.get(fp.cell)?.fieldCamp,
+            );
             const roll = factionOpR();
             if (roll > 0.45) {
               if (roll < 0.85) {
+                if (hasFieldCamp) {
+                  const named = pickFactionOpLocation(fp.cell, {
+                    allowWild: false,
+                  });
+                  if (!named) return null;
+                  return { verb, ...named };
+                }
                 return {
                   verb,
                   prep: "out in",
@@ -4780,7 +4890,11 @@
               }
               return null;
             }
-            return { verb, ...pickFactionOpLocation(fp.cell) };
+            const loc = pickFactionOpLocation(fp.cell, {
+              allowWild: !hasFieldCamp,
+            });
+            if (!loc) return null;
+            return { verb, ...loc };
           });
 
           factionOps.forEach((op, i) => {
@@ -7839,7 +7953,7 @@
               tileKey !== "overgrown-ruins" &&
               tileKey !== "fungal-ruins";
             const showPoi =
-              a?.poi?.length &&
+              a?.poi?.some((p) => !p?.hiddenOnMap) &&
               !hasRuinsPoi &&
               !showStructure &&
               !a?.fieldCamp &&
@@ -7866,7 +7980,9 @@
               const ch = pickVariant("ruins", tileset, variantSeed);
               row += `<span data-cell="${x},${y}" data-tile="ruins"${roadAttr}${ferryAttr} data-poi="ruins" title="${title}">${ch}</span>`;
             } else if (showPoi) {
-              const ferryRef = a?.poi?.find((p) => p.type === "ferry");
+              const ferryRef = a?.poi?.find(
+                (p) => p.type === "ferry" && !p?.hiddenOnMap,
+              );
               const ferryPickSeed = ferryRef?.ferryId
                 ? rngUtil.xs32(rngUtil.h32(ferryRef.ferryId))()
                 : null;
